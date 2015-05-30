@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
     'episodes',
 )
 
@@ -91,3 +92,5 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
     Path(BASE_DIR, 'soundscapes/templates'),
 )
+
+CRISPY_TEMPLATE_PACK = 'bootstrap3'

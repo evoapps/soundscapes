@@ -37,7 +37,8 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
         self.assertEquals(len(episode_items), 0)
 
         # Click to bring up a new episode upload form
-        upload_button = self.browser.find_element_by_id('id_upload_episode')
+        nav_bar = self.browser.find_element_by_id('id_nav_bar')
+        upload_button = nav_bar.find_element_by_id('id_new_episode')
         upload_button.click()
         form_locator = (By.TAG_NAME, 'form')
         ec = expected_conditions.presence_of_element_located(form_locator)
