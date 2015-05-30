@@ -5,16 +5,6 @@ from crispy_forms.helper import FormHelper
 from .handlers import get_meta_data
 from .models import Episode
 
-class UpdateEpisodeForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(UpdateEpisodeForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper()
-
-    class Meta:
-        model = Episode
-        fields = ('show', 'released', 'title', 'mp3')
-
 class UploadEpisodeForm(forms.ModelForm):
     look_up_on_save = forms.BooleanField(required = False)
 
@@ -30,7 +20,7 @@ class UploadEpisodeForm(forms.ModelForm):
         episode = super(UploadEpisodeForm, self).save(*args, **kwargs)
 
         if self.cleaned_data['look_up_on_save']:
-            episode.look_up()
+            episode.update()
             episode.save()
 
         return episode

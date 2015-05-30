@@ -1,22 +1,24 @@
 import eyed3
+import soundcloud
+import yaml
 from unipath import Path
 
 from django.conf import settings
 
-def get_meta_data(url_to_episode):
-    episode_location = _resolve_url(url_to_episode)
-    mp3_meta_data = _strip_meta_data(episode_location)
-    return mp3_meta_data
+def get_mp3_meta_data(episode, meta_data_key):
+    path_to_episode = _resolve_media_url(episode.mp3.url)
+    episode_audio = eyed3.load(path_to_episode)
+    return getattr(episode_audio.tag, meta_data_key)
 
-def _resolve_url(url):
+def _resolve_media_url(url):
     relative = Path(url).split_root()[1]
-    absolute = Path(settings.MEDIA_ROOT.parent, relative)
-    return absolute
+    return Path(settings.MEDIA_ROOT.parent, relative)
 
-def _strip_meta_data(file_loc):
-    meta = {}
-    audiofile = eyed3.load(file_loc)
-    meta['show'] = audiofile.tag.artist
-    meta['number'] = audiofile.tag.track_num[0]
-    meta['name'] = audiofile.tag.title
-    return meta
+def connect_to_soundcloud():
+    path_to_soundcloud_secrets = Path(settings.BASE_DIR,
+                                      'soundscapes/secrets.yml')
+
+    with open(path_to_soundcloud_secrets, 'rb') as creds_handle:
+        creds = yaml.load(creds_handle)
+
+    return soundcloud.Client(client_id = creds['client_id'])
