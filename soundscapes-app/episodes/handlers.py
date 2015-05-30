@@ -18,5 +18,5 @@ def _strip_meta_data(file_loc):
     audiofile = eyed3.load(file_loc)
     meta['show'] = audiofile.tag.artist
     meta['number'] = audiofile.tag.track_num[0]
-    meta['name'] = audiofile.tag.name
+    meta['name'] = audiofile.tag.title
     return meta
