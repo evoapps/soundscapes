@@ -1,0 +1,10 @@
+# Python files
+*.pyc
+
+# App files
+*.sqlite
+/static/
+/media/
+
+# OS files
+.DS_Store
