@@ -1,3 +1,5 @@
+from django.views.generic import ListView
 from django.shortcuts import render
 
-# Create your views here.
+class EpisodeListView(ListView):
+    pass
