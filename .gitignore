@@ -2,7 +2,7 @@
 *.pyc
 
 # App files
-*.sqlite
+*.sqlite3
 /static/
 /media/
 
