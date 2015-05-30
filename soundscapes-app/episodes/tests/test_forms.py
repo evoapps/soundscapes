@@ -26,5 +26,4 @@ class EpisodeFormTest(TestCase):
             self.assertTrue(form.is_valid())
             episode = form.save()
 
-        self.assertEquals(episode.number, 26)
         self.assertEquals(episode.show.name, 'Reply All')

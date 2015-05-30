@@ -16,3 +16,6 @@ class EpisodeFormView(FormView):
     def form_valid(self, form):
         form.save()
         return super(EpisodeFormView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        print 'invalid form. errors:', form.errors

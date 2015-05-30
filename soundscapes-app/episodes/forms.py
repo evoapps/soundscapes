@@ -13,9 +13,10 @@ class UpdateEpisodeForm(forms.ModelForm):
 
     class Meta:
         model = Episode
-        fields = ('show', 'number', 'name', 'mp3')
+        fields = ('show', 'released', 'title', 'mp3')
 
 class UploadEpisodeForm(forms.ModelForm):
+    look_up_on_save = forms.BooleanField(required = False)
 
     def __init__(self, *args, **kwargs):
         super(UploadEpisodeForm, self).__init__(*args, **kwargs)
@@ -28,11 +29,8 @@ class UploadEpisodeForm(forms.ModelForm):
     def save(self, *args, **kwargs):
         episode = super(UploadEpisodeForm, self).save(*args, **kwargs)
 
-        meta_data = get_meta_data(episode.mp3.url)
-        update_episode_form = UpdateEpisodeForm(instance = episode,
-                                                data = meta_data)
-
-        if update_episode_form.is_valid():
-            episode = update_episode_form.save()
+        if self.cleaned_data['look_up_on_save']:
+            episode.look_up()
+            episode.save()
 
         return episode
