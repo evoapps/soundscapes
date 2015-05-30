@@ -94,3 +94,6 @@ TEMPLATE_DIRS = (
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = Path(ROOT_DIR, 'media')
