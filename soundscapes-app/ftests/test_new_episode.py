@@ -49,7 +49,7 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
         path_to_new_episode = Path(
             settings.BASE_DIR,
             'ftests/fixtures/sample_episode_to_upload.mp3')
-        upload_field = episode_form.find_element_by_id('id_episode_file')
+        upload_field = episode_form.find_element_by_id('id_mp3')
         upload_field.send_keys(path_to_new_episode)
         episode_form.submit()
 
