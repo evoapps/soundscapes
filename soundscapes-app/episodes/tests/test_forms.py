@@ -9,7 +9,7 @@ from episodes.forms import UploadEpisodeForm
 
 TEST_MEDIA_ROOT = Path(settings.MEDIA_ROOT + '-test')
 
-@override_settings(MEDIA_ROOT = TEST_MEDIA_ROOT)
+@override_settings(MEDIA_ROOT = TEST_MEDIA_ROOT, MEDIA_URL = '/media-test/')
 class EpisodeFormTest(TestCase):
 
     def tearDown(self):

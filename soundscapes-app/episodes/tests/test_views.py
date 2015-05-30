@@ -14,7 +14,7 @@ from episodes.views import EpisodeListView
 
 TEST_MEDIA_ROOT = Path(settings.MEDIA_ROOT + '-test')
 
-@override_settings(MEDIA_ROOT = TEST_MEDIA_ROOT)
+@override_settings(MEDIA_ROOT = TEST_MEDIA_ROOT, MEDIA_URL = '/media-test/')
 class EpisodeViewTest(TestCase):
 
     def tearDown(self):
