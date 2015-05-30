@@ -58,7 +58,7 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
         # Upload a new episode
         episode_form = self.browser.find_element_by_tag_name('form')
         path_to_new_episode = Path(settings.BASE_DIR, 'ftests/fixtures',
-                                   'sample_episode_to_upload.mp3')
+                                   'reply-all-26.mp3')
         upload_field = episode_form.find_element_by_id('id_mp3')
         upload_field.send_keys(path_to_new_episode)
         episode_form.submit()
@@ -71,3 +71,8 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
         # The new episode is present in the list
         episode_items = self.get_episodes_in_list()
         self.assertEquals(len(episode_items), 1)
+
+        # Correct meta data was extracted from the mp3 file
+        episode = episode_items[0]
+        show_name = episode.find_element_by_id('id_show_name').text
+        self.assertEquals(show_name, 'Reply All')

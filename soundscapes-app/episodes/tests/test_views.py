@@ -34,8 +34,9 @@ class EpisodeViewTest(TestCase):
         self.assertIsInstance(form, UploadEpisodeForm)
 
     def test_post_new_episode_via_episode_form(self):
-        path_to_new_episode = Path(settings.BASE_DIR, 'ftests/fixtures',
-                                   'sample_episode_to_upload.mp3')
+        path_to_new_episode = Path(settings.BASE_DIR, 'episodes/tests/fixtures',
+                                   'reply-all-26.mp3')
+
         with open(path_to_new_episode, 'rb') as episode_handle:
             episode_file = File(episode_handle)
             self.client.post(reverse('new_episode'), {'mp3': episode_file})

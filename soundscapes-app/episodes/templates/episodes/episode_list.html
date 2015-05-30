@@ -3,14 +3,20 @@
 {% block body %}
 
   <ul id="id_nav_bar" class="nav nav-pills">
-    <li role="presentation"><a id="id_new_episode" href="{% url 'new_episode' %}">New Episode</a></li>
+    <li role="presentation">
+      <a id="id_new_episode" href="{% url 'new_episode' %}">New Episode</a>
+    </li>
   </ul>
 
   <h1>Episode List</h1>
 
   <ul id="id_episode_list" class="list-group">
     {% for episode in episode_list %}
-      <li class="list-group-item">{{ episode }}</li>
+      <li class="list-group-item">
+        <span id="id_show_name">{{ episode.show.name }}</span>
+        <span id="id_episode_number">#{{ episode.number }}: </span>
+        <span id="id_episode_name">{{ episode.name }}</span>
+      </li>
     {% endfor %}
   </ul>
 
