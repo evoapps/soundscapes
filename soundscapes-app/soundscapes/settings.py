@@ -87,3 +87,7 @@ STATIC_ROOT = Path(ROOT_DIR, 'static')
 STATICFILES_DIRS = (
     Path(BASE_DIR, 'soundscapes/static'),
 )
+
+TEMPLATE_DIRS = (
+    Path(BASE_DIR, 'soundscapes/templates'),
+)
