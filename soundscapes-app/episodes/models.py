@@ -3,11 +3,28 @@ from dateutil import parser
 from django.db import models
 
 from .mp3_handlers import get_mp3_meta_data
-from .soundcloud_handlers import connect_to_soundcloud, search_soundcloud_for
+from .soundcloud_handlers import (connect_to_soundcloud, search_soundcloud_for,
+                                  convert_to_pydatetime)
+
+class ShowManager(models.Manager):
+
+    def create_from_soundcloud_user(self, soundcloud_user, relink = False):
+        show_kwargs = {}
+        show_kwargs['name'] = soundcloud_user.get('username')
+        show_kwargs['soundcloud_id'] = soundcloud_user.get('id')
+        new_show, created = self.get_or_create(**show_kwargs)
+
+        if relink:
+            new_show.link_to_soundcloud()
+            new_show.save()
+
+        return new_show
 
 class Show(models.Model):
-    name = models.CharField(unique = True, max_length = 30)
-    soundcloud_id = models.IntegerField(blank = True, null = True)
+    name = models.CharField(unique=True, max_length=30)
+    soundcloud_id = models.IntegerField(unique=True, blank=True, null=True)
+
+    objects = ShowManager()
 
     def link_to_soundcloud(self):
         soundcloud_user = None
@@ -34,17 +51,30 @@ class Show(models.Model):
 
         for soundcloud_track in soundcloud_tracks:
             if soundcloud_track.id not in soundcloud_track_ids:
-                released = _convert_to_pydatetime(soundcloud_track.created_at)
+                Episode.objects.create_from_soundcloud_track(soundcloud_track)
 
-                episode = Episode(
-                    soundcloud_id = soundcloud_track.id,
-                    title = soundcloud_track.title,
-                    show = self,
-                    released = released,
-                )
-                episode.full_clean()
-                episode.save()
+class EpisodeManager(models.Manager):
 
+    def create_from_soundcloud_track(self, soundcloud_track, relink = False):
+        episode_kwargs = {}
+
+        episode_kwargs['title'] = soundcloud_track.title
+        episode_kwargs['soundcloud_id'] = soundcloud_track.id
+
+        soundcloud_user = soundcloud_track.user
+        show = Show.objects.create_from_soundcloud_user(soundcloud_user)
+        episode_kwargs['show'] = show
+
+        soundcloud_datetime = soundcloud_track.released
+        episode_kwargs['released'] = convert_to_pydatetime(soundcloud_datetime)
+
+        new_episode, _ = self.get_or_create(**episode_kwargs)
+
+        if relink:
+            new_episode.link_to_soundcloud()
+            new_episode.save()
+
+        return new_episode
 
 class Episode(models.Model):
     mp3 = models.FileField(max_length = 200, blank = True, null = True)
@@ -54,6 +84,8 @@ class Episode(models.Model):
     title = models.CharField(max_length = 80, blank = True, null = True)
 
     soundcloud_id = models.IntegerField(blank = True, null = True)
+
+    objects = EpisodeManager()
 
     def link_to_soundcloud(self):
         client = connect_to_soundcloud()
@@ -70,25 +102,12 @@ class Episode(models.Model):
 
         # writes over existing track
         if soundcloud_track:
+
             self.soundcloud_id = soundcloud_track.id
             self.title = soundcloud_track.title
 
             soundcloud_datetime = soundcloud_track.created_at
-            self.released = _convert_to_pydatetime(soundcloud_datetime)
+            self.released = convert_to_pydatetime(soundcloud_datetime)
 
             soundcloud_user = soundcloud_track.user
-            soundcloud_username = soundcloud_user['username']
-            soundcloud_user_id = soundcloud_user['id']
-
-            show, created = Show.objects.get_or_create(
-                name = soundcloud_username,
-                soundcloud_id = soundcloud_user_id)
-
-            if created:
-                show.link_to_soundcloud()
-                show.save()
-
-            self.show = show
-
-def _convert_to_pydatetime(soundcloud_datetime):
-    return parser.parse(soundcloud_datetime)
+            self.show = Show.objects.create_from_soundcloud_user(soundcloud_user)

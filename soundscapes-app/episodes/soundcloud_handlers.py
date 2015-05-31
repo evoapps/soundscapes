@@ -1,5 +1,6 @@
-import yaml
+from dateutil import parser
 import soundcloud
+import yaml
 from unipath import Path
 
 from django.conf import settings
@@ -37,3 +38,6 @@ def _search_for_gimlet(matches):
             break
 
     return found
+
+def convert_to_pydatetime(soundcloud_datetime):
+    return parser.parse(soundcloud_datetime)
