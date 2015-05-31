@@ -1,5 +1,5 @@
-from datetime.datetime import strpftime
-SOUNDCLOUD_DATETIME_FORMT = "%Y/%m/%d %H:%M:%S +0000"
+from datetime import datetime
+SOUNDCLOUD_DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S +0000"
 
 from django.db import models
 
@@ -26,6 +26,28 @@ class Show(models.Model):
 
         if soundcloud_show:
             self.soundcloud_id = soundcloud_show.id
+
+    def pull_episodes_from_soundcloud(self):
+        client = connect_to_soundcloud()
+
+        soundcloud_track_ids = self.episode_set.values_list('id', flat = True)
+
+        api_route = '/users/{id}/tracks'.format(id = self.soundcloud_id)
+        soundcloud_tracks = client.get(api_route)
+
+        for soundcloud_track in soundcloud_tracks:
+            if soundcloud_track.id not in soundcloud_track_ids:
+                released = _convert_to_pydatetime(soundcloud_track.created_at)
+
+                episode = Episode(
+                    soundcloud_id = soundcloud_track.id,
+                    title = soundcloud_track.title,
+                    show = self,
+                    released = released,
+                )
+                episode.full_clean()
+                episode.save()
+
 
 class Episode(models.Model):
     mp3 = models.FileField(max_length = 200, blank = True, null = True)
@@ -57,11 +79,7 @@ class Episode(models.Model):
         if soundcloud_track:
             self.soundcloud_id = soundcloud_track.id
             self.title = soundcloud_track.title
-
-            soundcloud_datetime = soundcloud_track.created_at
-            py_datetime = strpftime(soundcloud_datetime,
-                                    SOUNDCLOUD_DATETIME_FORMAT)
-            self.released = py_datetime
+            self.released = _convert_to_pydatetime(soundcloud_track.created_at)
 
             show_name = soundcloud_track.artist
             show, created = Show.objects.get_or_create(name = show_name)
@@ -71,3 +89,6 @@ class Episode(models.Model):
                 show.save()
 
             self.show = show
+
+def _convert_to_pydatetime(soundcloud_datetime):
+    return datetime.strptime(soundcloud_datetime, SOUNDCLOUD_DATETIME_FORMAT)

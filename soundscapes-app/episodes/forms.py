@@ -2,7 +2,6 @@ from django import forms
 
 from crispy_forms.helper import FormHelper
 
-from .handlers import get_meta_data
 from .models import Episode
 
 class UploadEpisodeForm(forms.ModelForm):
