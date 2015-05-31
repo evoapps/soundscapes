@@ -110,4 +110,5 @@ class Episode(models.Model):
             self.released = convert_to_pydatetime(soundcloud_datetime)
 
             soundcloud_user = soundcloud_track.user
-            self.show = Show.objects.create_from_soundcloud_user(soundcloud_user)
+            self.show = Show.objects.create_from_soundcloud_user(
+                soundcloud_user, relink = True)
