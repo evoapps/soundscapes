@@ -2,7 +2,8 @@ from dateutil import parser
 
 from django.db import models
 
-from .handlers import get_mp3_meta_data, connect_to_soundcloud
+from .mp3_handlers import get_mp3_meta_data
+from .soundcloud_handlers import connect_to_soundcloud
 
 class Show(models.Model):
     name = models.CharField(unique = True, max_length = 30)
