@@ -8,16 +8,12 @@ from .soundcloud_handlers import (connect_to_soundcloud, search_soundcloud_for,
 
 class ShowManager(models.Manager):
 
-    def create_from_soundcloud_user(self, soundcloud_user, relink = False):
+    def create_from_soundcloud_user(self, soundcloud_user):
         show_kwargs = {}
         show_kwargs['name'] = soundcloud_user.get('username')
         show_kwargs['soundcloud_id'] = soundcloud_user.get('id')
+
         new_show, created = self.get_or_create(**show_kwargs)
-
-        if relink:
-            new_show.link_to_soundcloud()
-            new_show.save()
-
         return new_show
 
 class Show(models.Model):
@@ -55,7 +51,7 @@ class Show(models.Model):
 
 class EpisodeManager(models.Manager):
 
-    def create_from_soundcloud_track(self, soundcloud_track, relink = False):
+    def create_from_soundcloud_track(self, soundcloud_track):
         episode_kwargs = {}
 
         episode_kwargs['title'] = soundcloud_track.title
@@ -69,11 +65,6 @@ class EpisodeManager(models.Manager):
         episode_kwargs['released'] = convert_to_pydatetime(soundcloud_datetime)
 
         new_episode, _ = self.get_or_create(**episode_kwargs)
-
-        if relink:
-            new_episode.link_to_soundcloud()
-            new_episode.save()
-
         return new_episode
 
 class Episode(models.Model):
@@ -110,5 +101,4 @@ class Episode(models.Model):
             self.released = convert_to_pydatetime(soundcloud_datetime)
 
             soundcloud_user = soundcloud_track.user
-            self.show = Show.objects.create_from_soundcloud_user(
-                soundcloud_user, relink = True)
+            self.show = Show.objects.create_from_soundcloud_user(soundcloud_user)
