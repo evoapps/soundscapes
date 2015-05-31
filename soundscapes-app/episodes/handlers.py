@@ -5,8 +5,8 @@ from unipath import Path
 
 from django.conf import settings
 
-def get_mp3_meta_data(episode, meta_data_key):
-    path_to_episode = _resolve_media_url(episode.mp3.url)
+def get_mp3_meta_data(episode_media_url, meta_data_key):
+    path_to_episode = _resolve_media_url(episode_media_url)
     episode_audio = eyed3.load(path_to_episode)
     return getattr(episode_audio.tag, meta_data_key)
 

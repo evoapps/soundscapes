@@ -18,7 +18,7 @@ class EpisodeModelsTest(TestCase):
         TEST_MEDIA_ROOT.rmtree()
         super(EpisodeModelsTest, self).tearDown()
 
-    def test_look_up_episode_info(self):
+    def test_link_to_soundcloud(self):
         path_to_new_episode = Path(settings.BASE_DIR, 'episodes/tests/fixtures',
                                    'reply-all-26.mp3')
 
@@ -27,5 +27,5 @@ class EpisodeModelsTest(TestCase):
             episode = Episode(mp3 = episode_file)
             episode.save()
 
-        episode.update()
+        episode.link_to_soundcloud()
         self.assertEquals(episode.show.name, 'Reply All')

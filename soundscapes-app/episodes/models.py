@@ -1,5 +1,4 @@
-from datetime import datetime
-SOUNDCLOUD_DATETIME_FORMAT = "%Y/%m/%d %H:%M:%S +0000"
+from dateutil import parser
 
 from django.db import models
 
@@ -11,21 +10,27 @@ class Show(models.Model):
 
     def link_to_soundcloud(self):
         client = connect_to_soundcloud()
+        soundcloud_user = None
 
-        soundcloud_show = None
+        if self.soundcloud_id:
+            api_route = '/users/{id}'.format(id = self.soundcloud_id)
+            soundcloud_user = client.get(api_route)
+        else:
+            assert self.name, 'Need name to search with'
+            matching_users = client.get('/users', q = self.name)
+            for match in matching_users:
+                gimlet_in_website = hasattr(match, 'website') and \
+                                    match.website.find('gimlet') > 0
+                # add other match conditions here
 
-        matching_shows = client.get('/users', q = self.name)
-        for match in matching_shows:
-            try:
-                if match.website.find('gimletmedia') > 0:
-                    soundcloud_show = match
+                if gimlet_in_website:
+                    soundcloud_user = match
                     break
-            except AttributeError:
-                # e.g., match.website is None
-                pass
 
-        if soundcloud_show:
-            self.soundcloud_id = soundcloud_show.id
+        # writes over existing show
+        if soundcloud_user:
+            self.name = soundcloud_user.username
+            self.soundcloud_id = soundcloud_user.id
 
     def pull_episodes_from_soundcloud(self):
         client = connect_to_soundcloud()
@@ -60,29 +65,40 @@ class Episode(models.Model):
 
     def link_to_soundcloud(self):
         client = connect_to_soundcloud()
-
-        if not self.title:
-            self.title = get_mp3_meta_data(self.mp3.url, key = 'title')
-
         soundcloud_track = None
 
-        matching_tracks = client.get('/tracks', q = self.title)
-        for match in matching_tracks:
-            try:
-                if match.website.find('gimletmedia') > 0:
+        if self.soundcloud_id:
+            api_route = '/tracks/{id}'.format(id = self.soundcloud_id)
+            soundcloud_track = client.get(api_route)
+        else:
+            if not self.title:
+                self.title = get_mp3_meta_data(self.mp3.url, 'title')
+            assert self.title, 'Need title to search with'
+            matching_tracks = client.get('/tracks', q = self.title)
+            for match in matching_tracks:
+                gimlet_in_tag_list = hasattr(match, 'tag_list') and \
+                                     match.tag_list.find('gimlet') > 0
+                # add other match conditions here
+
+                if gimlet_in_tag_list:
                     soundcloud_track = match
                     break
-            except AttributeError:
-                # e.g., match.website is None
-                pass
 
+        # writes over existing track
         if soundcloud_track:
             self.soundcloud_id = soundcloud_track.id
             self.title = soundcloud_track.title
-            self.released = _convert_to_pydatetime(soundcloud_track.created_at)
 
-            show_name = soundcloud_track.artist
-            show, created = Show.objects.get_or_create(name = show_name)
+            soundcloud_datetime = soundcloud_track.created_at
+            self.released = _convert_to_pydatetime(soundcloud_datetime)
+
+            soundcloud_user = soundcloud_track.user
+            soundcloud_username = soundcloud_user['username']
+            soundcloud_user_id = soundcloud_user['id']
+
+            show, created = Show.objects.get_or_create(
+                name = soundcloud_username,
+                soundcloud_id = soundcloud_user_id)
 
             if created:
                 show.link_to_soundcloud()
@@ -91,4 +107,4 @@ class Episode(models.Model):
             self.show = show
 
 def _convert_to_pydatetime(soundcloud_datetime):
-    return datetime.strptime(soundcloud_datetime, SOUNDCLOUD_DATETIME_FORMAT)
+    return parser.parse(soundcloud_datetime)

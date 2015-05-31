@@ -19,7 +19,7 @@ class UploadEpisodeForm(forms.ModelForm):
         episode = super(UploadEpisodeForm, self).save(*args, **kwargs)
 
         if self.cleaned_data['look_up_on_save']:
-            episode.update()
+            episode.link_to_soundcloud()
             episode.save()
 
         return episode
