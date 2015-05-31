@@ -3,30 +3,21 @@ from dateutil import parser
 from django.db import models
 
 from .mp3_handlers import get_mp3_meta_data
-from .soundcloud_handlers import connect_to_soundcloud
+from .soundcloud_handlers import connect_to_soundcloud, search_soundcloud_for
 
 class Show(models.Model):
     name = models.CharField(unique = True, max_length = 30)
     soundcloud_id = models.IntegerField(blank = True, null = True)
 
     def link_to_soundcloud(self):
-        client = connect_to_soundcloud()
         soundcloud_user = None
 
         if self.soundcloud_id:
             api_route = '/users/{id}'.format(id = self.soundcloud_id)
-            soundcloud_user = client.get(api_route)
+            soundcloud_user = search_soundcloud_for(api_route)
         else:
             assert self.name, 'Need name to search with'
-            matching_users = client.get('/users', q = self.name)
-            for match in matching_users:
-                gimlet_in_website = hasattr(match, 'website') and \
-                                    match.website.find('gimlet') > 0
-                # add other match conditions here
-
-                if gimlet_in_website:
-                    soundcloud_user = match
-                    break
+            soundcloud_user = search_soundcloud_for('/users', q = self.name)
 
         # writes over existing show
         if soundcloud_user:
@@ -70,20 +61,12 @@ class Episode(models.Model):
 
         if self.soundcloud_id:
             api_route = '/tracks/{id}'.format(id = self.soundcloud_id)
-            soundcloud_track = client.get(api_route)
+            soundcloud_track = search_soundcloud_for(api_route)
         else:
             if not self.title:
                 self.title = get_mp3_meta_data(self.mp3.url, 'title')
-            assert self.title, 'Need title to search with'
-            matching_tracks = client.get('/tracks', q = self.title)
-            for match in matching_tracks:
-                gimlet_in_tag_list = hasattr(match, 'tag_list') and \
-                                     match.tag_list.find('gimlet') > 0
-                # add other match conditions here
-
-                if gimlet_in_tag_list:
-                    soundcloud_track = match
-                    break
+                assert self.title, 'Need title to search with'
+            soundcloud_track = search_soundcloud_for('/tracks', q = self.title)
 
         # writes over existing track
         if soundcloud_track:
