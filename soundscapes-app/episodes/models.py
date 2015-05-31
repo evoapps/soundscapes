@@ -1,9 +1,31 @@
+from datetime.datetime import strpftime
+SOUNDCLOUD_DATETIME_FORMT = "%Y/%m/%d %H:%M:%S +0000"
+
 from django.db import models
 
 from .handlers import get_mp3_meta_data, connect_to_soundcloud
 
 class Show(models.Model):
-    name = models.CharField(max_length = 30)
+    name = models.CharField(unique = True, max_length = 30)
+    soundcloud_id = models.IntegerField(blank = True, null = True)
+
+    def link_to_soundcloud(self):
+        client = connect_to_soundcloud()
+
+        soundcloud_show = None
+
+        matching_shows = client.get('/users', q = self.name)
+        for match in matching_shows:
+            try:
+                if match.website.find('gimletmedia') > 0:
+                    soundcloud_show = match
+                    break
+            except AttributeError:
+                # e.g., match.website is None
+                pass
+
+        if soundcloud_show:
+            self.soundcloud_id = soundcloud_show.id
 
 class Episode(models.Model):
     mp3 = models.FileField(max_length = 200, blank = True, null = True)
@@ -12,48 +34,40 @@ class Episode(models.Model):
     released = models.DateTimeField(blank = True, null = True)
     title = models.CharField(max_length = 80, blank = True, null = True)
 
-    soundcloud_track = None
-    soundcloud_track_id = models.IntegerField(blank = True, null = True)
+    soundcloud_id = models.IntegerField(blank = True, null = True)
 
-    def update(self):
-        self.soundcloud_track = self.get_soundcloud_track()
-
-        self.update_show()
-        self.update_released()
-        self.update_title()
-        self.update_soundcloud_track_id()
-
-    def get_soundcloud_track(self):
-        if not self.soundcloud_track_id:
-            track = self.search_for_soundcloud_track()
-        else:
-            client = connect_to_soundcloud()
-            track = client.get('/tracks', id = self.soundcloud_track_id)
-        return track
-
-    def search_for_soundcloud_track(self):
-        if not self.title:
-            self.title = get_mp3_meta_data(self, key = 'title')
-
+    def link_to_soundcloud(self):
         client = connect_to_soundcloud()
+
+        if not self.title:
+            self.title = get_mp3_meta_data(self.mp3.url, key = 'title')
+
+        soundcloud_track = None
+
         matching_tracks = client.get('/tracks', q = self.title)
-        track = matching_tracks[0]
+        for match in matching_tracks:
+            try:
+                if match.website.find('gimletmedia') > 0:
+                    soundcloud_track = match
+                    break
+            except AttributeError:
+                # e.g., match.website is None
+                pass
 
-        return track
+        if soundcloud_track:
+            self.soundcloud_id = soundcloud_track.id
+            self.title = soundcloud_track.title
 
-    def update_show():
-        track = self.soundcloud_track or self.get_soundcloud_track()
-        show, _ = Show.objects.get_or_create(name = track.artist)
-        self.show = show
+            soundcloud_datetime = soundcloud_track.created_at
+            py_datetime = strpftime(soundcloud_datetime,
+                                    SOUNDCLOUD_DATETIME_FORMAT)
+            self.released = py_datetime
 
-    def update_released(soundcloud_track = None):
-        track = self.soundcloud_track or self.get_soundcloud_track()
-        self.released = track.release_date
+            show_name = soundcloud_track.artist
+            show, created = Show.objects.get_or_create(name = show_name)
 
-    def update_title(soundcloud_track = None):
-        track = self.soundcloud_track or self.get_soundcloud_track()
-        self.title = track.title
+            if created:
+                show.link_to_soundcloud()
+                show.save()
 
-    def update_soundcloud_track_id(soundcloud_track = None):
-        track = self.soundcloud_track or self.get_soundcloud_track()
-        self.soundcloud_track_id = track.id
+            self.show = show
