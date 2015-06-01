@@ -19,3 +19,9 @@ class EpisodeViewTest(TestCase):
         response = self.client.get(reverse('show_list'))
         shows = response.context['show_list']
         self.assertEquals(len(shows), num_shows)
+
+    def test_show_create_view_creates_new_shows(self):
+        show = mommy.prepare(Show)
+        post = {'name': show.name, 'rss': show.rss}
+        self.client.post(reverse('new_show'), post)
+        self.assertEquals(Show.objects.last().name, show.name)
