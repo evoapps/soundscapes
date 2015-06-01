@@ -7,6 +7,9 @@ class Show(models.Model):
     name = models.CharField(unique=True, max_length=30)
     rss = models.URLField(unique=True)
 
+    def get_absolute_url(self):
+        return '/shows/{pk}/'.format(pk = self.pk)
+
     def pull_episodes(self):
         episodes = get_entries_in_feed(self.rss)
 

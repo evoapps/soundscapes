@@ -8,21 +8,14 @@ from django.test.utils import override_settings
 
 from model_mommy import mommy
 
-from episodes.models import Episode
-from episodes.views import EpisodeListView
+from episodes.models import Show, Episode
+from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
 
-TEST_MEDIA_ROOT = Path(settings.MEDIA_ROOT + '-test')
-
-@override_settings(MEDIA_ROOT = TEST_MEDIA_ROOT, MEDIA_URL = '/media-test/')
 class EpisodeViewTest(TestCase):
 
-    def tearDown(self):
-        TEST_MEDIA_ROOT.rmtree()
-        super(EpisodeViewTest, self).tearDown()
-
-    def test_episode_list_view_returns_list_of_episodes(self):
-        num_episodes = 10
-        mommy.make(Episode, _quantity = 10)
-        response = self.client.get(reverse('episode_list'))
-        episodes = response.context['episode_list']
-        self.assertEquals(len(episodes), num_episodes)
+    def test_show_list_view_returns_list_of_shows(self):
+        num_shows = 5
+        mommy.make(Show, _quantity = num_shows)
+        response = self.client.get(reverse('show_list'))
+        shows = response.context['show_list']
+        self.assertEquals(len(shows), num_shows)

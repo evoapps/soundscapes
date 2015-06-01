@@ -13,7 +13,7 @@
   <ul id="id_show_list" class="list-group">
     {% for show in show_list %}
       <li class="list-group-item">
-        <span id="id_show_name">{{ show.name }}</span>
+        <a id="id_show_name" href="{{ show.get_absolute_url }}">{{ show.name }}</a>
       </li>
     {% endfor %}
   </ul>
