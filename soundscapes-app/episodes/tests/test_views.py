@@ -27,3 +27,16 @@ class EpisodeViewTest(TestCase):
         post = {'name': show.name, 'rss': show.rss}
         self.client.post(reverse('new_show'), post)
         self.assertEquals(Show.objects.last().name, show.name)
+
+    def test_get_episodes_as_json(self):
+        show = mommy.make(Show)
+        mommy.make(Episode, show = show, _quantity = 5)
+        episode_queryset = show.episode_set.all()
+        expected_json = serializers.serialize('json', episode_queryset)
+
+        url_to_get_episodes = reverse('get_episodes_as_json',
+                                      kwargs = {'pk': show.pk})
+        response_raw = self.client.get(url_to_get_episodes)
+        response_json = json.loads(response_raw._container[0])
+
+        self.assertJSONEqual(response_json, expected_json)
