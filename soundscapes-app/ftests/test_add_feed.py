@@ -8,6 +8,12 @@ from unipath import Path
 
 class AddFeedTest(SoundscapesFunctionalTest):
 
+    def navigate_to_show_list(self):
+        """ Point the browser to the page that lists all of the shows """
+        show_list_relative_url = reverse('show_list')
+        show_list_url = self.live_server_url + show_list_relative_url
+        self.browser.get(show_list_url)
+
     def nav_bar_item(self, item_id):
         nav_bar = self.browser.find_element_by_id('id_nav_bar')
         return nav_bar.find_element_by_id(item_id)
@@ -18,12 +24,17 @@ class AddFeedTest(SoundscapesFunctionalTest):
         SHOW_RSS = 'http://feeds.gimletmedia.com/hearstartup'
 
         self.navigate_to_show_list()
-        self.nav_bar_item('id_new_feed').click()
+        self.nav_bar_item('id_new_show').click()
 
         show_form = self.browser.find_element_by_tag_name('form')
         show_form.find_element_by_id('id_name').send_keys(SHOW_NAME)
         show_form.find_element_by_id('id_rss').send_keys(SHOW_RSS)
         show_form.submit()
+
+        # View a show
+        shows = self.get_items_in_list('id_show_list')
+        show = shows[0]
+        show.find_element_by_id('id_view').click()
 
         # Download episode via show's episodes page
         episodes = self.get_items_in_list('id_episode_list')

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+  <ul id="id_nav_bar" class="nav nav-pills">
+    <li role="presentation">
+      <a id="id_new_show" href="{% url 'new_show' %}">+ Feed</a>
+    </li>
+  </ul>
+
+  <h1>Show List</h1>
+
+  <ul id="id_show_list" class="list-group">
+    {% for show in show_list %}
+      <li class="list-group-item">
+        <span id="id_show_name">{{ show.name }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+
+{% endblock body %}

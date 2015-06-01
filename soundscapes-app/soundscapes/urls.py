@@ -1,11 +1,10 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-urlpatterns = patterns('',
-    # Examples:
-    # url(r'^$', 'soundscapes.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
+from episodes.views import ShowListView, ShowCreateView, EpisodeListView
 
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^episodes/', include('episodes.urls')),
+urlpatterns = patterns('',
+    url(r'^shows/$', ShowListView.as_view(), name = 'show_list'),
+    url(r'^shows/new/$', ShowCreateView.as_view(), name = 'new_show'),
+    url(r'^episodes/$', EpisodeListView.as_view(), name = 'episode_list'),
 )

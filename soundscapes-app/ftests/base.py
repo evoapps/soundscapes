@@ -27,12 +27,6 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
         TEST_MEDIA_ROOT.rmtree()
         super(SoundscapesFunctionalTest, self).tearDown()
 
-    def navigate_to_episode_list(self):
-        """ Point the browser to the page that lists all of the episodes """
-        episode_list_relative_url = reverse('episode_list')
-        episode_list_url = self.live_server_url + episode_list_relative_url
-        self.browser.get(episode_list_url)
-
-    def get_episodes_in_list(self):
-        episode_list = self.browser.find_element_by_id('id_episode_list')
+    def get_items_in_list(self, list_id):
+        episode_list = self.browser.find_element_by_id(list_id)
         return episode_list.find_elements_by_tag_name('li')
