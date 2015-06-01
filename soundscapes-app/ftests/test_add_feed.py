@@ -31,6 +31,9 @@ class AddFeedTest(SoundscapesFunctionalTest):
         show_form.find_element_by_id('id_rss').send_keys(SHOW_RSS)
         show_form.submit()
 
+        # Refresh show feed
+        self.nav_bar_item('id_refresh_feed').click()
+
         # Download episode via show's episodes page
         episodes = self.get_items_in_list('id_episode_list')
         latest_episode = episodes[0]

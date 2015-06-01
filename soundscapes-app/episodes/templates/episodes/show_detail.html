@@ -2,6 +2,23 @@
 
 {% block body %}
 
+  <ul id="id_nav_bar" class="nav nav-pills">
+    <li role="presentation">
+      <form action="{% url 'refresh_show' pk=show.pk %}" method="post">
+        {% csrf_token %}
+        <input id="id_refresh_feed" type="submit" value="Refresh" />
+      </form>
+    </li>
+  </ul>
+
   <h1>{{ show.name }}</h1>
+
+  <h2>Episodes</h2>
+
+  <ul id="id_episode_list" class="list-group">
+    {% for episode in show.episode_set.all %}
+      <li class="list-group-item">{{ episode.title }}</li>
+    {% endfor %}
+  </ul>
 
 {% endblock body %}
