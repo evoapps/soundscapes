@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.decorators.http import require_POST, require_GET
 
+from .forms import ShowForm
 from .models import Show
 
 class ShowListView(ListView):
@@ -12,6 +13,7 @@ class ShowListView(ListView):
 
 class ShowCreateView(CreateView):
     model = Show
+    form_class = ShowForm
 
 class ShowDetailView(DetailView):
     model = Show
