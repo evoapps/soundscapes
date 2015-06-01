@@ -20,8 +20,8 @@ class AddFeedTest(SoundscapesFunctionalTest):
 
     def test_add_new_feed(self):
         # Add a new show via a form
-        SHOW_NAME = 'StartUp'
-        SHOW_RSS = 'http://feeds.gimletmedia.com/hearstartup'
+        SHOW_NAME = 'Mystery Show'
+        SHOW_RSS = 'http://feeds.gimletmedia.com/mysteryshow'
 
         self.navigate_to_show_list()
         self.nav_bar_item('id_new_show').click()
@@ -33,27 +33,20 @@ class AddFeedTest(SoundscapesFunctionalTest):
 
         # Refresh show feed
         self.nav_bar_item('id_refresh_feed').click()
+        ## ...downloading episodes
 
-        # Download episode via show's episodes page
-        episodes = self.get_items_in_list('id_episode_list')
-        latest_episode = episodes[0]
-        latest_episode.find_element_by_id('id_download_episode').click()
-
-        self.fail('Figure out css locator for successfully downloaded episode')
-        wait_for_locator = (By.CLASS_NAME, 'downloaded')
-        error_msg = 'Episode not downloaded'
-        wait_for = e_c.presence_of_element_located(wait_for_locator)
-        WebDriverWait(self.browser, 10.0).until(wait_for, error_msg)
-
-        # See downloaded episodes on homepage
-        self.navigate_to_home_page()
+        # See downloaded episodes on the show page
         svg = self.browser.find_element_by_tag_name('svg')
-        episode_nodes = svg.find_elements_by_tag_name('g')
-        self.assertEquals(len(episode_nodes), 1)
+        episodes = svg.find_elements_by_tag_name('g')
+        self.assertGreaterThan(len(episodes), 0)
 
-        # View an episode
-        episode_node = episode_nodes[0]
-        episode_node.find_element_by_id('id_view').click()
+        # The top episode has a single segment
+        latest_episode = episodes[0]
+        segments = latest_episode.find_elements_by_tag_name('g')
+        self.assertEquals(len(segments), 1)
+
+        # Click on an episode to view it
+        latest_episode.click()
 
         # Add a new segment via a form
         self.nav_bar_item('id_new_segment').click()
@@ -65,7 +58,8 @@ class AddFeedTest(SoundscapesFunctionalTest):
 
         # Since the segment was in the middle of the episode,
         # there are now three segments in the episode.
-        segments = self.get_items_in_list('id_segment_list')
+        svg = self.browser.find_element_by_tag_name('svg')
+        segments = svg.find_elements_by_tag_name('g')
         self.assertEquals(len(segments), 3)
 
         # Share the segment

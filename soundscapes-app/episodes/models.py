@@ -18,6 +18,8 @@ class Show(models.Model):
 
         for new in new_episodes:
             episode_kwargs = {}
+            mp3_url = new['media_content'][0]['url']
+            episode_kwargs['mp3'] = download_episode(mp3_url)
             episode_kwargs['title'] = new['title']
             episode_kwargs['released'] = convert_to_pydatetime(new['published'])
             self.episode_set.create(**episode_kwargs)
