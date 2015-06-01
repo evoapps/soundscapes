@@ -16,8 +16,8 @@
 
   <h2>Episodes</h2>
 
-  <svg>
-  </svg>
+  <div id="vis">
+  </div>
 
   </ul>
 
@@ -28,6 +28,6 @@
   <script type="text/javascript" src="{% static 'episodes/d3.js/colorbrewer.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
-d3.json("{% url 'get_episodes_as_json' pk=show.pk %}", show_soundscapes)
+d3.json("{% url 'get_episodes_as_json' pk=show.pk %}", show_soundscapes);
   </script>
 {% endblock javascript %}
