@@ -23,6 +23,12 @@ show_soundscapes = function(episodes) {
 
   d3.selectAll("g.episode")
     .append("text")
+    .text(function(ep) { return ep.fields.title; })
     .attr("y", function(ep, i) { return perEpisodeHeight * (i + 1); })
-    .text(function(ep) { console.log(ep); return ep.fields.title; });
+    .on("mouseover", function(ep) {
+      d3.select(this).classed("hover", true);
+    })
+    .on("mouseout", function(ep) {
+      d3.select(this).classed("hover", false);
+    });
 }

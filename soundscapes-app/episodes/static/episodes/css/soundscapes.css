@@ -1,3 +1,7 @@
 text {
   font: 24px Helvetica;
 }
+
+text.hover {
+  fill: blue;
+}
