@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block style %}
+  <link href="{% static 'episodes/css/soundscapes.css' %}" rel="stylesheet">
+{% endblock style %}
+
 {% block body %}
 
   <ul id="id_nav_bar" class="nav nav-pills">

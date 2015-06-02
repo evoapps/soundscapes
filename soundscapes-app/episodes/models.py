@@ -48,5 +48,5 @@ class Episode(models.Model):
             'show': slugify(self.name),
             'episode': slugify(self.title),
         }
-        mp3_dst = '{show}-{episode}'.format(**mp3_dst_kwargs)
+        mp3_dst = '{show}-{episode}.mp3'.format(**mp3_dst_kwargs)
         episode_kwargs['mp3'] = download_episode(self.rss, mp3_dst)
