@@ -2,6 +2,17 @@ text {
   font: 24px Helvetica;
 }
 
-text.hover {
+path {
+  fill: none;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+
+.hover {
   fill: blue;
+}
+
+path.hover {
+  stroke: blue;
+  fill: none;
 }

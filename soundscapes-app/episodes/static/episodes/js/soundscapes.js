@@ -1,69 +1,85 @@
-show_soundscapes = function(episodes) {
-  var episodes = JSON.parse(episodes); // don't know why this isn't automatic
 
+show_soundscapes = function(episodes) {
+  var episodes = JSON.parse(episodes); // don't know why d3.json doesn't handle this
+
+  // Convert release string to javascript Date
   episodes.forEach(function(el) {
     el.fields.released = Date.parse(el.fields.released);
   });
 
   var numEpisodes = episodes.length,
-      perEpisodeHeight = 30;
+      episodeDetailHeight = 30,
+      episodeTimelineRadius = 5;
 
   var svgWidth = 700,
-      svgHeight = perEpisodeHeight * numEpisodes;
+      svgHeight = episodeDetailHeight * numEpisodes;
 
-  var svg = d3.select("svg")
+  var episodeDetailX = 100,
+      episodeTimelineX = 20;
+
+  var episodeDetailScale = d3.scale.linear()
+    .domain([episodes.length, 1])
+    .range([svgHeight - episodeDetailHeight, episodeDetailHeight]);
+
+  var episodeTimelineScale = d3.time.scale()
+    .domain([
+      d3.min(episodes, function(el) { return el.fields.released; }),
+      Date.now()
+    ])
+    .range([svgHeight - episodeTimelineRadius, episodeTimelineRadius]);
+
+  var hover = function(el, bool) { d3.select(this).classed("hover", bool); },
+      hoverOn = function(el) { return hover(el, true); },
+      hoverOff = function(el) { return hover(el, false); };
+
+  d3.select("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
 
-  svg.selectAll("g")
+  highlight = function(el) {
+    var gEpisode = d3.select(this);
+    gEpisode.select("text").classed("hover", true);
+    gEpisode.select("circle").classed("hover", true);
+    gEpisode.select("path").classed("hover", true);
+  }
+
+  unlight = function(el) {
+    var gEpisode = d3.select(this);
+    gEpisode.select("text").classed("hover", false);
+    gEpisode.select("circle").classed("hover", false);
+    gEpisode.select("path").classed("hover", false);
+  }
+
+  d3.select("svg")
+    .selectAll("g")
     .data(episodes)
     .enter()
-      .append("g")
-      .attr("class", "episode");
+    .append("g")
+    .attr("class", "episode")
+    .on("mouseover", highlight)
+    .on("mouseout", unlight);
 
-  var episodeNodes = d3.selectAll("g.episode")
-
-  var episodeDetailLeftBuffer = 100;
-
-  var detailScale = d3.scale.linear()
-    .domain([episodes.length, 1])
-    .range([svgHeight, perEpisodeHeight * 2]);
-
-  episodeNodes.append("g")
+  d3.select("svg")
+    .selectAll("g")
     .append("text")
     .text(function(ep) { return ep.fields.title; })
-    .attr("x", episodeDetailLeftBuffer)
-    .attr("y", function(ep, i) { return detailScale(i); })
-    .on("mouseover", function(ep) {
-      d3.select(this).classed("hover", true);
-    })
-    .on("mouseout", function(ep) {
-      d3.select(this).classed("hover", false);
-    });
+    .attr("x", episodeDetailX)
+    .attr("y", function(el, i) { return episodeDetailScale(i); });
 
-  var rightNow = Date.now(),
-      firstEpisode = d3.min(episodes,
-        function(el) { return el.fields.released; });
-
-  var timeNodeLeftBuffer = 10,
-      timeNodeRadius = 5;
-
-  var timeScale = d3.time.scale()
-    .domain([firstEpisode, rightNow])
-    .range([svgHeight - timeNodeRadius, timeNodeRadius * 2]);
-
-  episodeNodes.append("g")
+  d3.select("svg")
+    .selectAll("g")
     .append("circle")
-    .attr("r", timeNodeRadius)
-    .attr("cx", timeNodeLeftBuffer + timeNodeRadius)
-    .attr("cy", function(el) { return timeScale(el.fields.released); });
+    .attr("r", episodeTimelineRadius)
+    .attr("cx", episodeTimelineX)
+    .attr("cy", function(el) { return episodeTimelineScale(el.fields.released); });
 
-  var diagonal = d3.svg.diagonal()
-    .projection(function(d) { return [d.y, d.x]; });
+  var connector = d3.svg.diagonal.radial()
+    .source(function(el) { return {x: episodeTimelineX, y: episodeTimelineScale(el.fields.released)}; })
+    .target(function(el, i) { return {x: episodeDetailX, y: episodeDetailScale(i)}; });
 
-  svg.selectAll("g")
-    .data(episodes)
-    .enter()
-      .append("path")
-      .attr("d", diagonal);
+  d3.select("svg")
+    .selectAll("g")
+    .append("path")
+    .attr("d", connector)
+    .attr("class", "link");
 }
