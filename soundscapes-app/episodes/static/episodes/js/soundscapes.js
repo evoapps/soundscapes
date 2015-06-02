@@ -11,10 +11,11 @@ show_soundscapes = function(episodes) {
   var svgWidth = 700,
       svgHeight = perEpisodeHeight * numEpisodes;
 
-  d3.select("svg")
+  var svg = d3.select("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
-    .selectAll("g")
+
+  svg.selectAll("g")
     .data(episodes)
     .enter()
       .append("g")
@@ -56,4 +57,13 @@ show_soundscapes = function(episodes) {
     .attr("r", timeNodeRadius)
     .attr("cx", timeNodeLeftBuffer + timeNodeRadius)
     .attr("cy", function(el) { return timeScale(el.fields.released); });
+
+  var diagonal = d3.svg.diagonal()
+    .projection(function(d) { return [d.y, d.x]; });
+
+  svg.selectAll("g")
+    .data(episodes)
+    .enter()
+      .append("path")
+      .attr("d", diagonal);
 }
