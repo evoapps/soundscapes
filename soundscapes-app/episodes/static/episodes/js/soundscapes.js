@@ -9,7 +9,7 @@ show_soundscapes = function(episodes) {
       perEpisodeHeight = 30;
 
   var svgWidth = 700,
-      svgHeight = perEpisodeHeight * (numEpisodes + 1);
+      svgHeight = perEpisodeHeight * numEpisodes;
 
   d3.select("svg")
     .attr("width", svgWidth)
@@ -24,11 +24,15 @@ show_soundscapes = function(episodes) {
 
   var episodeDetailLeftBuffer = 100;
 
+  var detailScale = d3.scale.linear()
+    .domain([episodes.length, 1])
+    .range([svgHeight, perEpisodeHeight * 2]);
+
   episodeNodes.append("g")
     .append("text")
     .text(function(ep) { return ep.fields.title; })
     .attr("x", episodeDetailLeftBuffer)
-    .attr("y", function(ep, i) { return perEpisodeHeight * (i + 1); })
+    .attr("y", function(ep, i) { return detailScale(i); })
     .on("mouseover", function(ep) {
       d3.select(this).classed("hover", true);
     })
@@ -45,7 +49,7 @@ show_soundscapes = function(episodes) {
 
   var timeScale = d3.time.scale()
     .domain([firstEpisode, rightNow])
-    .range([svgHeight + timeNodeRadius, timeNodeRadius]);
+    .range([svgHeight - timeNodeRadius, timeNodeRadius * 2]);
 
   episodeNodes.append("g")
     .append("circle")
