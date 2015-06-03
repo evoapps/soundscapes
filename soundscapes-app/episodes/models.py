@@ -34,6 +34,12 @@ class EpisodeFileStorage(FileSystemStorage):
         """ Overwrites files with same name """
         return name
 
+class EpisodeManager(models.Manager):
+    def create_with_segment(self, *args, **kwargs):
+        episode = self.create(**kwargs)
+        episode.segment_set.create(start_time = 0.0, end_time = 0.0)
+        return episode
+
 class Episode(models.Model):
     show = models.ForeignKey('Show')
     released = models.DateTimeField()
@@ -43,6 +49,8 @@ class Episode(models.Model):
     mp3 = models.FileField(max_length = 200, blank = True, null = True,
                            storage = EpisodeFileStorage())
 
+    objects = EpisodeManager()
+
     def download_mp3(self):
         mp3_dst_kwargs = {
             'show': slugify(self.name),
@@ -50,3 +58,10 @@ class Episode(models.Model):
         }
         mp3_dst = '{show}-{episode}.mp3'.format(**mp3_dst_kwargs)
         episode_kwargs['mp3'] = download_episode(self.rss, mp3_dst)
+
+class Segment(models.Model):
+    episode = models.ForeignKey('Episode')
+
+    TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
+    start_time = models.DecimalField(**TIME_RESOLUTION)
+    end_time = models.DecimalField(**TIME_RESOLUTION)
