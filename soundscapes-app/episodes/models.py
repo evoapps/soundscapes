@@ -42,6 +42,7 @@ class Episode(models.Model):
 
     rss_mp3_url = models.URLField(unique = True)
     mp3 = models.FileField(max_length = 200, blank = True)
+    duration = models.FloatField(null = True)
 
     objects = EpisodeManager()
 

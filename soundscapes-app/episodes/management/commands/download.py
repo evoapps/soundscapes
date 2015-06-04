@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from optparse import make_option
+import pydub
 
 from episodes.handlers.rss import download_episode
 from episodes.models import Show
@@ -36,4 +37,8 @@ class Command(BaseCommand):
                 self.stdout.write('({}) Downloading: {}'.format(show.name, episode.title))
                 episode_mp3 = download_episode(episode.rss_mp3_url)
                 episode.mp3 = episode_mp3
+
+                audio_segment = pydub.AudioSegment.from_mp3(episode_mp3)
+                episode.duration = audio_segment.duration_seconds
+
                 episode.save()
