@@ -25,14 +25,9 @@ class Show(models.Model):
             episode_kwargs = {}
             episode_kwargs['title'] = new['title']
             episode_kwargs['released'] = convert_to_pydatetime(new['published'])
-            episode_kwargs['rss'] = new['media_content'][0]['url']
+            episode_kwargs['rss_mp3_url'] = new['media_content'][0]['url']
 
             self.episode_set.create(**episode_kwargs)
-
-class EpisodeFileStorage(FileSystemStorage):
-    def get_available_name(self, name):
-        """ Overwrites files with same name """
-        return name
 
 class EpisodeManager(models.Manager):
     def create_with_segment(self, *args, **kwargs):
@@ -45,19 +40,10 @@ class Episode(models.Model):
     released = models.DateTimeField()
     title = models.CharField(max_length = 80)
 
-    rss = models.URLField(unique=True)
-    mp3 = models.FileField(max_length = 200, blank = True, null = True,
-                           storage = EpisodeFileStorage())
+    rss_mp3_url = models.URLField(unique = True)
+    mp3 = models.FileField(max_length = 200, blank = True)
 
     objects = EpisodeManager()
-
-    def download_mp3(self):
-        mp3_dst_kwargs = {
-            'show': slugify(self.name),
-            'episode': slugify(self.title),
-        }
-        mp3_dst = '{show}-{episode}.mp3'.format(**mp3_dst_kwargs)
-        episode_kwargs['mp3'] = download_episode(self.rss, mp3_dst)
 
 class Segment(models.Model):
     episode = models.ForeignKey('Episode')

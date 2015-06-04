@@ -5,6 +5,7 @@
 *.sqlite3
 /static/
 /media/
+/downloads/
 
 # OS files
 .DS_Store
