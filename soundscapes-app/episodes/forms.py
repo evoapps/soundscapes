@@ -1,15 +1,9 @@
 from django import forms
 
-from .models import Show, Episode
+from .models import Show
 
 class ShowForm(forms.ModelForm):
 
     class Meta:
         model = Show
-        fields = ('name', 'rss')
-
-class UploadEpisodeMP3Form(forms.ModelForm):
-
-    class Meta:
-        model = Episode
-        fields = ('mp3', )
+        fields = ('name', 'rss_url')

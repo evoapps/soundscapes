@@ -1,32 +1,8 @@
-from dateutil import parser
-import feedparser
-import tempfile
 import requests
 from unipath import Path
 
 from django.conf import settings
 from django.core.files import File
-from django.utils.text import slugify
-
-def refresh_show(show):
-    rss = feedparser.parse(show.rss)
-    entries = rss['entries']
-
-
-    titles = self.episode_set.values_list('title', flat = True)
-    new_episodes = filter(lambda x: x['title'] not in titles, episodes)
-
-    for new in new_episodes:
-        episode_kwargs = {}
-        episode_kwargs['title'] = new['title']
-        episode_kwargs['released'] = convert_to_pydatetime(new['published'])
-        episode_kwargs['rss_mp3_url'] = new['media_content'][0]['url']
-
-        self.episode_set.create(**episode_kwargs)
-
-def get_entries_in_feed(rss_url):
-    feed = feedparser.parse(rss_url)
-    return feed['entries']
 
 def download_episode(downloadable_url):
     """ A URL from the media_content['url'] of an RSS entry.
@@ -51,6 +27,3 @@ def download_episode(downloadable_url):
                 expected_loc_handle.write(chunk)
 
     return File(open(expected_loc, 'rb'))
-
-def convert_to_pydatetime(str_datetime):
-    return parser.parse(str_datetime)

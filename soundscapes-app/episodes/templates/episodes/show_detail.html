@@ -7,15 +7,6 @@
 
 {% block body %}
 
-  <ul id="id_nav_bar" class="nav nav-pills">
-    <li role="presentation">
-      <form action="{% url 'refresh_show' pk=show.pk %}" method="post">
-        {% csrf_token %}
-        <input id="id_refresh_feed" type="submit" value="Refresh" />
-      </form>
-    </li>
-  </ul>
-
   <h1>{{ show.name }}</h1>
 
   <svg>
@@ -28,7 +19,6 @@
   <script type="text/javascript" src="{% static 'episodes/d3.js/colorbrewer.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
-var eps, ordinalStack;
-d3.json("{% url 'get_episodes_as_json' pk=show.pk %}", show_soundscapes);
+d3.json("{% url 'json_episodes' pk=show.pk %}", show_soundscapes);
   </script>
 {% endblock javascript %}
