@@ -5,29 +5,18 @@ from episodes.handlers.rss import download_episode
 from episodes.models import Show
 
 class Command(BaseCommand):
-    args = '<show.name, show.name, ...>'
-    help = 'Refreshes the episode list.'
+    help = 'Retrieve missing RSS entries and save them as Episodes'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--all',
-            action = 'store_true',
-            dest = 'download_all',
-            default = False,
-            help = 'Refresh episodes for all shows'),
-        )
-
+    def add_arguments(self, parser):
+        parser.add_argument('show_name', nargs = '+')
 
     def handle(self, *args, **options):
-        show_name_options = Show.objects.values_list('name', flat = True)
+        all_show_names = Show.objects.values_list('name', flat = True)
+        show_names = options['show_name'] or show_name_option
 
-        if options['download_all']:
-            show_name_choices = show_name_options
-        else:
-            show_name_choices = args
-
-        for show_name in show_name_choices:
+        for name in show_names:
             try:
-                show = Show.objects.get(name = show_name)
+                show = Show.objects.get(name = name)
             except Show.DoesNotExist:
                 raise CommandError('Show "{}" does not exist'.format(show_name))
 
