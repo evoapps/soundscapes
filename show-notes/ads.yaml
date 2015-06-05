@@ -1,0 +1,11 @@
+- show: "Reply All"
+  title: "#27 The Fever"
+  ads:
+    1:
+      sponsor: "MailChimp"
+      start_time: 9:45
+      end_time: 10:45
+    2:
+      sponsor: "Stamps.com"
+      start_time: 10:46
+      end_time: 12:05
