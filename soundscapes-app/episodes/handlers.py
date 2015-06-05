@@ -1,8 +1,14 @@
+import feedparser
+import pydub
 import requests
 from unipath import Path
 
 from django.conf import settings
 from django.core.files import File
+
+def fetch_rss_entries(rss_url):
+    feed = feedparser.parse(self.rss_url)
+    return feed['entries']
 
 def download_episode(downloadable_url):
     """ A URL from the media_content['url'] of an RSS entry.
@@ -27,3 +33,7 @@ def download_episode(downloadable_url):
                 expected_loc_handle.write(chunk)
 
     return File(open(expected_loc, 'rb'))
+
+def get_audio_duration(mp3):
+    audio_segment = pydub.AudioSegment.from_mp3(mp3)
+    return audio_segment.duration_seconds

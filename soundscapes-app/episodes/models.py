@@ -1,5 +1,4 @@
-from dateutil import parser as dateutil_parser
-import feedparser
+from dateutil import parser as dateparser
 import json
 import pydub
 from unipath import Path
@@ -9,7 +8,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
-from .handlers import download_episode
+from .handlers import fetch_rss_entries, download_episode, get_audio_duration
 
 class Show(models.Model):
     name = models.CharField(unique = True, max_length = 30)
@@ -19,29 +18,35 @@ class Show(models.Model):
         return '/shows/{pk}/'.format(pk = self.pk)
 
     def refresh(self):
-        """ Fetch RSS entries """
-        feed = feedparser.parse(self.rss_url)
-        all_entries = feed['entries']
-        episode_entries = self.episode_set.values_list('rss_entry', flat = True)
-        new_entries = filter(lambda entry: entry not in episode_entries,
+        """ Create episodes from new RSS entries """
+        all_entries = fetch_rss_entries(self.rss_url)
+        current_entries = self.episode_set.values_list('rss_entry', flat = True)
+        new_entries = filter(lambda entry: entry not in current_entries,
                              all_entries)
         for rss_entry in new_entries:
             Episode.objects.create_from_rss_entry(rss_entry, show = self)
 
 class EpisodeManager(models.Manager):
     def create_from_rss_entry(self, rss_entry, show):
+        """ Create an episode from an RSS entry
 
-        # hack!
-        rss_entry_content = rss_entry.copy()
-        rss_entry_content['published_parsed'] = str(rss_entry_content['published_parsed'])
-
+        Episodes are created from parsed JSON only, meaning episodes
+        are created without mp3's or mp3 analysis (e.g., duration).
+        """
         kwargs = {
             'show': show,
-            'rss_entry': json.dumps(rss_entry_content, skipkeys = True),
-            'released': dateutil_parser.parse(rss_entry['published']),
+            'released': dateparser.parse(rss_entry['published']),
             'title': rss_entry['title'],
             'rss_mp3_url': rss_entry['media_content'][0]['url'],
         }
+
+        # hack! json.dumps chokes on time object
+        modified_rss_entry = rss_entry.copy()
+        modified_rss_entry['published_parsed'] = \
+            str(modified_rss_entry['published_parsed'])
+        rss_entry_dumps = json.dumps(modified_rss_entry)
+        kwargs['rss_entry'] = rss_entry_dumps
+
         return self.create(**kwargs)
 
 class Episode(models.Model):
@@ -59,16 +64,23 @@ class Episode(models.Model):
     objects = EpisodeManager()
 
     def download(self):
+        """ Download the episode file and analyze its duration
+
+        Episodes are only downloaded if the mp3 FileField is empty. Analyzing
+        the episode duration here is not necessary but the file is already
+        open.
+        """
         if not self.mp3:
             mp3 = download_episode(self.rss_mp3_url)
             self.mp3 = mp3
-
-            audio_segment = pydub.AudioSegment.from_mp3(mp3)
-            self.duration = audio_segment.duration_seconds
-
+            self.duration = get_audio_duration(mp3)
             self.save()
 
     def analyze(self):
+        """ Create an initial segment spanning the episode
+
+        Segments are only created if none yet exist.
+        """
         if self.segment_set.count() == 0:
             self.segment_set.create(start_time = 0.0, end_time = self.duration)
 
