@@ -2,14 +2,14 @@
   pk: 1
   fields:
     name: "StartUp"
-    rss: "http://feeds.gimletmedia.com/hearstartup"
+    rss_url: "http://feeds.gimletmedia.com/hearstartup"
 - model: episodes.show
   pk: 2
   fields:
     name: "Reply All"
-    rss: "http://feeds.gimletmedia.com/hearreplyall"
+    rss_url: "http://feeds.gimletmedia.com/hearreplyall"
 - model: episodes.show
   pk: 3
   fields:
     name: "Mystery Show"
-    rss: "http://feeds.gimletmedia.com/mysteryshow"
+    rss_url: "http://feeds.gimletmedia.com/mysteryshow"
