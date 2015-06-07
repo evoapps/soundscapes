@@ -19,6 +19,7 @@ class Show(models.Model):
 
     def refresh(self):
         """ Create episodes from new RSS entries """
+        print 'refreshing'
         all_entries = fetch_rss_entries(self.rss_url)
         current_entries = self.episode_set.values_list('rss_entry', flat = True)
         new_entries = filter(lambda entry: entry not in current_entries,
@@ -62,6 +63,9 @@ class Episode(models.Model):
     duration = models.FloatField(null = True)
 
     objects = EpisodeManager()
+
+    def get_absolute_url(self):
+        return '/episodes/{pk}/'.format(pk = self.pk)
 
     def download(self):
         """ Download the episode file and analyze its duration

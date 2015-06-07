@@ -28,21 +28,21 @@ class AddFeedTest(SoundscapesFunctionalTest):
 
         show_form = self.browser.find_element_by_tag_name('form')
         show_form.find_element_by_id('id_name').send_keys(SHOW_NAME)
-        show_form.find_element_by_id('id_rss').send_keys(SHOW_RSS)
+        show_form.find_element_by_id('id_rss_url').send_keys(SHOW_RSS)
         show_form.submit()
-
-        # Refresh show feed
-        self.nav_bar_item('id_refresh_feed').click()
-        ## ...downloading episodes
 
         # See downloaded episodes on the show page
         svg = self.browser.find_element_by_tag_name('svg')
-        episodes = svg.find_elements_by_tag_name('g')
-        self.assertGreaterThan(len(episodes), 0)
+        episodes = svg.find_elements_by_css_selector('g.episode')
+        self.assertGreater(len(episodes), 0)
+
+        # Download the latest episode
+        latest_episode = episodes[0]
+        #latest_episode.find_element_by_
 
         # The top episode has a single segment
         latest_episode = episodes[0]
-        segments = latest_episode.find_elements_by_tag_name('g')
+        segments = latest_episode.find_elements_by_tag_name('g.segment')
         self.assertEquals(len(segments), 1)
 
         # Click on an episode to view it

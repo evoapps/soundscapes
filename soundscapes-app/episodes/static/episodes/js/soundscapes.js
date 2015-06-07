@@ -7,6 +7,8 @@ show_soundscapes = function(episodes) {
     el.fields.released = Date.parse(el.fields.released);
   });
 
+  raw = episodes; // save for poking around on the console
+
   var numEpisodes = episodes.length,
       episodeDetailHeight = 30,
       episodeTimelineRadius = 5;
@@ -51,7 +53,7 @@ show_soundscapes = function(episodes) {
   }
 
   d3.select("svg")
-    .selectAll("g")
+    .selectAll("g.episode")
     .data(episodes)
     .enter()
     .append("g")
@@ -59,15 +61,18 @@ show_soundscapes = function(episodes) {
     .on("mouseover", highlight)
     .on("mouseout", unlight);
 
-  d3.select("svg")
-    .selectAll("g")
+  selectEpisode = function(el) {
+    window.location.href = el.fields.
+  }
+
+  d3.selectAll("g.episode")
     .append("text")
     .text(function(ep) { return ep.fields.title; })
     .attr("x", episodeDetailX)
-    .attr("y", function(el, i) { return episodeDetailScale(i); });
+    .attr("y", function(el, i) { return episodeDetailScale(i); })
+    .on("click", selectEpisode);
 
-  d3.select("svg")
-    .selectAll("g")
+  d3.selectAll("g.episode")
     .append("circle")
     .attr("r", episodeTimelineRadius)
     .attr("cx", episodeTimelineX)
@@ -77,8 +82,7 @@ show_soundscapes = function(episodes) {
     .source(function(el) { return {x: episodeTimelineX, y: episodeTimelineScale(el.fields.released)}; })
     .target(function(el, i) { return {x: episodeDetailX, y: episodeDetailScale(i)}; });
 
-  d3.select("svg")
-    .selectAll("g")
+  d3.selectAll("g.episode")
     .append("path")
     .attr("d", connector)
     .attr("class", "link");

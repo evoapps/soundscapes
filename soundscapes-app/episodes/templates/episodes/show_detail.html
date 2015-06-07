@@ -19,6 +19,7 @@
   <script type="text/javascript" src="{% static 'episodes/d3.js/colorbrewer.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
+var raw;
 d3.json("{% url 'json_episodes' pk=show.pk %}", show_soundscapes);
   </script>
 {% endblock javascript %}

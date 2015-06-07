@@ -7,7 +7,7 @@ from django.conf import settings
 from django.core.files import File
 
 def fetch_rss_entries(rss_url):
-    feed = feedparser.parse(self.rss_url)
+    feed = feedparser.parse(rss_url)
     return feed['entries']
 
 def download_episode(downloadable_url):
