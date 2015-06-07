@@ -20,3 +20,14 @@
       sponsor: "Ford Motor Company"
       start_time: 15:27
       end_time: 16:13
+- show: "Mystery Show"
+  title: "Case #3 Belt Buckle"
+  ads:
+    1:
+      sponsor: "Kind Snacks"
+      start_time: 25:23
+      end_time: 26:32
+    2:
+      sponsor: "Squarespace"
+      start_time: 26:32
+      end_time: 27:40
