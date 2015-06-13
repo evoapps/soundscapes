@@ -8,21 +8,28 @@ from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 
-from .handlers import fetch_rss_entries, download_episode, get_audio_duration
+from .handlers import fetch_rss_entries, dump_rss_entry
+from .handlers import download_episode, get_audio_duration
 
 class Show(models.Model):
+    """ A collection of Episodes, plugged in to an RSS podcast feed """
     name = models.CharField(unique = True, max_length = 30)
     rss_url = models.URLField(unique = True)
 
     def get_absolute_url(self):
+        # reverse(...) should work. Weird import somewhere.
         return '/shows/{pk}/'.format(pk = self.pk)
 
     def refresh(self):
-        """ Create episodes from new RSS entries """
-        print 'refreshing'
+        """ Create episodes from new RSS entries
+
+        Evaluates uniqueness based on "rss_entry" field.
+
+        TODO: add "revert" as an optional argument.
+        """
         all_entries = fetch_rss_entries(self.rss_url)
         current_entries = self.episode_set.values_list('rss_entry', flat = True)
-        new_entries = filter(lambda entry: entry not in current_entries,
+        new_entries = filter(lambda e: dump_rss_entry(e) not in current_entries,
                              all_entries)
         for rss_entry in new_entries:
             Episode.objects.create_from_rss_entry(rss_entry, show = self)
@@ -32,25 +39,21 @@ class EpisodeManager(models.Manager):
         """ Create an episode from an RSS entry
 
         Episodes are created from parsed JSON only, meaning episodes
-        are created without mp3's or mp3 analysis (e.g., duration).
+        are created without mp3s or mp3 analysis (e.g., duration).
+
+        TODO: implement a better way to deserialize a JSON RSS entry.
         """
         kwargs = {
             'show': show,
             'released': dateparser.parse(rss_entry['published']),
             'title': rss_entry['title'],
             'rss_mp3_url': rss_entry['media_content'][0]['url'],
+            'rss_entry': dump_rss_entry(rss_entry),
         }
-
-        # hack! json.dumps chokes on time object
-        modified_rss_entry = rss_entry.copy()
-        modified_rss_entry['published_parsed'] = \
-            str(modified_rss_entry['published_parsed'])
-        rss_entry_dumps = json.dumps(modified_rss_entry)
-        kwargs['rss_entry'] = rss_entry_dumps
-
         return self.create(**kwargs)
 
 class Episode(models.Model):
+    """ A RSS entry from a podcast feed """
     show = models.ForeignKey('Show')
     rss_entry = models.TextField()
 
@@ -59,12 +62,14 @@ class Episode(models.Model):
 
     rss_mp3_url = models.URLField(unique = True)
 
+    # mp3 and analyses require downloading the episode
     mp3 = models.FileField(max_length = 200, blank = True)
     duration = models.FloatField(null = True)
 
     objects = EpisodeManager()
 
     def get_absolute_url(self):
+        # reverse(...) should work. Weird import somewhere.
         return '/episodes/{pk}/'.format(pk = self.pk)
 
     def download(self):
@@ -73,22 +78,34 @@ class Episode(models.Model):
         Episodes are only downloaded if the mp3 FileField is empty. Analyzing
         the episode duration here is not necessary but the file is already
         open.
+
+        TODO: use case for "overwrite" as an optional argument?
+
+        URGENT: bundle duration analysis with self.analyze, add boolean
+                argument "analyze" that defaults to True
         """
         if not self.mp3:
             mp3 = download_episode(self.rss_mp3_url)
             self.mp3 = mp3
-            self.duration = get_audio_duration(mp3)
             self.save()
+
+            self.duration = get_audio_duration(mp3)
 
     def analyze(self):
         """ Create an initial segment spanning the episode
 
         Segments are only created if none yet exist.
+
+        TODO: add "reset" optional argument
         """
         if self.segment_set.count() == 0:
             self.segment_set.create(start_time = 0.0, end_time = self.duration)
 
 class Segment(models.Model):
+    """ A section of an Episode
+
+    TODO: validate time fields in clean method
+    """
     episode = models.ForeignKey('Episode')
 
     TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}

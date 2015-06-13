@@ -10,6 +10,13 @@ def fetch_rss_entries(rss_url):
     feed = feedparser.parse(rss_url)
     return feed['entries']
 
+def dump_rss_entry(rss_entry):
+    # hack! "json.dumps(rss_entry)" chokes on time object
+    modified_rss_entry = rss_entry.copy()
+    modified_rss_entry['published_parsed'] = \
+        str(modified_rss_entry['published_parsed'])
+    return json.dumps(modified_rss_entry)
+
 def download_episode(downloadable_url):
     """ A URL from the media_content['url'] of an RSS entry.
 
