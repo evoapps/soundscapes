@@ -5,7 +5,7 @@ from django.views.generic import ListView, CreateView, DetailView
 from django.views.decorators.http import require_POST, require_GET
 
 from .forms import ShowForm
-from .models import Show
+from .models import Show, Episode
 
 class ShowListView(ListView):
     model = Show
@@ -16,6 +16,9 @@ class ShowCreateView(CreateView):
 
 class ShowDetailView(DetailView):
     model = Show
+
+class EpisodeDetailView(DetailView):
+    model = Episode
 
 @require_GET
 def json_episodes(request, pk):

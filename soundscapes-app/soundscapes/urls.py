@@ -1,37 +1,37 @@
 from django.conf.urls import patterns, include, url
 from django.contrib import admin
 
-import episodes.views
+from episodes import views
 
 urlpatterns = patterns('',
     url(
         r'^shows/$',
-        episodes.views.ShowListView.as_view(),
+        views.ShowListView.as_view(),
         name = 'show_list',
     ),
     url(
         r'^shows/new/$',
-        episodes.views.ShowCreateView.as_view(),
+        views.ShowCreateView.as_view(),
         name = 'new_show',
     ),
     url(
         r'^shows/(?P<pk>\d+)/$',
-        episodes.views.ShowDetailView.as_view(),
+        views.ShowDetailView.as_view(),
         name = 'view_show',
     ),
     url(
         r'^shows/(?P<pk>\d+)/episodes$',
-        episodes.views.json_episodes,
+        views.json_episodes,
         name = 'json_episodes',
     ),
     url(
         r'episodes/(?P<pk>\d+)/$',
-        episodes.views.EpisodeDetailView.as_view(),
+        views.EpisodeDetailView.as_view(),
         name = 'view_episode',
     ),
     url(
         r'episodes/(?P<pk>\d+)/download$',
-        episodes.views.download_episode,
+        views.download_episode,
         name = 'download_episode',
     ),
 )
