@@ -61,8 +61,8 @@ show_soundscapes = function(episodes) {
     .on("mouseover", highlight)
     .on("mouseout", unlight);
 
-  selectEpisode = function(el) {
-    window.location.href = el.fields.
+  redirectToEpisodeDetail = function(episodePk) {
+    window.location.href = episodeDetailURLRouter(episodePk);
   }
 
   d3.selectAll("g.episode")
@@ -70,7 +70,13 @@ show_soundscapes = function(episodes) {
     .text(function(ep) { return ep.fields.title; })
     .attr("x", episodeDetailX)
     .attr("y", function(el, i) { return episodeDetailScale(i); })
-    .on("click", selectEpisode);
+    .on("click", function(el) {
+      if !(el.fields.mp3) {
+        downloadEpisode(el.pk);
+      }
+
+      redirectToEpisodeDetail(el.pk);
+    });
 
   d3.selectAll("g.episode")
     .append("circle")

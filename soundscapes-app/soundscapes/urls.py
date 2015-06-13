@@ -24,4 +24,14 @@ urlpatterns = patterns('',
         episodes.views.json_episodes,
         name = 'json_episodes',
     ),
+    url(
+        r'episodes/(?P<pk>\d+)/$',
+        episodes.views.EpisodeDetailView.as_view(),
+        name = 'view_episode',
+    ),
+    url(
+        r'episodes/(?P<pk>\d+)/download$',
+        episodes.views.download_episode,
+        name = 'download_episode',
+    ),
 )

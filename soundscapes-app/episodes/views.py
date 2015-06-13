@@ -23,3 +23,10 @@ def json_episodes(request, pk):
     episodes = show.episode_set.all()
     episodes_json = serializers.serialize('json', episodes)
     return JsonResponse(episodes_json, safe = False)
+
+@require_POST
+def download_episode(request, pk):
+    episode = get_object_or_404(Episode, pk = pk)
+    episode.download()
+    episode.save()
+    return redirect(episode)

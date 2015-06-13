@@ -12,6 +12,8 @@
   <svg>
   </svg>
 
+  <form action="" method="post" type="hidden"></form>
+
 {% endblock body %}
 
 {% block javascript %}
@@ -20,6 +22,24 @@
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
 var raw;
+
+episodeDownloadURLRouter = function(episodePk) {
+  $.get("{% url 'episode_download_url_router' %}",
+        {pk: episodePk},
+        function (data) {
+          console.log(data);
+        });
+}
+
+episodeDetailURLRouter = function(episodePk) {
+  var episodeDetailURL
+  $.get("{% url 'episode_detail_url_router' %}",
+        {pk: episodePk},
+        function (data) {
+          console.log(data);
+        });
+}
+
 d3.json("{% url 'json_episodes' pk=show.pk %}", show_soundscapes);
   </script>
 {% endblock javascript %}
