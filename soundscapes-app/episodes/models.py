@@ -1,6 +1,4 @@
 from dateutil import parser as dateparser
-import json
-import pydub
 from unipath import Path
 
 from django.core.files.storage import FileSystemStorage
@@ -20,14 +18,18 @@ class Show(models.Model):
         # reverse(...) should work. Weird import somewhere.
         return '/shows/{pk}/'.format(pk = self.pk)
 
-    def refresh(self):
+    def refresh(self, max = 10):
         """ Create episodes from new RSS entries
 
         Evaluates uniqueness based on "rss_entry" field.
 
+        max: int, number of entries to retrieve. A max number of entries
+             are fetched before determining uniquess. Passing None will
+             fetch all episodes.
+
         TODO: add "revert" as an optional argument.
         """
-        all_entries = fetch_rss_entries(self.rss_url)
+        all_entries = fetch_rss_entries(self.rss_url, n = max)
         current_entries = self.episode_set.values_list('rss_entry', flat = True)
         new_entries = filter(lambda e: dump_rss_entry(e) not in current_entries,
                              all_entries)
@@ -87,9 +89,8 @@ class Episode(models.Model):
         if not self.mp3:
             mp3 = download_episode(self.rss_mp3_url)
             self.mp3 = mp3
-            self.save()
-
             self.duration = get_audio_duration(mp3)
+            self.save()
 
     def analyze(self):
         """ Create an initial segment spanning the episode

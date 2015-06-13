@@ -1,4 +1,5 @@
 import feedparser
+import json
 import pydub
 import requests
 from unipath import Path
@@ -6,9 +7,17 @@ from unipath import Path
 from django.conf import settings
 from django.core.files import File
 
-def fetch_rss_entries(rss_url):
+def fetch_rss_entries(rss_url, n = None):
+    """ Retrieve entries from an RSS feed
+
+    n: the number of recent episodes to return
+
+    Defaults to returning the full feed.
+    """
     feed = feedparser.parse(rss_url)
-    return feed['entries']
+    entries = feed['entries']
+    n = n or len(entries)
+    return entries[0:n]
 
 def dump_rss_entry(rss_entry):
     # hack! "json.dumps(rss_entry)" chokes on time object
