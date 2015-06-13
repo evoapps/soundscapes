@@ -18,6 +18,10 @@ class AddFeedTest(SoundscapesFunctionalTest):
         nav_bar = self.browser.find_element_by_id('id_nav_bar')
         return nav_bar.find_element_by_id(item_id)
 
+    def select_svg_episodes(self):
+        svg = self.browser.find_element_by_tag_name('svg')
+        return svg.find_elements_by_css_selector('g.episode')
+
     def test_add_new_feed(self):
         # Add a new show via a form
         SHOW_NAME = 'Mystery Show'
@@ -32,21 +36,29 @@ class AddFeedTest(SoundscapesFunctionalTest):
         show_form.submit()
 
         # See downloaded episodes on the show page
-        svg = self.browser.find_element_by_tag_name('svg')
-        episodes = svg.find_elements_by_css_selector('g.episode')
+        episodes = self.select_svg_episodes()
         self.assertGreater(len(episodes), 0)
 
-        # Download the latest episode
-        latest_episode = episodes[0]
-        #latest_episode.find_element_by_
+        # Download the first episode
+        first_episode = episodes[0]
+        first_episode.find_element_by_class_name('download').click()
+        self.wait_for(tag = 'body')
 
-        # The top episode has a single segment
-        latest_episode = episodes[0]
-        segments = latest_episode.find_elements_by_tag_name('g.segment')
-        self.assertEquals(len(segments), 1)
+        """
+        Unsure whether downloading a episode should drill down to
+        view the episode or should stay on the show view list. Right now
+        it is assumed that downloading an episode drills down to view
+        the episode.
+        """
+        episodes = self.select_svg_episodes()
+        first_episode = episodes[0]
+        first_episode.find_element_by_class_name('view').click()
+        self.wait_for(tag = 'body')
 
-        # Click on an episode to view it
-        latest_episode.click()
+        # Episodes start with a single segment
+        svg = self.browser.find_element_by_tag_name('svg')
+        segments = svg.find_elements_by_css_selector('path.segment')
+        self.assertEquals(len(segents), 1)
 
         # Add a new segment via a form
         self.nav_bar_item('id_new_segment').click()
@@ -56,10 +68,12 @@ class AddFeedTest(SoundscapesFunctionalTest):
         segment_form.find_element_by_id('id_end_time').send_keys('11:54')
         segment_form.submit()
 
+        # Redirects to show view page
+
         # Since the segment was in the middle of the episode,
         # there are now three segments in the episode.
         svg = self.browser.find_element_by_tag_name('svg')
-        segments = svg.find_elements_by_tag_name('g')
+        segments = svg.find_elements_by_css_selector('path.segment')
         self.assertEquals(len(segments), 3)
 
         # Share the segment
