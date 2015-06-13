@@ -90,7 +90,7 @@ STATICFILES_DIRS = (
 )
 
 TEMPLATE_DIRS = (
-    Path(BASE_DIR, 'soundscapes/templates'),
+    Path(BASE_DIR, 'templates'),
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
