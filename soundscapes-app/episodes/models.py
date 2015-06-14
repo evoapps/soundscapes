@@ -1,10 +1,9 @@
 from dateutil import parser as dateparser
 from unipath import Path
 
-from django.core.files.storage import FileSystemStorage
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils.text import slugify
 
 from .handlers import fetch_rss_entries, dump_rss_entry
 from .handlers import download_episode, get_audio_duration
@@ -83,8 +82,9 @@ class Episode(models.Model):
 
         TODO: use case for "overwrite" as an optional argument?
 
-        URGENT: bundle duration analysis with self.analyze, add boolean
-                argument "analyze" that defaults to True
+        URGENT: add boolean argument "analyze" that defaults to True,
+                and use it to trigger self.analyze. Duration should be
+                bundled with self.analyze.
         """
         if not self.mp3:
             mp3 = download_episode(self.rss_mp3_url)
