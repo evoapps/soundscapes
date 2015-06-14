@@ -1,7 +1,7 @@
 from .base import *
 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as e_c
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from unipath import Path
@@ -14,11 +14,11 @@ class AddFeedTest(SoundscapesFunctionalTest):
         show_list_url = self.live_server_url + show_list_relative_url
         self.browser.get(show_list_url)
 
-    def nav_bar_item(self, item_id):
+    def find_nav_bar_item(self, item_id):
         nav_bar = self.browser.find_element_by_id('id_nav_bar')
         return nav_bar.find_element_by_id(item_id)
 
-    def select_svg_episodes(self):
+    def find_svg_episodes(self):
         svg = self.browser.find_element_by_tag_name('svg')
         return svg.find_elements_by_css_selector('g.episode')
 
@@ -28,7 +28,7 @@ class AddFeedTest(SoundscapesFunctionalTest):
         SHOW_RSS = 'http://feeds.gimletmedia.com/mysteryshow'
 
         self.navigate_to_show_list()
-        self.nav_bar_item('id_new_show').click()
+        self.find_nav_bar_item('id_new_show').click()
 
         show_form = self.browser.find_element_by_tag_name('form')
         show_form.find_element_by_id('id_name').send_keys(SHOW_NAME)
@@ -36,7 +36,7 @@ class AddFeedTest(SoundscapesFunctionalTest):
         show_form.submit()
 
         # See downloaded episodes on the show page
-        episodes = self.select_svg_episodes()
+        episodes = self.find_svg_episodes()
         self.assertGreater(len(episodes), 0)
 
         # Download the first episode
@@ -50,7 +50,7 @@ class AddFeedTest(SoundscapesFunctionalTest):
         it is assumed that downloading an episode drills down to view
         the episode.
         """
-        episodes = self.select_svg_episodes()
+        episodes = self.find_svg_episodes()
         first_episode = episodes[0]
         first_episode.find_element_by_class_name('view').click()
         self.wait_for(tag = 'body')

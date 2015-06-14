@@ -26,7 +26,3 @@ class SoundscapesFunctionalTest(LiveServerTestCase):
     def tearDown(self):
         TEST_MEDIA_ROOT.rmtree()
         super(SoundscapesFunctionalTest, self).tearDown()
-
-    def get_items_in_list(self, list_id):
-        episode_list = self.browser.find_element_by_id(list_id)
-        return episode_list.find_elements_by_tag_name('li')
