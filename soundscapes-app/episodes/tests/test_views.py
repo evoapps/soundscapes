@@ -1,12 +1,8 @@
 import json
 from unipath import Path
 
-from django.conf import settings
-from django.core import serializers
-from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.test.utils import override_settings
 from django.utils.six import BytesIO
 
 from model_mommy import mommy
@@ -19,6 +15,7 @@ from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
 class EpisodeViewTest(TestCase):
 
     def _parse_response_json(self, response):
+        """ Given a response from self.client, return the data from JSON """
         response_json = response._container[0]
         response_stream = BytesIO(response_json)
         return JSONParser().parse(response_stream)
