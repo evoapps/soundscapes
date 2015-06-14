@@ -32,7 +32,7 @@ class EpisodeViewTest(TestCase):
 
     def test_show_create_view_creates_new_shows(self):
         show = mommy.prepare(Show)
-        post = {'name': show.name, 'rss': show.rss}
+        post = {'name': show.name, 'rss_url': show.rss_url}
         self.client.post(reverse('new_show'), post)
         self.assertEquals(Show.objects.last().name, show.name)
 
