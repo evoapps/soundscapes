@@ -11,13 +11,17 @@ from django.utils.six import BytesIO
 
 from model_mommy import mommy
 from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 
 from episodes.models import Show, Episode
 from episodes.serializers import EpisodeSerializer
 from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
 
 class EpisodeViewTest(TestCase):
+
+    def _parse_response_json(self, response):
+        response_json = response._container[0]
+        response_stream = BytesIO(response_json)
+        return JSONParser().parse(response_stream)
 
     def test_show_list_view_returns_list_of_shows(self):
         num_shows = 5
@@ -39,10 +43,27 @@ class EpisodeViewTest(TestCase):
         expected_episodes_serializer = EpisodeSerializer(episodes, many = True)
         expected_data = expected_episodes_serializer.data
 
-        url_to_get_episodes = reverse('json_episodes')
-        response_raw = self.client.get(url_to_get_episodes)
-        response_json = response_raw._container[0]
-        response_stream = BytesIO(response_json)
-        response_data = JSONParser().parse(response_stream)
+        url = reverse('json_episodes')
+        response = self.client.get(url)
+        response_data = self._parse_response_json(response)
 
         self.assertEqual(expected_data, response_data)
+
+    def test_get_related_episodes_as_json(self):
+        """ Only return the episodes of a particular show """
+        show = mommy.make(Show)
+        mommy.make(Episode, show = show, _quantity = 5)
+
+        other_show = mommy.make(Show)
+        mommy.make(Episode, show = other_show, _quantity = 5)
+
+        selected_episodes = show.episode_set.all()
+        selected_episodes_serializer = EpisodeSerializer(selected_episodes,
+                                                         many = True)
+        selected_data = selected_episodes_serializer.data
+
+        url = reverse('json_episodes', kwargs = {'show': show.pk})
+        response = self.client.get(url)
+        response_data = self._parse_response_json(response)
+
+        self.assertEqual(selected_data, response_data)
