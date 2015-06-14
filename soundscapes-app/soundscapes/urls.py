@@ -20,8 +20,8 @@ urlpatterns = patterns('',
         name = 'view_show',
     ),
     url(
-        r'^shows/(?P<pk>\d+)/episodes$',
-        views.json_episodes,
+        r'^api/episodes$',
+        views.EpisodeListAPIView.as_view(),
         name = 'json_episodes',
     ),
     url(

@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Episode, Segment
+from .models import Show, Episode, Segment
 
 class SegmentSerializer(serializers.ModelSerializer):
 

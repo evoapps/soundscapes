@@ -7,10 +7,14 @@ from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.utils.six import BytesIO
 
 from model_mommy import mommy
+from rest_framework.parsers import JSONParser
+from rest_framework.renderers import JSONRenderer
 
 from episodes.models import Show, Episode
+from episodes.serializers import EpisodeSerializer
 from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
 
 class EpisodeViewTest(TestCase):
@@ -31,12 +35,14 @@ class EpisodeViewTest(TestCase):
     def test_get_episodes_as_json(self):
         show = mommy.make(Show)
         mommy.make(Episode, show = show, _quantity = 5)
-        episode_queryset = show.episode_set.all()
-        expected_json = serializers.serialize('json', episode_queryset)
+        episodes = show.episode_set.all()
+        expected_episodes_serializer = EpisodeSerializer(episodes, many = True)
+        expected_data = expected_episodes_serializer.data
 
-        url_to_get_episodes = reverse('get_episodes_as_json',
-                                      kwargs = {'pk': show.pk})
+        url_to_get_episodes = reverse('json_episodes')
         response_raw = self.client.get(url_to_get_episodes)
-        response_json = json.loads(response_raw._container[0])
+        response_json = response_raw._container[0]
+        response_stream = BytesIO(response_json)
+        response_data = JSONParser().parse(response_stream)
 
-        self.assertJSONEqual(response_json, expected_json)
+        self.assertEqual(expected_data, response_data)
