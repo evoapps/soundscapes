@@ -10,11 +10,11 @@ class SegmentSerializer(serializers.ModelSerializer):
         model = Segment
 
 class EpisodeSerializer(serializers.ModelSerializer):
-    segment_set = SegmentSerializer(many = True)
+    segments = SegmentSerializer(many = True)
     url = serializers.URLField(source = 'get_absolute_url')
 
     class Meta:
         model = Episode
-        fields = ('id', 'show', 'released', 'title', 'mp3', 'segment_set',
+        fields = ('id', 'show', 'released', 'title', 'mp3', 'segments',
                   'url')
         depth = 1

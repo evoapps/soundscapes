@@ -55,7 +55,7 @@ class EpisodeManager(models.Manager):
 
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """
-    show = models.ForeignKey('Show')
+    show = models.ForeignKey(Show)
     rss_entry = models.TextField()
 
     released = models.DateTimeField()
@@ -99,15 +99,15 @@ class Episode(models.Model):
 
         TODO: add "reset" optional argument
         """
-        if self.segment_set.count() == 0:
-            self.segment_set.create(start_time = 0.0, end_time = self.duration)
+        if self.segments.count() == 0:
+            self.segments.create(start_time = 0.0, end_time = self.duration)
 
 class Segment(models.Model):
     """ A section of an Episode
 
     TODO: validate time fields in clean method
     """
-    episode = models.ForeignKey('Episode')
+    episode = models.ForeignKey(Episode, related_name = 'segments')
 
     TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
     start_time = models.DecimalField(**TIME_RESOLUTION)
