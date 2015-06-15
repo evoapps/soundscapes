@@ -9,11 +9,8 @@
 
   <h1>{{ show.name }}</h1>
 
-  <svg>
-  </svg>
-
-  <form action="" method="post" type="hidden"></form>
-
+  <div id="episodeList">
+  </div>
 {% endblock body %}
 
 {% block javascript %}
@@ -21,25 +18,7 @@
   <script type="text/javascript" src="{% static 'episodes/d3.js/colorbrewer.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
-var raw;
-
-episodeDownloadURLRouter = function(episodePk) {
-  $.get("{% url 'episode_download_url_router' %}",
-        {pk: episodePk},
-        function (data) {
-          console.log(data);
-        });
-}
-
-episodeDetailURLRouter = function(episodePk) {
-  var episodeDetailURL
-  $.get("{% url 'episode_detail_url_router' %}",
-        {pk: episodePk},
-        function (data) {
-          console.log(data);
-        });
-}
-
-d3.json("{% url 'json_episodes' pk=show.pk %}", show_soundscapes);
+var globalVars = {};
+d3.json("{% url 'json_episodes' show=show.pk %}", drawEpisodeList);
   </script>
 {% endblock javascript %}
