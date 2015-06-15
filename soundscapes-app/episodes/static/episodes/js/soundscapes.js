@@ -21,3 +21,8 @@ function drawEpisodeList(episodes) {
     .attr("href", function (ep) { return ep.url; })
     .text(function (ep) { return ep.title; });
 }
+
+function drawSegments(episode) {
+  // don't know if this is going to be a single object or an array
+  globalVars.episode = episode;
+}

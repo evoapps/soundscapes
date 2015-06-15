@@ -22,12 +22,17 @@ urlpatterns = patterns('',
     url(
         r'^api/episodes$',
         views.EpisodeListAPIView.as_view(),
-        name = 'json_episodes',
+        name = 'json_episode_list',
     ),
     url(
-        r'^api/episodes/(?P<show>\d+)$',
+        r'^api/show/(?P<show>\d+)/episodes$',
         views.EpisodeListAPIView.as_view(),
-        name = 'json_episodes',
+        name = 'json_episode_list',
+    ),
+    url(
+        r'^api/episode/(?P<episode>\d+)$',
+        views.EpisodeRetrieveAPIView.as_view(),
+        name = 'json_episode',
     ),
     url(
         r'^episodes/(?P<pk>\d+)/$',

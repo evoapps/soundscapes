@@ -7,10 +7,12 @@
 
 {% block body %}
 
-  <h1>{{ show.name }}</h1>
+  <h1>{{ episode.show.name }}</h1>
 
-  <div id="episodeList">
-  </div>
+  <h2>{{ episode.title }}</h2>
+
+  <svg>
+  </svg>
 
 {% endblock body %}
 
@@ -20,6 +22,6 @@
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
   <script>
 var globalVars = {};
-d3.json("{% url 'json_episode_list' show=show.pk %}", drawEpisodeList);
+d3.json("{% url 'json_episode' episode=episode.pk %}", drawSegments);
   </script>
 {% endblock javascript %}
