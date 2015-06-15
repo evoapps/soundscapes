@@ -2,6 +2,7 @@ from dateutil import parser as dateparser
 from unipath import Path
 
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.core.files.storage import FileSystemStorage
 from django.db import models
 
@@ -14,8 +15,7 @@ class Show(models.Model):
     rss_url = models.URLField(unique = True)
 
     def get_absolute_url(self):
-        # reverse(...) should work. Weird import somewhere.
-        return '/shows/{pk}/'.format(pk = self.pk)
+        return reverse('view_show', kwargs = {'pk': self.pk})
 
     def refresh(self, max = 10):
         """ Create episodes from new RSS entries
@@ -70,8 +70,7 @@ class Episode(models.Model):
     objects = EpisodeManager()
 
     def get_absolute_url(self):
-        # reverse(...) should work. Weird import somewhere.
-        return '/episodes/{pk}/'.format(pk = self.pk)
+        reverse('view_episode', kwargs = {'pk': self.pk})
 
     def download(self):
         """ Download the episode file and analyze its duration
