@@ -1,8 +1,14 @@
+from unipath import Path
+
+# RSS handling
 import feedparser
 import json
-import pydub
 import requests
-from unipath import Path
+
+# mp3 handling
+import pydub
+from math import floor
+from noise import pnoise1
 
 from django.conf import settings
 from django.core.files import File
@@ -54,5 +60,22 @@ def get_audio_duration(mp3_file):
     audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
     return audio_segment.duration_seconds
 
-def get_audio_features(mp3):
-    pass
+def get_audio_features(mp3_file):
+    """ (MOCKED) Extract (x,y) pairs from an mp3
+
+    MOCKED: right now only random numbers are generated
+
+    TODO: implement sampling_rate parameter
+    """
+    audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
+    duration = int(floor(audio_segment.duration_seconds))
+
+    xy_data = list()
+
+    for time in xrange(duration):
+        # hack! transform of x is only because I don't understand pnoise1
+        x = float(time)/duration
+        y = pnoise1(x, octaves = 1)
+        xy_data.append((time,y))
+
+    return xy_data

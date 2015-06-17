@@ -7,6 +7,7 @@ from django.core.files import File
 
 from episodes.handlers import fetch_rss_entries
 from episodes.handlers import get_audio_duration
+from episodes.handlers import get_audio_features
 
 class HandlerTest(unittest.TestCase):
     def setUp(self):
@@ -29,3 +30,15 @@ class HandlerTest(unittest.TestCase):
         duration = get_audio_duration(episode_file)
         self.assertIsInstance(duration, float)
         self.assertGreater(duration, 0)
+
+        episode_file.close()
+
+    def test_get_audio_features(self):
+        to_episode = Path(settings.BASE_DIR, 'ftests/fixtures/reply-all-26.mp3')
+        episode_file = File(open(to_episode, 'rb'))
+        xy_data = get_audio_features(episode_file)
+        self.assertGreater(len(xy_data), 0)
+        sample_x, sample_y = xy_data[0]
+        self.assertIsInstance(sample_y, float)
+
+        episode_file.close()
