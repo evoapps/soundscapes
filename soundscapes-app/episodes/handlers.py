@@ -50,6 +50,9 @@ def download_episode(downloadable_url):
 
     return File(open(expected_loc, 'rb'))
 
-def get_audio_duration(mp3):
-    audio_segment = pydub.AudioSegment.from_mp3(mp3)
+def get_audio_duration(mp3_file):
+    audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
     return audio_segment.duration_seconds
+
+def get_audio_features(mp3):
+    pass
