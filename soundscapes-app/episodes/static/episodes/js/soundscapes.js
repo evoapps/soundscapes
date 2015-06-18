@@ -3,9 +3,7 @@ function drawEpisodeList(episodes) {
   globalVars.episodes = episodes;
 
   // Convert release string to javascript Date
-  episodes.forEach(function (ep) {
-    ep.released = Date.parse(ep.released);
-  });
+  episodes.forEach(parseEpisode);
 
   d3.select("#episodeList")
     .selectAll("div.episode")
@@ -25,4 +23,39 @@ function drawEpisodeList(episodes) {
 function drawSegments(episode) {
   // don't know if this is going to be a single object or an array
   globalVars.episode = episode;
+
+  parseEpisode(episode);
+
+  var svgWidth = 500,
+      svgHeight = 200;
+
+  var line = d3.svg.line(),
+      timeScale = d3.scale.linear(),
+      valueScale = d3.scale.linear();
+
+  line
+    .x(function (moment) { return timeScale(moment.time); })
+    .y(function (moment) { return valueScale(moment.value); });
+
+  timeScale
+    .domain(d3.extent(episode.moments, function (moment) { return parseFloat(moment.time); }))
+    .range([0, svgWidth])
+
+  valueScale
+    .domain(d3.extent(episode.moments, function (moment) { return moment.value; }))
+    .range([0, svgHeight])
+
+  d3.select("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight)
+    .selectAll("path.segment")
+    .data(episode.segments)
+    .enter()
+    .append("path")
+    .attr("class", "segment")
+    .attr("d", function (segment) { return line(segment.moments); })
+}
+
+function parseEpisode(episode) {
+  episode.released = Date.parse(episode.released);
 }
