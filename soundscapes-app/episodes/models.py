@@ -6,7 +6,8 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 from .handlers import fetch_rss_entries, dump_rss_entry
-from .handlers import download_episode, get_audio_duration
+from .handlers import download_episode
+from .handlers import get_audio_duration, get_audio_features
 
 # Decimal field kwargs for moments and segments
 TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
@@ -112,11 +113,12 @@ class Episode(models.Model):
 
     def _create_initial_segment(self):
         if self.segments.count() == 0:
-            start_time = 0.0
-            end_time = self.duration
-            moments = self.moments.filter(time >= start_time, time < end_time)
-            self.segments.create(start_time = start_time, end_time = end_time,
-                                 moments = moments)
+            kwargs = {
+                'start_time': 0.0,
+                'end_time': self.duration,
+                'episode': self,
+            }
+            Segment.objects.create_and_capture_moments(**kwargs)
 
 class Moment(models.Model):
     """ A particular time point in an episode
@@ -139,6 +141,15 @@ class Moment(models.Model):
     class Meta:
         unique_together = ('episode', 'time')
 
+class SegmentManager(models.Manager):
+    def create_and_capture_moments(self, **kwargs):
+        segment = self.create(**kwargs)
+
+        episode = segment.episode
+        moments = episode.moments.filter(time__gte = segment.start_time,
+                                         time__lte = segment.end_time)
+        segment.moments.add(*moments)
+
 class Segment(models.Model):
     """ A section of an Episode
 
@@ -150,3 +161,5 @@ class Segment(models.Model):
     end_time = models.DecimalField(**TIME_RESOLUTION)
 
     moments = models.ManyToManyField(Moment, related_name = 'moments')
+
+    objects = SegmentManager()

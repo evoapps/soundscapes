@@ -67,8 +67,9 @@ def get_audio_features(mp3_file):
 
     TODO: implement sampling_rate parameter
     """
-    audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
-    duration = int(floor(audio_segment.duration_seconds))
+    #audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
+    #duration = int(floor(audio_segment.duration_seconds))
+    duration = 10
 
     xy_data = list()
 
