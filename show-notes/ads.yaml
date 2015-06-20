@@ -53,3 +53,15 @@
       sponsor: "Squarespace"
       start_time: 26:32
       end_time: 27:40
+- show: "Mystery Show"
+  title: "Case #5 Source Code"
+  ads:
+    1: 14:08
+      sponsor: "Kind Snacks"
+      start_time: 14:08
+      end_time: 15:20
+    2:
+      sponsor: "Squarespace"
+      start_time: 15:20
+      end_time: 16:20
+
