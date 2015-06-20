@@ -20,13 +20,6 @@ function drawEpisodeList(episodes) {
     .text(function (ep) { return ep.title; });
 }
 
-function addEndMoments(segment) {
-  var firstMoment = {time: segment.start_time, value: 0.0},
-      lastMoment = {time: segment.end_time, value: 0.0};
-  segment.moments.splice(0, 0, firstMoment);
-  segment.moments.push(lastMoment);
-}
-
 function drawSegments(episode) {
   // don't know if this is going to be a single object or an array
   globalVars.episode = episode;
@@ -66,4 +59,11 @@ function drawSegments(episode) {
 
 function parseEpisode(episode) {
   episode.released = Date.parse(episode.released);
+}
+
+function addEndMoments(segment) {
+  var firstMoment = {time: segment.start_time, value: 0.0},
+      lastMoment = {time: segment.end_time, value: 0.0};
+  segment.moments.splice(0, 0, firstMoment);
+  segment.moments.push(lastMoment);
 }
