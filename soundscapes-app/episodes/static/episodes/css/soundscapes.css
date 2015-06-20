@@ -2,8 +2,7 @@ text {
   font: 24px Helvetica;
 }
 
-path {
-  fill: none;
+path.segment {
   stroke: black;
   stroke-width: 1.5px;
 }
