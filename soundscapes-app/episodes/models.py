@@ -95,7 +95,11 @@ class Episode(models.Model):
 
         self.analyze()
 
-    def analyze(self):
+    def analyze(self, reset = False):
+        if reset:
+            Moment.objects.filter(episode = self).delete()
+            Segment.objects.filter(episode = self).delete()
+
         self._get_duration()
         self._create_moments()
         self._create_initial_segment()
