@@ -97,7 +97,8 @@ def get_audio_features(mp3_file):
     expected_loc = Path(analyses_dir, expected_file)
 
     if not expected_loc.exists():
-        audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
+        downloaded_mp3 = Path(settings.DOWNLOADS_DIR, Path(mp3_file.name).name)
+        audio_segment = pydub.AudioSegment.from_mp3(downloaded_mp3)
 
         # step 1: convert mp3 to wav
         temp_wav = Path(analyses_dir, Path(mp3_file.name).stem + '.wav')
@@ -127,6 +128,8 @@ def get_audio_features(mp3_file):
 
         frame = pd.DataFrame({'time': mva_ts, 'value': mva})
         frame.to_csv(expected_loc, index = False)
+
+        temp_wav.remove()
 
     frame = pd.read_csv(expected_loc)
     return zip(frame.time, frame.value)
