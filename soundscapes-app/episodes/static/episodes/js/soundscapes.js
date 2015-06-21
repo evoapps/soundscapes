@@ -59,13 +59,10 @@ function drawSegments(episode) {
 
   function selectSegment(segment) {
     var segmentPath = d3.select(this);
-    console.log("selected episode");
     segmentPath.classed("playing", !segmentPath.classed("playing"));
     if (segmentPath.classed("playing")) {
-      console.log("has playing, so playing episode");
       episode.playEpisode(segment.start_time);
     } else {
-      console.log("not playing, so stopping episode");
       episode.stopEpisode();
     }
   }

@@ -11,7 +11,7 @@ function loadEpisodeAudioSource(episode) {
   // Decode asynchronously
   request.onload = function () {
     audioContext.decodeAudioData(request.response,
-      function (buffer) { console.log("loaded"); episodeBuffer = buffer; },
+      function (buffer) { episodeBuffer = buffer; },
       function (error) { console.log(error); });
   }
   request.send();
@@ -24,5 +24,5 @@ function loadEpisodeAudioSource(episode) {
   }
 
   episode.playEpisode = playEpisode;
-  episode.stopEpisode = function () { console.log("stopping"); source.stop(); };
+  episode.stopEpisode = function () { source.stop(); };
 }
