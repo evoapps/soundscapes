@@ -18,6 +18,7 @@
   <script type="text/javascript" src="{% static 'episodes/d3.js/d3.min.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/d3.js/colorbrewer.js' %}"></script>
   <script type="text/javascript" src="{% static 'episodes/js/soundscapes.js' %}"></script>
+  <script type="text/javascript" src="{% static 'episodes/js/player.js' %}"></script>
   <script>
 var globalVars = {};
 d3.json("{% url 'json_episode_list' show=show.pk %}", drawEpisodeList);

@@ -1,33 +1,5 @@
 
 function drawEpisodeList(episodes) {
-  globalVars.episodes = episodes;
-
-  var svgWidth = 500,
-      svgHeight = 200;
-
-  var line = d3.svg.line(),
-      timeScale = d3.scale.linear(),
-      valueScale = d3.scale.linear();
-
-  var longestEpisodeTime = d3.max(episodes, function (episode) {
-    return episode.duration;
-  });
-  var largestMomentValue = d3.max(episodes, function (episode) {
-    return d3.max(episode.moments, function (moment) { return moment.value; });
-  });
-
-  line
-    .x(function (moment) { return timeScale(moment.time); })
-    .y(function (moment) { return valueScale(moment.value); })
-    .interpolate("basis");
-
-  timeScale
-    .domain([0, longestEpisodeTime])
-    .range([0, svgWidth]);
-
-  valueScale
-    .domain([0, largestMomentValue])
-    .range([svgHeight, 0]);
 
   // Convert release string to javascript Date
   episodes.forEach(parseEpisode);
@@ -37,26 +9,12 @@ function drawEpisodeList(episodes) {
     .data(episodes)
     .enter()
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .append("g")
-    .attr("class", "episode")
+    .attr("class", "soundscape")
     .attr("id", function (episode) { return "episode" + episode.id; })
-    .each(function (episode) {
-      episode.segments.forEach(addEndMoments);
-
-      d3.select(this)
-        .selectAll("path.segment")
-        .data(episode.segments)
-        .enter()
-        .append("path")
-        .attr("class", "segment")
-        .attr("d", function (segment) { return line(segment.moments) + "Z"; });
-    });
+    .each(drawSegments);
 }
 
 function drawSegments(episode) {
-  episode.segments.forEach(addEndMoments);
 
   var svgWidth = 500,
       svgHeight = 200;
@@ -67,7 +25,8 @@ function drawSegments(episode) {
 
   line
     .x(function (moment) { return timeScale(moment.time); })
-    .y(function (moment) { return valueScale(moment.value); });
+    .y(function (moment) { return valueScale(moment.value); })
+    .interpolate("basis");
 
   timeScale
     .domain(d3.extent(episode.moments, function (moment) { return parseFloat(moment.time); }))
@@ -77,7 +36,9 @@ function drawSegments(episode) {
     .domain(d3.extent(episode.moments, function (moment) { return moment.value; }))
     .range([svgHeight, 0]);
 
-  d3.select("svg")
+  episode.segments.forEach(addEndMoments);
+
+  d3.select("#episode" + episode.id)
     .attr("width", svgWidth)
     .attr("height", svgHeight)
     .append("g")
@@ -108,10 +69,10 @@ function drawSegments(episode) {
     }
   }
 
-  d3.selectAll("path.segment")
-    .on("click", selectSegment);
-
-  loadEpisodeAudioSource(episode);
+  // d3.selectAll("path.segment")
+  //   .on("click", selectSegment);
+  //
+  // loadEpisodeAudioSource(episode);
 }
 
 function parseEpisode(episode) {
