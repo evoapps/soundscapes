@@ -22,6 +22,6 @@ class EpisodeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Episode
-        fields = ('id', 'show', 'released', 'title', 'mp3',
+        fields = ('id', 'show', 'released', 'title', 'mp3', 'duration',
                   'segments', 'moments', 'url')
         depth = 1

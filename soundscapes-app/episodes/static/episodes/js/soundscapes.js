@@ -2,29 +2,60 @@
 function drawEpisodeList(episodes) {
   globalVars.episodes = episodes;
 
+  var svgWidth = 500,
+      svgHeight = 200;
+
+  var line = d3.svg.line(),
+      timeScale = d3.scale.linear(),
+      valueScale = d3.scale.linear();
+
+  var longestEpisodeTime = d3.max(episodes, function (episode) {
+    return episode.duration;
+  });
+  var largestMomentValue = d3.max(episodes, function (episode) {
+    return d3.max(episode.moments, function (moment) { return moment.value; });
+  });
+
+  console.log(longestEpisodeTime);
+  console.log(largestMomentValue);
+
+  line
+    .x(function (moment) { return timeScale(moment.time); })
+    .y(function (moment) { return valueScale(moment.value); });
+
+  timeScale
+    .domain([0, longestEpisodeTime])
+    .range([0, svgWidth]);
+
+  valueScale
+    .domain([0, largestMomentValue])
+    .range([svgHeight, 0]);
+
   // Convert release string to javascript Date
   episodes.forEach(parseEpisode);
 
   d3.select("#episodeList")
-    .selectAll("div.episode")
+    .selectAll("svg")
     .data(episodes)
     .enter()
-    .append("div")
-    .attr("class", "episode");
-
-  var episodeDivs = d3.selectAll("div.episode");
-
-  episodeDivs.append("h2")
-    .append("a")
-    .attr("href", function (ep) { return ep.url; })
-    .text(function (ep) { return ep.title; });
+    .append("svg")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight)
+    .append("g")
+    .attr("class", "episode")
+    .attr("id", function (episode) { return "episode" + episode.id; })
+    .each(function (episode) {
+      d3.select(this)
+        .selectAll("path.segment")
+        .data(episode.segments)
+        .enter()
+        .append("path")
+        .attr("class", "segment")
+        .attr("d", function (segment) { return line(segment.moments) + "Z"; });
+    });
 }
 
 function drawSegments(episode) {
-  // don't know if this is going to be a single object or an array
-  globalVars.episode = episode;
-
-  parseEpisode(episode);
   episode.segments.forEach(addEndMoments);
 
   var svgWidth = 500,
