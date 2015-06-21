@@ -54,8 +54,24 @@ function drawSegments(episode) {
     .enter()
     .append("path")
     .attr("class", "segment")
+    .attr("id", function (segment) { return segment.id; })
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
-    .on("click", function (segment) { episode.playEpisode(segment.start_time); });
+
+  function selectSegment(segment) {
+    var segmentPath = d3.select(this);
+    console.log("selected episode");
+    segmentPath.classed("playing", !segmentPath.classed("playing"));
+    if (segmentPath.classed("playing")) {
+      console.log("has playing, so playing episode");
+      episode.playEpisode(segment.start_time);
+    } else {
+      console.log("not playing, so stopping episode");
+      episode.stopEpisode();
+    }
+  }
+
+  d3.selectAll("path.segment")
+    .on("click", selectSegment);
 
   loadEpisodeAudioSource(episode);
 }
