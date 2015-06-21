@@ -104,3 +104,5 @@ MEDIA_ROOT = Path(ROOT_DIR, 'media')
 # Download RSS files to downloads directory, and then
 # load them into the models (and MEDIA_ROOT)
 DOWNLOADS_DIR = Path(ROOT_DIR, 'downloads')
+
+ANALYSES_DIR = Path(ROOT_DIR, 'analyses')

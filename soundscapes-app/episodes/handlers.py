@@ -101,9 +101,9 @@ def get_audio_features(mp3_file):
 
         # step 1: convert mp3 to wav
         temp_wav = Path(analyses_dir, Path(mp3_file.name).stem + '.wav')
-        wav_segment = audio_segment.export(temp_wav, format = 'wav')
+        audio_segment.export(temp_wav, format = 'wav')
 
-        rate, data = scipy.io.wavfile.read(wav_segment)
+        rate, data = scipy.io.wavfile.read(temp_wav)
         ys = np.asarray(data[:,1], dtype = float)
         nsamples = len(ys)
         total_file_time = nsamples / rate
@@ -125,8 +125,8 @@ def get_audio_features(mp3_file):
 
         weave.inline(weave_code, ['y_squared', 'nn', 'mva', 'index_width', 'samples', 'nsamples_mva', 'mva_ts', 'ts'])
 
-        frame = pd.DataFrame({'t': mva_ts, 'y': mva})
-        frame.to_csv(expected_loc)
+        frame = pd.DataFrame({'time': mva_ts, 'value': mva})
+        frame.to_csv(expected_loc, index = False)
 
     frame = pd.read_csv(expected_loc)
-    return frame.t.values, frame.y.values
+    return zip(frame.time, frame.value)

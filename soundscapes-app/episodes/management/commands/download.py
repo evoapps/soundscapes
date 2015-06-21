@@ -7,6 +7,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--episode-id', nargs = '+')
+        parser.add_argument('--analyze', action = 'store_true')
 
     def handle(self, *args, **options):
         all_episodes_ids = Episode.objects.values_list('id', flat = True)
@@ -18,4 +19,4 @@ class Command(BaseCommand):
             except Episode.DoesNotExist:
                 raise CommandError('Episode "{}" does not exist'.format(pk))
 
-            episode.download()
+            episode.download(analyze = options['analyze'])
