@@ -11,7 +11,11 @@ function loadEpisodeAudioSource(episode) {
   // Decode asynchronously
   request.onload = function () {
     audioContext.decodeAudioData(request.response,
-      function (buffer) { episodeBuffer = buffer; },
+      function (buffer) {
+        episodeBuffer = buffer;
+        var episodeGroup = document.getElementById("episode" + episode.id);
+        episodeGroup.classList.add("loaded");
+      },
       function (error) { console.log(error); });
   }
   request.send();

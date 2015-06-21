@@ -49,16 +49,26 @@ function drawSegments(episode) {
   d3.select("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
+    .append("g")
+    .attr("class", "episode")
+    .attr("id", "episode" + episode.id)
     .selectAll("path.segment")
     .data(episode.segments)
     .enter()
     .append("path")
     .attr("class", "segment")
-    .attr("id", function (segment) { return segment.id; })
+    .attr("id", function (segment) { return "segment" + segment.id; })
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
 
   function selectSegment(segment) {
+    var episodeGroup = d3.select(this.parentNode);
+
+    if (!episodeGroup.classed("loaded")) {
+      return;
+    }
+
     var segmentPath = d3.select(this);
+
     segmentPath.classed("playing", !segmentPath.classed("playing"));
     if (segmentPath.classed("playing")) {
       episode.playEpisode(segment.start_time);
