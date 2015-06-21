@@ -55,6 +55,9 @@ function drawSegments(episode) {
     .append("path")
     .attr("class", "segment")
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
+    .on("click", function (segment) { episode.playEpisode(segment.start_time); });
+
+  loadEpisodeAudioSource(episode);
 }
 
 function parseEpisode(episode) {
