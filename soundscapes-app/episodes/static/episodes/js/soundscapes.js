@@ -16,12 +16,10 @@ function drawEpisodeList(episodes) {
     return d3.max(episode.moments, function (moment) { return moment.value; });
   });
 
-  console.log(longestEpisodeTime);
-  console.log(largestMomentValue);
-
   line
     .x(function (moment) { return timeScale(moment.time); })
-    .y(function (moment) { return valueScale(moment.value); });
+    .y(function (moment) { return valueScale(moment.value); })
+    .interpolate("basis");
 
   timeScale
     .domain([0, longestEpisodeTime])
@@ -45,6 +43,8 @@ function drawEpisodeList(episodes) {
     .attr("class", "episode")
     .attr("id", function (episode) { return "episode" + episode.id; })
     .each(function (episode) {
+      episode.segments.forEach(addEndMoments);
+
       d3.select(this)
         .selectAll("path.segment")
         .data(episode.segments)
