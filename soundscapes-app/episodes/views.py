@@ -21,7 +21,7 @@ class ShowDetailView(DetailView):
     model = Show
 
 class EpisodeListAPIView(generics.ListAPIView):
-    """ Serialize Episodes """
+    """ Serialize a list of episodes """
     serializer_class = EpisodeSerializer
 
     def get_queryset(self):
@@ -32,6 +32,15 @@ class EpisodeListAPIView(generics.ListAPIView):
             queryset = queryset.filter(show__pk = show)
 
         return queryset
+
+class EpisodeRetrieveAPIView(generics.RetrieveAPIView):
+    """ Serialize individual episodes
+
+    TODO: combine EpisodeListAPI and EpisodeRetrieveAPI into GenericAPI
+    """
+    queryset = Episode.objects.all()
+    serializer_class = EpisodeSerializer
+    lookup_url_kwarg = 'episode'
 
 class EpisodeDetailView(DetailView):
     model = Episode

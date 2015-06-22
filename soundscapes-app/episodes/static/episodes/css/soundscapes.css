@@ -2,8 +2,15 @@ text {
   font: 24px Helvetica;
 }
 
-path {
-  fill: none;
+g {
+  fill-opacity: 0.5;
+}
+
+g.loaded {
+  fill-opacity: 1.0;
+}
+
+path.segment {
   stroke: black;
   stroke-width: 1.5px;
 }

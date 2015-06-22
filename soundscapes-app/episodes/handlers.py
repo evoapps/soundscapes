@@ -1,11 +1,45 @@
+from unipath import Path
+
+# RSS handling
 import feedparser
 import json
-import pydub
 import requests
-from unipath import Path
+
+# mp3 handling
+import numpy as np
+import pydub
+from scipy import weave
+import scipy.io.wavfile
+
+import pandas as pd
 
 from django.conf import settings
 from django.core.files import File
+
+weave_code = r"""
+int i, j, ct, jmin, jmax, ii;
+double sum=0;
+for(ii = 0; ii < nsamples_mva; ++ii){
+sum = 0;
+ct = 0;
+i = samples[ii];
+jmin = i - index_width;
+jmax = i + index_width;
+
+if(i - index_width < 0)
+jmin = 0;
+
+if(i + index_width > nn)
+jmax = nn;
+
+for(j = jmin; j < jmax; ++j){
+sum += y_squared[j];
+ct++;
+}
+mva[ii] = sum / ct;
+mva_ts[ii] = ts[i];
+}
+"""
 
 def fetch_rss_entries(rss_url, n = None):
     """ Retrieve entries from an RSS feed
@@ -50,6 +84,52 @@ def download_episode(downloadable_url):
 
     return File(open(expected_loc, 'rb'))
 
-def get_audio_duration(mp3):
-    audio_segment = pydub.AudioSegment.from_mp3(mp3)
+def get_audio_duration(mp3_file):
+    audio_segment = pydub.AudioSegment.from_mp3(mp3_file)
     return audio_segment.duration_seconds
+
+def get_audio_features(mp3_file):
+    analyses_dir = Path(settings.ANALYSES_DIR)
+    if not analyses_dir.exists():
+        analyses_dir.mkdir()
+
+    expected_file = Path(mp3_file.name).stem + '.csv'
+    expected_loc = Path(analyses_dir, expected_file)
+
+    if not expected_loc.exists():
+        downloaded_mp3 = Path(settings.DOWNLOADS_DIR, Path(mp3_file.name).name)
+        audio_segment = pydub.AudioSegment.from_mp3(downloaded_mp3)
+
+        # step 1: convert mp3 to wav
+        temp_wav = Path(analyses_dir, Path(mp3_file.name).stem + '.wav')
+        audio_segment.export(temp_wav, format = 'wav')
+
+        rate, data = scipy.io.wavfile.read(temp_wav)
+        ys = np.asarray(data[:,1], dtype = float)
+        nsamples = len(ys)
+        total_file_time = nsamples / rate
+
+        ts, dt = np.linspace(0, total_file_time, nsamples, retstep = True)
+
+        delta_sample = 5.0
+        delta_window = delta_sample * 2
+        index_width = (int)(delta_window / dt)
+
+        nn = len(ys)
+        samples = np.arange(0, nn, (int) (delta_sample / dt))
+        nsamples_mva = len(samples)
+
+        mva = np.zeros(nsamples_mva)
+        mva_ts = np.zeros(nsamples_mva)
+
+        y_squared = (ys**2)
+
+        weave.inline(weave_code, ['y_squared', 'nn', 'mva', 'index_width', 'samples', 'nsamples_mva', 'mva_ts', 'ts'])
+
+        frame = pd.DataFrame({'time': mva_ts, 'value': mva})
+        frame.to_csv(expected_loc, index = False)
+
+        temp_wav.remove()
+
+    frame = pd.read_csv(expected_loc)
+    return zip(frame.time, frame.value)

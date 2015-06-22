@@ -21,4 +21,3 @@ class Command(BaseCommand):
             show.refresh()
             for episode in show.episode_set.all():
                 episode.download()
-                episode.analyze()

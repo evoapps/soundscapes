@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
 from django.contrib import admin
 
 from episodes import views
@@ -22,12 +24,17 @@ urlpatterns = patterns('',
     url(
         r'^api/episodes$',
         views.EpisodeListAPIView.as_view(),
-        name = 'json_episodes',
+        name = 'json_episode_list',
     ),
     url(
-        r'^api/episodes/(?P<show>\d+)$',
+        r'^api/show/(?P<show>\d+)/episodes$',
         views.EpisodeListAPIView.as_view(),
-        name = 'json_episodes',
+        name = 'json_episode_list',
+    ),
+    url(
+        r'^api/episode/(?P<episode>\d+)$',
+        views.EpisodeRetrieveAPIView.as_view(),
+        name = 'json_episode',
     ),
     url(
         r'^episodes/(?P<pk>\d+)/$',
@@ -39,4 +46,4 @@ urlpatterns = patterns('',
         views.download_episode,
         name = 'download_episode',
     ),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

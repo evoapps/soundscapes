@@ -9,6 +9,17 @@
       sponsor: "Stamps.com"
       start_time: 10:46
       end_time: 12:05
+- show: "Reply All"
+  title: "#28 Shipped to Timbuktu"
+  ads:
+    1:
+      sponsor: "MailChimp"
+      start_time: 25:21
+      end_time: 26:16
+    2:
+      sponsor: "Stamps.com"
+      start_time: 26:16
+      end_time: 26:54
 - show: "StartUp"
   title: "Profiled (Season 2, #6)"
   ads:
@@ -53,3 +64,16 @@
       sponsor: "Kind Snacks"
       start_time: 24:08
       end_time: 25:23
+- show: "Mystery Show"
+  title: "Case #5 Source Code"
+  ads:
+    1: 14:08
+      sponsor: "Kind Snacks"
+      start_time: 14:08
+      end_time: 15:20
+    2:
+      sponsor: "Squarespace"
+      start_time: 15:20
+      end_time: 16:20
+
+>>>>>>> divs

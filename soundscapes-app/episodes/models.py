@@ -7,7 +7,11 @@ from django.core.files.storage import FileSystemStorage
 from django.db import models
 
 from .handlers import fetch_rss_entries, dump_rss_entry
-from .handlers import download_episode, get_audio_duration
+from .handlers import download_episode
+from .handlers import get_audio_duration, get_audio_features
+
+# Decimal field kwargs for moments and segments
+TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
 
 class Show(models.Model):
     """ A collection of Episodes, plugged in to an RSS podcast feed """
@@ -55,7 +59,7 @@ class EpisodeManager(models.Manager):
 
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """
-    show = models.ForeignKey('Show')
+    show = models.ForeignKey(Show)
     rss_entry = models.TextField()
 
     released = models.DateTimeField()
@@ -72,42 +76,93 @@ class Episode(models.Model):
     def get_absolute_url(self):
         reverse('view_episode', kwargs = {'pk': self.pk})
 
-    def download(self):
+    def download(self, analyze = True):
         """ Download the episode file and analyze its duration
 
-        Episodes are only downloaded if the mp3 FileField is empty. Analyzing
-        the episode duration here is not necessary but the file is already
-        open.
+        Episodes are only downloaded if the mp3 FileField is empty. After an
+        episode is downloaded, it is analyzed. Analysis can be prevented by
+        setting the optional boolean param "analyze" to False.
 
         TODO: use case for "overwrite" as an optional argument?
-
-        URGENT: add boolean argument "analyze" that defaults to True,
-                and use it to trigger self.analyze. Duration should be
-                bundled with self.analyze.
         """
         if not self.mp3:
-            mp3 = download_episode(self.rss_mp3_url)
-            self.mp3 = mp3
-            self.duration = get_audio_duration(mp3)
+            self.mp3 = download_episode(self.rss_mp3_url)
             self.save()
 
-    def analyze(self):
-        """ Create an initial segment spanning the episode
+        if not analyze:
+            return
 
-        Segments are only created if none yet exist.
+        self.analyze()
 
-        TODO: add "reset" optional argument
-        """
-        if self.segment_set.count() == 0:
-            self.segment_set.create(start_time = 0.0, end_time = self.duration)
+    def analyze(self, reset = False):
+        if reset:
+            Moment.objects.filter(episode = self).delete()
+            Segment.objects.filter(episode = self).delete()
+
+        self._get_duration()
+        self._create_moments()
+        self._create_initial_segment()
+
+    def _get_duration(self):
+        if not self.duration:
+            self.duration = get_audio_duration(self.mp3)
+            self.save()
+
+    def _create_moments(self):
+        if self.moments.count() == 0:
+            xy_data = get_audio_features(self.mp3)
+            for x, y in xy_data:
+                self.moments.create(time = x, value = y)
+
+    def _create_initial_segment(self):
+        if self.segments.count() == 0:
+            kwargs = {
+                'start_time': 0.0,
+                'end_time': self.duration,
+                'episode': self,
+            }
+            Segment.objects.create_and_capture_moments(**kwargs)
+
+class Moment(models.Model):
+    """ A particular time point in an episode
+
+    Moments are the "dots" that make up the "line" of an episode. They are
+    literal data points: they have numeric fields for visualizing and
+    interacting with the episode. Time points within an episode are unique.
+
+    Validating the resolution of a collection of moments (e.g., whether
+    moments are one second or 500 msec apart) is not implemented, but it
+    can be enforced at the model manager level.
+
+        >>> episode.moments.select(time = my_list_of_times)
+
+    """
+    episode = models.ForeignKey(Episode, related_name = 'moments')
+    time = models.DecimalField(**TIME_RESOLUTION)
+    value = models.FloatField()
+
+    class Meta:
+        unique_together = ('episode', 'time')
+
+class SegmentManager(models.Manager):
+    def create_and_capture_moments(self, **kwargs):
+        segment = self.create(**kwargs)
+
+        episode = segment.episode
+        moments = episode.moments.filter(time__gte = segment.start_time,
+                                         time__lte = segment.end_time)
+        segment.moments.add(*moments)
 
 class Segment(models.Model):
     """ A section of an Episode
 
     TODO: validate time fields in clean method
     """
-    episode = models.ForeignKey('Episode')
+    episode = models.ForeignKey(Episode, related_name = 'segments')
 
-    TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
     start_time = models.DecimalField(**TIME_RESOLUTION)
     end_time = models.DecimalField(**TIME_RESOLUTION)
+
+    moments = models.ManyToManyField(Moment, related_name = 'moments')
+
+    objects = SegmentManager()

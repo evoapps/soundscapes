@@ -40,7 +40,7 @@ class EpisodeViewTest(TestCase):
         expected_episodes_serializer = EpisodeSerializer(episodes, many = True)
         expected_data = expected_episodes_serializer.data
 
-        url = reverse('json_episodes')
+        url = reverse('json_episode_list')
         response = self.client.get(url)
         response_data = self._parse_response_json(response)
 
@@ -59,8 +59,20 @@ class EpisodeViewTest(TestCase):
                                                          many = True)
         selected_data = selected_episodes_serializer.data
 
-        url = reverse('json_episodes', kwargs = {'show': show.pk})
+        url = reverse('json_episode_list', kwargs = {'show': show.pk})
         response = self.client.get(url)
         response_data = self._parse_response_json(response)
 
         self.assertEqual(selected_data, response_data)
+
+    def test_get_single_episode_as_json(self):
+        """ Episode detail view requires returning a single episode """
+        episode = mommy.make(Episode, _quantity = 10)[5]
+        episode_serializer = EpisodeSerializer(episode)
+        episode_data = episode_serializer.data
+
+        url = reverse('json_episode', kwargs = {'episode': episode.pk})
+        response = self.client.get(url)
+        response_data = self._parse_response_json(response)
+
+        self.assertEqual(episode_data, response_data)
