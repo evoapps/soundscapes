@@ -77,7 +77,7 @@ class Episode(models.Model):
     objects = EpisodeManager()
 
     def get_absolute_url(self):
-        reverse('view_episode', kwargs = {'pk': self.pk})
+        return reverse('view_episode', kwargs = {'pk': self.pk})
 
     def __str__(self):
         return '{show}: {title}'.format(show = self.show, title = self.title)

@@ -12,6 +12,7 @@ class SerializerTest(TestCase):
         serializer = EpisodeSerializer(episode)
         data = serializer.data
         self.assertIn('url', data.keys())
+        self.assertEqual(data['url'], episode.get_absolute_url())
 
     def test_serialized_episode_has_moment_data(self):
         num_moments = 10
