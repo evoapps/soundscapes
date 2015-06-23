@@ -14,7 +14,7 @@ class ShowAdmin(admin.ModelAdmin):
 
 @admin.register(Episode)
 class EpisodeAdmin(admin.ModelAdmin):
-    pass
+    list_filter = ('show', )
 
 @admin.register(Segment)
 class SegmentAdmin(admin.ModelAdmin):
