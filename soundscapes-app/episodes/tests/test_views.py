@@ -15,7 +15,7 @@ from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
 class EpisodeViewTest(TestCase):
 
     def _parse_response_json(self, response):
-        """ Given a response from self.client, return the data from JSON """
+        """ Given a response from self.client, parse the JSON data """
         response_json = response._container[0]
         response_stream = BytesIO(response_json)
         return JSONParser().parse(response_stream)
