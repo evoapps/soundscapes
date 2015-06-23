@@ -39,6 +39,9 @@ class Show(models.Model):
         for rss_entry in new_entries:
             Episode.objects.create_from_rss_entry(rss_entry, show = self)
 
+    def __str__(self):
+        return self.name
+
 class EpisodeManager(models.Manager):
     def create_from_rss_entry(self, rss_entry, show):
         """ Create an episode from an RSS entry
@@ -75,6 +78,9 @@ class Episode(models.Model):
 
     def get_absolute_url(self):
         reverse('view_episode', kwargs = {'pk': self.pk})
+
+    def __str__(self):
+        return '{show}: {title}'.format(show = self.show, title = self.title)
 
     def download(self, analyze = True):
         """ Download the episode file and analyze its duration
