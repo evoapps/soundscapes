@@ -1,3 +1,5 @@
+var svgWidth = 500,
+    svgHeight = 200;
 
 function drawEpisodeList(episodes) {
   globalVars.episodes = episodes;
@@ -6,18 +8,24 @@ function drawEpisodeList(episodes) {
   episodes.forEach(parseEpisode);
 
   d3.select("#episodeList")
-    .selectAll("li")
+    .selectAll("li.episode")
     .data(episodes)
     .enter()
     .append("li")
+    .attr("class", "episode");
 
-  d3.selectAll("li")
+  var episodeItems = d3.selectAll("li.episode");
+
+  episodeItems
     .append("svg")
-    .attr("class", "soundscape")
+    .attr("width", svgWidth)
+    .attr("height", svgHeight)
+    .append("g")
+    .attr("class", "episode")
     .attr("id", function (episode) { return "episode" + episode.id; })
     .each(drawSegments);
 
-  d3.selectAll("li")
+  episodeItems
     .append("h2")
     .append("a")
     .attr("href", function (episode) { return episode.url; })
@@ -25,9 +33,6 @@ function drawEpisodeList(episodes) {
 }
 
 function drawSegments(episode) {
-
-  var svgWidth = 500,
-      svgHeight = 200;
 
   var line = d3.svg.line(),
       timeScale = d3.scale.linear(),
@@ -49,11 +54,6 @@ function drawSegments(episode) {
   episode.segments.forEach(addEndMoments);
 
   d3.select("#episode" + episode.id)
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .append("g")
-    .attr("class", "episode")
-    .attr("id", "episode" + episode.id)
     .selectAll("path.segment")
     .data(episode.segments)
     .enter()
@@ -61,11 +61,15 @@ function drawSegments(episode) {
     .attr("class", "segment")
     .attr("id", function (segment) { return "segment" + segment.id; })
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
+    .on("click", selectSegment);
 
   function selectSegment(segment) {
     var episodeGroup = d3.select(this.parentNode);
+    console.log("selected segment");
 
     if (!episodeGroup.classed("loaded")) {
+      console.log("loading again");
+      loadEpisodeAudioSource(episode);
       return;
     }
 
@@ -79,10 +83,6 @@ function drawSegments(episode) {
     }
   }
 
-  // d3.selectAll("path.segment")
-  //   .on("click", selectSegment);
-  //
-  // loadEpisodeAudioSource(episode);
 }
 
 function parseEpisode(episode) {
