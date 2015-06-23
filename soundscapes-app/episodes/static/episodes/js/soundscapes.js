@@ -1,17 +1,27 @@
 
 function drawEpisodeList(episodes) {
+  globalVars.episodes = episodes;
 
   // Convert release string to javascript Date
   episodes.forEach(parseEpisode);
 
   d3.select("#episodeList")
-    .selectAll("svg")
+    .selectAll("li")
     .data(episodes)
     .enter()
+    .append("li")
+
+  d3.selectAll("li")
     .append("svg")
     .attr("class", "soundscape")
     .attr("id", function (episode) { return "episode" + episode.id; })
     .each(drawSegments);
+
+  d3.selectAll("li")
+    .append("h2")
+    .append("a")
+    .attr("href", function (episode) { return episode.url; })
+    .text(function (episode) { return episode.title; })
 }
 
 function drawSegments(episode) {
