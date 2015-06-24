@@ -25,7 +25,7 @@ class EpisodeListAPIView(generics.ListAPIView):
     serializer_class = EpisodeSerializer
 
     def get_queryset(self):
-        queryset = Episode.objects.all()
+        queryset = Episode.objects.all().order_by('-released')
 
         show = self.kwargs.get('show', None)
         if show is not None:
@@ -36,7 +36,7 @@ class EpisodeListAPIView(generics.ListAPIView):
 class EpisodeRetrieveAPIView(generics.RetrieveAPIView):
     """ Serialize individual episodes
 
-    TODO: combine EpisodeListAPI and EpisodeRetrieveAPI into GenericAPI
+    TODO: combine EpisodeListAPI and EpisodeRetrieveAPI into GenericAPIView
     """
     queryset = Episode.objects.all()
     serializer_class = EpisodeSerializer
