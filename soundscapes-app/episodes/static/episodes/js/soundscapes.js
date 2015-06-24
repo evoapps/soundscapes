@@ -8,7 +8,6 @@ var colorRampScale = d3.scale.ordinal()
 function drawEpisodeList(episodes) {
   globalVars.episodes = episodes;
 
-
   // Convert release string to javascript Date
   episodes.forEach(parseEpisode);
 
@@ -38,6 +37,7 @@ function drawEpisodeList(episodes) {
 }
 
 function drawSegments(episode) {
+  globalVars.episode = episode;
 
   var line = d3.svg.line(),
       timeScale = d3.scale.linear(),
@@ -87,9 +87,9 @@ function drawSegments(episode) {
 
     segmentPath.classed("playing", !segmentPath.classed("playing"));
     if (segmentPath.classed("playing")) {
-      episode.playEpisode(segment.start_time);
+      episode.player.play(segment.start_time);
     } else {
-      episode.stopEpisode();
+      episode.player.stop();
     }
   }
 

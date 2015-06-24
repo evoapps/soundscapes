@@ -19,15 +19,17 @@ function loadEpisodeAudioSource(episode) {
   }
   request.send();
 
-  function playEpisode(offset) {
-    source = audioContext.createBufferSource();
-    source.buffer = episode.player.buffer;
-    source.connect(audioContext.destination);
-    source.start(0, offset);
+  episode.player.play = function (offset) {
+    this.source = audioContext.createBufferSource();
+    this.source.buffer = episode.player.buffer;
+    this.source.connect(audioContext.destination);
+    this.source.start(0, offset);
 
-    episode.player.source = source;
+    this.startTime = audioContext.currentTime;
   }
 
-  episode.playEpisode = playEpisode;
-  episode.stopEpisode = function () { this.player.source.stop(); };
+  episode.player.stop = function () {
+    this.source.stop();
+  };
+
 }
