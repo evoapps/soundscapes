@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+  <link href="{% static 'episodes/css/soundscapes.css' %}" rel="stylesheet">
+{% endblock style %}
+
+{% block body %}
+
+  <ul id="episodeList" class="list-unstyled">
+  </ul>
+
+{% endblock body %}
+
+{% block javascript %}
+{% include 'episodes/_soundscape-javascript.html' %}
+  <script>
+var globalVars = {};
+d3.json("{% url 'json_episode_feed' %}", drawEpisodeList);
+  </script>
+{% endblock javascript %}

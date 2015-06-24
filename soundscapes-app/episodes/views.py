@@ -33,6 +33,11 @@ class EpisodeListAPIView(generics.ListAPIView):
 
         return queryset
 
+class EpisodeFeedAPIView(generics.ListAPIView):
+    """ Serialize a list of episodes """
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all().order_by('-released')
+
 class EpisodeRetrieveAPIView(generics.RetrieveAPIView):
     """ Serialize individual episodes
 
