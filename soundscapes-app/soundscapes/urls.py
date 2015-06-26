@@ -12,6 +12,11 @@ urlpatterns = patterns('',
         TemplateView.as_view(template_name = 'home.html'),
     ),
     url(
+        r'^feed/$',
+        TemplateView.as_view(template_name = 'episodes/episode_feed.html'),
+        name = 'episode_feed',
+    ),
+    url(
         r'^shows/$',
         views.ShowListView.as_view(),
         name = 'show_list',
@@ -40,6 +45,11 @@ urlpatterns = patterns('',
         r'^api/episode/(?P<episode>\d+)$',
         views.EpisodeRetrieveAPIView.as_view(),
         name = 'json_episode',
+    ),
+    url(
+        r'^api/feed$',
+        views.EpisodeFeedAPIView.as_view(),
+        name = 'json_episode_feed',
     ),
     url(
         r'^episodes/(?P<pk>\d+)/$',

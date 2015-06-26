@@ -1,8 +1,7 @@
 var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 function loadEpisodeAudioSource(episode) {
-  var episodeBuffer = null,
-      source = null;
+  episode.player = {}
 
   var request = new XMLHttpRequest();
   request.open('GET', episode.mp3, true);
@@ -12,7 +11,7 @@ function loadEpisodeAudioSource(episode) {
   request.onload = function () {
     audioContext.decodeAudioData(request.response,
       function (buffer) {
-        episodeBuffer = buffer;
+        episode.player.buffer = buffer;
         var episodeGroup = document.getElementById("episode" + episode.id);
         episodeGroup.classList.add("loaded");
       },
@@ -20,13 +19,17 @@ function loadEpisodeAudioSource(episode) {
   }
   request.send();
 
-  function playEpisode(offset) {
-    source = audioContext.createBufferSource();
-    source.buffer = episodeBuffer;
-    source.connect(audioContext.destination);
-    source.start(0, offset);
+  episode.player.play = function (offset) {
+    this.source = audioContext.createBufferSource();
+    this.source.buffer = episode.player.buffer;
+    this.source.connect(audioContext.destination);
+    this.source.start(0, offset);
+
+    this.startTime = audioContext.currentTime;
   }
 
-  episode.playEpisode = playEpisode;
-  episode.stopEpisode = function () { source.stop(); };
+  episode.player.stop = function () {
+    this.source.stop();
+  };
+
 }
