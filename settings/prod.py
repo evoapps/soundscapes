@@ -2,7 +2,7 @@ from .base import *
 
 from os import environ
 
-SECRET_KEY = environ.get('SECRET_KEY')
+SECRET_KEY = environ.get('DJANGO_SECRET_KEY')
 
 DEBUG = False
 TEMPLATE_DEBUG = False
