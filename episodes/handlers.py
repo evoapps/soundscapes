@@ -1,4 +1,5 @@
 from unipath import Path
+import subprocess
 
 # RSS handling
 import feedparser
@@ -86,9 +87,11 @@ def download_episode(downloadable_url):
 
 def get_audio_duration(mp3_name):
     downloaded_mp3 = Path(settings.DOWNLOADS_DIR, mp3_name)
-    audio_segment = pydub.AudioSegment.from_mp3(downloaded_mp3)
-    duration = audio_segment.duration_seconds
-    del audio_segment
+
+    json_data = subprocess.check_output(
+        ['avprobe', '-show_format', '-of', 'json', downloaded_mp3]
+    )
+    duration = float(json.loads(json_data)['format']['duration'])/60.0
     return duration
 
 def get_audio_features(mp3_name):
