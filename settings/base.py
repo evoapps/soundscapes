@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 from unipath import Path
 
 ROOT_DIR = Path(__file__).ancestor(3)
-BASE_DIR = Path(ROOT_DIR, 'soundscapes-app')
+BASE_DIR = Path(ROOT_DIR, 'soundscapes')
 
 # Application definition
 
