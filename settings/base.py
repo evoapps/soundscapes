@@ -61,7 +61,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = Path(ROOT_DIR, 'static')
 STATICFILES_DIRS = (
     Path(BASE_DIR, 'soundscapes/static'),
 )
@@ -73,7 +72,6 @@ TEMPLATE_DIRS = (
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = Path(ROOT_DIR, 'media')
 
 # Download RSS files to downloads directory, and then
 # load them into the models (and MEDIA_ROOT)

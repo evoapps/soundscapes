@@ -19,3 +19,6 @@ DATABASES = {
         'PORT': environ.get('DATABASE_PORT', '5432'),
     },
 }
+
+STATIC_ROOT = environ.get('STATIC_ROOT')
+MEDIA_ROOT = environ.get('MEDIA_ROOT')

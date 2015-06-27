@@ -19,3 +19,6 @@ DATABASES = {
         'PORT': '',
     },
 }
+
+STATIC_ROOT = Path(ROOT_DIR, 'static')
+MEDIA_ROOT = Path(ROOT_DIR, 'media')
