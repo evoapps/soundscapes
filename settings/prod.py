@@ -4,7 +4,7 @@ from os import environ
 
 SECRET_KEY = environ.get('DJANGO_SECRET_KEY')
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = ['.evoapps.xyz', ]
