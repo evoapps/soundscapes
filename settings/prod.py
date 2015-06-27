@@ -4,10 +4,10 @@ from os import environ
 
 SECRET_KEY = environ.get('DJANGO_SECRET_KEY')
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = False
 
-ALLOWED_HOSTS = ['soundscapes.evoapps.xyz', ]
+ALLOWED_HOSTS = ['.evoapps.xyz', ]
 
 DATABASES = {
     'default': {
