@@ -135,11 +135,11 @@ def get_audio_features(mp3_name):
     return zip(frame.time, frame.value)
 
 def _convert_mp3_to_wav(mp3_name):
-    downloaded_mp3 = Path(settings.DOWNLOADS_DIR, Path(mp3_file.name).name)
+    downloaded_mp3 = Path(settings.DOWNLOADS_DIR, mp3_name)
     audio_segment = pydub.AudioSegment.from_mp3(downloaded_mp3)
 
     # step 1: convert mp3 to wav
-    temp_wav = Path(analyses_dir, Path(mp3_file.name).stem + '.wav')
+    temp_wav = Path(analyses_dir, Path(mp3_name).stem + '.wav')
     audio_segment.export(temp_wav, format = 'wav')
     del audio_segment
 
