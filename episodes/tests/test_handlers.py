@@ -27,7 +27,7 @@ class HandlerTest(unittest.TestCase):
     def test_get_episode_duration(self):
         to_episode = Path(settings.BASE_DIR, 'ftests/fixtures/reply-all-26.mp3')
         episode_file = File(open(to_episode, 'rb'))
-        duration = get_audio_duration(episode_file)
+        duration = get_audio_duration(episode_file.name)
         self.assertIsInstance(duration, float)
         self.assertGreater(duration, 0)
 

@@ -111,12 +111,12 @@ class Episode(models.Model):
 
     def _get_duration(self):
         if not self.duration:
-            self.duration = get_audio_duration(self.mp3)
+            self.duration = get_audio_duration(self.mp3.name)
             self.save()
 
     def _create_moments(self):
         if self.moments.count() == 0:
-            xy_data = get_audio_features(self.mp3)
+            xy_data = get_audio_features(self.mp3.name)
             for x, y in xy_data:
                 self.moments.create(time = x, value = y)
 
