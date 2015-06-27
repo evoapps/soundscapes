@@ -10,8 +10,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 from unipath import Path
 
-ROOT_DIR = Path(__file__).ancestor(3)
-BASE_DIR = Path(ROOT_DIR, 'soundscapes')
+BASE_DIR = Path(__file__).ancestor(2)
+ROOT_DIR = BASE_DIR.parent
 
 # Application definition
 
