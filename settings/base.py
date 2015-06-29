@@ -10,8 +10,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 from unipath import Path
 
-BASE_DIR = Path(__file__).ancestor(2)
-ROOT_DIR = BASE_DIR.parent
+APP_DIR = Path(__file__).ancestor(2)
+PROJ_DIR = APP_DIR.parent
 
 # Application definition
 
@@ -62,11 +62,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    Path(BASE_DIR, 'soundscapes/static'),
+    Path(APP_DIR, 'soundscapes/static'),
 )
 
 TEMPLATE_DIRS = (
-    Path(BASE_DIR, 'templates'),
+    Path(APP_DIR, 'templates'),
 )
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
@@ -75,6 +75,6 @@ MEDIA_URL = '/media/'
 
 # Download RSS files to downloads directory, and then
 # load them into the models (and MEDIA_ROOT)
-DOWNLOADS_DIR = Path(ROOT_DIR, 'downloads')
+DOWNLOADS_DIR = Path(PROJ_DIR, 'downloads')
 
-ANALYSES_DIR = Path(ROOT_DIR, 'analyses')
+ANALYSES_DIR = Path(PROJ_DIR, 'analyses')

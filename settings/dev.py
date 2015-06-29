@@ -20,5 +20,5 @@ DATABASES = {
     },
 }
 
-STATIC_ROOT = Path(ROOT_DIR, 'static')
-MEDIA_ROOT = Path(ROOT_DIR, 'media')
+STATIC_ROOT = Path(PROJ_DIR, 'static')
+MEDIA_ROOT = Path(PROJ_DIR, 'media')

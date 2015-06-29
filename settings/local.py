@@ -10,6 +10,6 @@ ALLOWED_HOSTS = []
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': Path(BASE_DIR, 'soundscapes.sqlite3'),
+        'NAME': Path(APP_DIR, 'soundscapes.sqlite3'),
     }
 }
