@@ -1,8 +1,4 @@
-from django.core import serializers
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
-from django.views.decorators.http import require_POST, require_GET
 
 from rest_framework import generics
 
@@ -49,10 +45,3 @@ class EpisodeRetrieveAPIView(generics.RetrieveAPIView):
 
 class EpisodeDetailView(DetailView):
     model = Episode
-
-@require_POST
-def download_episode(request, pk):
-    episode = get_object_or_404(Episode, pk = pk)
-    episode.download()
-    episode.save()
-    return redirect(episode)

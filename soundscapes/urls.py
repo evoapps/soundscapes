@@ -56,10 +56,5 @@ urlpatterns = patterns('',
         views.EpisodeDetailView.as_view(),
         name = 'view_episode',
     ),
-    url(
-        r'^episodes/(?P<pk>\d+)/download$',
-        views.download_episode,
-        name = 'download_episode',
-    ),
     url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
