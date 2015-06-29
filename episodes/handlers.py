@@ -7,12 +7,12 @@ import json
 import requests
 
 # mp3 handling
-import numpy as np
-import pydub
-from scipy import weave
-import scipy.io.wavfile
-
-import pandas as pd
+# import numpy as np
+# import pydub
+# from scipy import weave
+# import scipy.io.wavfile
+#
+# import pandas as pd
 
 from django.conf import settings
 from django.core.files import File
