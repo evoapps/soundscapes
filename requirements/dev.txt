@@ -1,5 +1,6 @@
 -r base.txt
-
+gnureadline==6.3.3
+ipython==3.2.0
 model-mommy==1.2.4
 selenium==2.46.0
 six==1.9.0
