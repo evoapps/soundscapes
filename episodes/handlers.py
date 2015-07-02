@@ -8,7 +8,8 @@ import requests
 
 # mp3 handling
 # import numpy as np
-# import pydub
+import pydub
+from math import ceil
 # from scipy import weave
 # import scipy.io.wavfile
 #
@@ -91,59 +92,60 @@ def get_audio_duration(mp3_name):
     json_data = subprocess.check_output(
         ['avprobe', '-show_format', '-of', 'json', downloaded_mp3]
     )
-    duration = float(json.loads(json_data)['format']['duration'])/60.0
+    duration = float(json.loads(json_data)['format']['duration'])
     return duration
 
-def get_audio_features(mp3_name):
+def get_audio_features(mp3_name, interval_size = 5000.0):
     analyses_dir = Path(settings.ANALYSES_DIR)
     if not analyses_dir.exists():
         analyses_dir.mkdir()
 
-    downloaded_mp3 = Path(settings.DOWNLOADS_DIR, mp3_name)
+    converted_wav = _convert_mp3_to_wav(mp3_name)
+    chunks_of_wav = _break_wav_into_chunks(converted_wav)
 
-    expected_file = Path(mp3_name).stem + '.csv'
-    expected_loc = Path(analyses_dir, expected_file)
+    values = list()
+    for chunk in chunks_of_wav:
+        segment = pydub.AudioSegment.from_file(chunk, format = 'wav')
+        moments = pydub.utils.make_chunks(segment, interval_size)
+        del segment
 
-    if not expected_loc.exists():
-        temp_wav = _convert_mp3_to_wav(mp3_name)
+        dbfs_of_peaks = [chunk.max_dBFS for chunk in moments]
+        del moments
 
-        rate, data = scipy.io.wavfile.read(temp_wav)
-        ys = np.asarray(data[:,1], dtype = float)
-        nsamples = len(ys)
-        total_file_time = nsamples / rate
+        values.extend([max(0, loudness + 120) for loudness in dbfs_of_peaks])
 
-        ts, dt = np.linspace(0, total_file_time, nsamples, retstep = True)
-
-        delta_sample = 5.0
-        delta_window = delta_sample * 2
-        index_width = (int)(delta_window / dt)
-
-        nn = len(ys)
-        samples = np.arange(0, nn, (int) (delta_sample / dt))
-        nsamples_mva = len(samples)
-
-        mva = np.zeros(nsamples_mva)
-        mva_ts = np.zeros(nsamples_mva)
-
-        y_squared = (ys**2)
-
-        weave.inline(weave_code, ['y_squared', 'nn', 'mva', 'index_width', 'samples', 'nsamples_mva', 'mva_ts', 'ts'])
-
-        frame = pd.DataFrame({'time': mva_ts, 'value': mva})
-        frame.to_csv(expected_loc, index = False)
-
-        temp_wav.remove()
-
-    frame = pd.read_csv(expected_loc)
-    return zip(frame.time, frame.value)
+    times = [i * (interval_size / 1000.0) for i in range(len(values))]
+    return zip(times, values)
 
 def _convert_mp3_to_wav(mp3_name):
-    downloaded_mp3 = Path(settings.DOWNLOADS_DIR, mp3_name)
-    audio_segment = pydub.AudioSegment.from_mp3(downloaded_mp3)
+    stem = Path(mp3_name).stem
 
-    # step 1: convert mp3 to wav
-    temp_wav = Path(settings.ANALYSES_DIR, Path(mp3_name).stem + '.wav')
-    audio_segment.export(temp_wav, format = 'wav')
-    del audio_segment
+    downloaded_mp3 = Path(settings.DOWNLOADS_DIR, stem + '.mp3')
+    converted_wav = Path(settings.ANALYSES_DIR, stem + '.wav')
 
-    return temp_wav
+    subprocess.check_output(['avconv', '-i', downloaded_mp3, converted_wav])
+    return converted_wav
+
+def _break_wav_into_chunks(full_length_wav, chunk_size = 600.0):
+    stem = Path(full_length_wav).stem
+
+    recreate_mp3_name = Path(full_length_wav).stem + '.mp3'
+    duration = get_audio_duration(recreate_mp3_name)
+    num_chunks = int(ceil(duration/chunk_size))
+    start_times = [i * chunk_size for i in range(num_chunks)]
+    chunk_names = ['{stem}-{i}-of-{total}.wav'.format(stem = stem, i = i, total = num_chunks - 1)
+                   for i in range(num_chunks)]
+    chunk_paths = [Path(settings.ANALYSES_DIR, name) for name in chunk_names]
+
+    formatted_chunk_time = _format_time_for_avconv(chunk_size)
+
+    for start, out_path in zip(start_times, chunk_paths):
+        formatted_start_time = _format_time_for_avconv(start)
+        subprocess.check_output(['avconv', '-i', full_length_wav, '-ss', formatted_start_time, '-t', formatted_chunk_time, out_path])
+
+    return chunk_paths
+
+def _format_time_for_avconv(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    return '%d:%02d:%02d' % (hours, minutes, seconds)
