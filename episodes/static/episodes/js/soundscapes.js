@@ -53,9 +53,16 @@ function drawSegments(episode) {
     .domain(d3.extent(episode.moments, function (moment) { return parseFloat(moment.time); }))
     .range([0, svgWidth]);
 
+  // valueScale
+  //   .domain(d3.extent(episode.moments, function (moment) { return moment.value; }))
+  //   .range([svgHeight, 0]);
+  function value(moment) { return moment.value; }
+  var min = d3.min(episode.moments, value),
+      median = d3.median(episode.moments, value),
+      max = d3.max(episode.moments, value);
   valueScale
-    .domain(d3.extent(episode.moments, function (moment) { return moment.value; }))
-    .range([svgHeight, 0]);
+    .domain([min, median - 5, max])
+    .range([svgHeight, svgHeight/2, 0])
 
   episode.segments.forEach(addEndMoments);
 
@@ -99,9 +106,9 @@ function parseEpisode(episode) {
   episode.released = Date.parse(episode.released);
 }
 
-function addEndMoments(segment) {
-  var firstMoment = {time: segment.start_time, value: 0.0},
-      lastMoment = {time: segment.end_time, value: 0.0};
+function addEndMoments(segment, minimum) {
+  var firstMoment = {time: segment.start_time, value: 0.1},
+      lastMoment = {time: segment.end_time, value: 0.1};
   segment.moments.splice(0, 0, firstMoment);
   segment.moments.push(lastMoment);
 }

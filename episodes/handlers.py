@@ -109,7 +109,7 @@ def get_audio_features(mp3_name, interval_size = 5000.0):
         moments = pydub.utils.make_chunks(segment, interval_size)
         del segment
 
-        dbfs_of_peaks = [chunk.max_dBFS for chunk in moments]
+        dbfs_of_peaks = [chunk.dBFS for chunk in moments]
         del moments
 
         values.extend([max(0, loudness + 120) for loudness in dbfs_of_peaks])
