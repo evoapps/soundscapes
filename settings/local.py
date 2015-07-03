@@ -13,3 +13,6 @@ DATABASES = {
         'NAME': Path(APP_DIR, 'soundscapes.sqlite3'),
     }
 }
+
+STATIC_ROOT = Path(PROJ_DIR, 'static')
+MEDIA_ROOT = Path(PROJ_DIR, 'media')
