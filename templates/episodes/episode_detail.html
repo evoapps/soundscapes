@@ -11,10 +11,12 @@
 
   <h2>{{ episode.title }}</h2>
 
-  <svg width="500" height="200">
-    <g id="episode{{ episode.id }}">
-    </g>
-  </svg>
+  <div class="svg-container">
+    <svg preserveAspectRation="xMinYMin meet" viewBox="0 0 600 400" class="svg-content-responsive">
+      <g id="episode{{ episode.id }}">
+      </g>
+    </svg>
+  </div>
 
 {% endblock body %}
 
