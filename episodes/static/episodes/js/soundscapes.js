@@ -1,6 +1,11 @@
 var svgWidth = 500,
     svgHeight = 200;
 
+var line = d3.svg.line(),
+    timeScale = d3.scale.linear(),
+    valueScale = d3.scale.linear(),
+    colorScale = d3.scale.ordinal();
+
 var colorRampScale = d3.scale.ordinal()
   .domain(["StartUp", "Reply All", "Mystery Show"])
   .range(["Blues", "Greens", "Purples"]);
@@ -38,11 +43,6 @@ function drawEpisodeList(episodes) {
 
 function drawSegments(episode) {
   globalVars.episode = episode;
-
-  var line = d3.svg.line(),
-      timeScale = d3.scale.linear(),
-      valueScale = d3.scale.linear(),
-      colorScale = d3.scale.ordinal();
 
   line
     .x(function (moment) { return timeScale(moment.time); })

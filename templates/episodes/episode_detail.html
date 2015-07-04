@@ -18,6 +18,8 @@
     </svg>
   </div>
 
+  <audio src="{{ episode.mp3.url }}" controls></audio>
+
 {% endblock body %}
 
 {% block javascript %}
@@ -25,5 +27,10 @@
   <script>
 var globalVars = {};
 d3.json("{% url 'json_episode' episode=episode.pk %}", drawSegments);
+
+window.onload = function () {
+  var audioElement = document.querySelector("audio");
+  audioElement.addEventListener("timeupdate", updateProgress, false);
+}
   </script>
 {% endblock javascript %}
