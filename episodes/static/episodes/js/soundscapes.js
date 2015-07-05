@@ -83,23 +83,13 @@ function drawSegments(episode) {
     });
 
   function selectSegment(segment) {
-    var episodeGroup = d3.select(this.parentNode);
-
-    if (!episodeGroup.classed("loaded")) {
-      loadEpisodeAudioSource(episode);
-      return;
-    }
-
-    var segmentPath = d3.select(this);
-
-    segmentPath.classed("playing", !segmentPath.classed("playing"));
-    if (segmentPath.classed("playing")) {
-      episode.player.play(segment.start_time);
-    } else {
-      episode.player.stop();
-    }
+    d3.event.stopPropagation();
+    console.log("clicked segment");
   }
 
+  d3.select("svg").on("click", function () {
+    console.log("clicked svg");
+  });
 }
 
 function parseEpisode(episode) {
