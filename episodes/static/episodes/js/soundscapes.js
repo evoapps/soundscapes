@@ -85,11 +85,15 @@ function drawSegments(episode) {
   function selectSegment(segment) {
     d3.event.stopPropagation();
     console.log("clicked segment");
+
+    toggleAudio();
   }
 
-  d3.select("svg").on("click", function () {
+  function selectSVG() {
     console.log("clicked svg");
-  });
+  }
+
+  d3.select("svg").on("click", selectSVG);
 }
 
 function parseEpisode(episode) {

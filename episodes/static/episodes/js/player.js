@@ -6,9 +6,21 @@ function updateProgress() {
   console.log(timeScale(currentTime));
 
   d3.select("g")
-    .append("circle")
-    .attr("cx", timeScale(currentTime))
-    .attr("cy", 50)
-    .attr("r", 10)
-    .style("fill", "black");
+    .append("line")
+    .attr("x1", timeScale(currentTime))
+    .attr("y1", 0)
+    .attr("x2", timeScale(currentTime))
+    .attr("y2", d3.max(valueScale.range()))
+    .style("stroke", "black");
+}
+
+function toggleAudio() {
+  var audioElement = document.querySelector("audio");
+
+  if (audioElement.paused) {
+    audioElement.play();
+  } else {
+    audioElement.pause();
+  }
+
 }
