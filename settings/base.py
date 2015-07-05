@@ -27,6 +27,7 @@ INSTALLED_APPS = (
     'crispy_forms',
 
     'episodes',
+    'api',
 )
 
 MIDDLEWARE_CLASSES = (

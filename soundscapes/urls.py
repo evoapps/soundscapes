@@ -32,29 +32,10 @@ urlpatterns = patterns('',
         name = 'view_show',
     ),
     url(
-        r'^api/episodes$',
-        views.EpisodeListAPIView.as_view(),
-        name = 'json_episode_list',
-    ),
-    url(
-        r'^api/show/(?P<show>\d+)/episodes$',
-        views.EpisodeListAPIView.as_view(),
-        name = 'json_episode_list',
-    ),
-    url(
-        r'^api/episode/(?P<episode>\d+)$',
-        views.EpisodeRetrieveAPIView.as_view(),
-        name = 'json_episode',
-    ),
-    url(
-        r'^api/feed$',
-        views.EpisodeFeedAPIView.as_view(),
-        name = 'json_episode_feed',
-    ),
-    url(
         r'^episodes/(?P<pk>\d+)/$',
         views.EpisodeDetailView.as_view(),
         name = 'view_episode',
     ),
+    url(r'^api/', include('api.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
