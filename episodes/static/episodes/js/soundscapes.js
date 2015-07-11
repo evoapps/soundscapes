@@ -66,6 +66,16 @@ function drawSegments(episode) {
 
   episode.segments.forEach(addEndMoments);
 
+  needleData = [{x: timeScale(0), y: 0}, {x: timeScale(0), y: d3.max(valueScale.range())}];
+  d3.select("#episode" + episode.id)
+    .append("line")
+    .attr("id", "needle")
+    .style("stroke", "black")
+    .attr("x1", timeScale(0))
+    .attr("y1", 0)
+    .attr("x2", timeScale(0))
+    .attr("y2", d3.max(valueScale.range()));
+
   d3.select("#episode" + episode.id)
     .selectAll("path.segment")
     .data(episode.segments)
@@ -95,8 +105,11 @@ function drawSegments(episode) {
   }
 
   function updateNeedle(segment) {
-    var mouseX = d3.mouse(this)[1];
-    d3.select("#needle");
+    var mouseX = d3.mouse(this)[0];
+    d3.select("#needle")
+      .attr("x1", mouseX)
+      .attr("x2", mouseX);
+
   }
 
   d3.select("svg").on("click", selectSVG);

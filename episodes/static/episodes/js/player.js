@@ -5,13 +5,9 @@ function updateProgress() {
   currentTime = audioElement.currentTime;
   console.log(timeScale(currentTime));
 
-  d3.select("g")
-    .append("line")
+  d3.select("#needle")
     .attr("x1", timeScale(currentTime))
-    .attr("y1", 0)
-    .attr("x2", timeScale(currentTime))
-    .attr("y2", d3.max(valueScale.range()))
-    .style("stroke", "black");
+    .attr("x2", timeScale(currentTime));
 }
 
 function toggleAudio() {
