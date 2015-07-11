@@ -1,8 +1,6 @@
-
 from rest_framework import serializers
-from rest_framework.reverse import reverse
 
-from .models import Show, Episode, Moment, Segment
+from episodes.models import Show, Episode, Moment, Segment
 
 class MomentSerializer(serializers.ModelSerializer):
 

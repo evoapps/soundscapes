@@ -1,35 +1,26 @@
-var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-function loadEpisodeAudioSource(episode) {
-  episode.player = {}
+function updateProgress() {
+  var audioElement = document.querySelector("audio");
 
-  var request = new XMLHttpRequest();
-  request.open('GET', episode.mp3, true);
-  request.responseType = 'arraybuffer';
+  currentTime = audioElement.currentTime;
+  console.log(timeScale(currentTime));
 
-  // Decode asynchronously
-  request.onload = function () {
-    audioContext.decodeAudioData(request.response,
-      function (buffer) {
-        episode.player.buffer = buffer;
-        var episodeGroup = document.getElementById("episode" + episode.id);
-        episodeGroup.classList.add("loaded");
-      },
-      function (error) { console.log(error); });
+  d3.select("g")
+    .append("line")
+    .attr("x1", timeScale(currentTime))
+    .attr("y1", 0)
+    .attr("x2", timeScale(currentTime))
+    .attr("y2", d3.max(valueScale.range()))
+    .style("stroke", "black");
+}
+
+function toggleAudio() {
+  var audioElement = document.querySelector("audio");
+
+  if (audioElement.paused) {
+    audioElement.play();
+  } else {
+    audioElement.pause();
   }
-  request.send();
-
-  episode.player.play = function (offset) {
-    this.source = audioContext.createBufferSource();
-    this.source.buffer = episode.player.buffer;
-    this.source.connect(audioContext.destination);
-    this.source.start(0, offset);
-
-    this.startTime = audioContext.currentTime;
-  }
-
-  episode.player.stop = function () {
-    this.source.stop();
-  };
 
 }
