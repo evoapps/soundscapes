@@ -75,6 +75,7 @@ function drawSegments(episode) {
     .attr("id", function (segment) { return "segment" + segment.id; })
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
     .on("click", selectSegment)
+    .on("mousemove", updateNeedle)
     .style("fill", function (segment) {
       var ramp = colorRampScale(episode.show.name),
           size = 5;
@@ -98,6 +99,11 @@ function drawSegments(episode) {
     } else {
       episode.player.stop();
     }
+  }
+
+  function updateNeedle(segment) {
+    var mouseX = d3.mouse(this)[1];
+    d3.select("#needle");
   }
 
 }
