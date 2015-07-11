@@ -13,7 +13,7 @@
 {% endblock body %}
 
 {% block javascript %}
-{% include 'episodes/_soundscape-javascript.html' %}
+{% include 'episodes/_soundscape.html' %}
   <script>
 var globalVars = {};
 d3.json("{% url 'json_episode_feed' %}", drawEpisodeList);
