@@ -10,8 +10,10 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 from unipath import Path
 
+# PROJ_DIR/DEPLOY_DIR/APP_DIR/settings/base.py
 APP_DIR = Path(__file__).ancestor(2)
-PROJ_DIR = APP_DIR.parent
+DEPLOY_DIR = APP_DIR.parent
+PROJ_DIR = DEPLOY_DIR.parent
 
 # Application definition
 
@@ -29,6 +31,9 @@ INSTALLED_APPS = (
     'episodes',
 )
 
+# Third party app definitions
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -43,38 +48,22 @@ ROOT_URLCONF = 'soundscapes.urls'
 
 WSGI_APPLICATION = 'soundscapes.wsgi.application'
 
-# Internationalization
-# https://docs.djangoproject.com/en/1.7/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.7/howto/static-files/
+TEMPLATE_DIRS = (
+    Path(APP_DIR, 'templates'),
+)
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     Path(APP_DIR, 'soundscapes/static'),
 )
 
-TEMPLATE_DIRS = (
-    Path(APP_DIR, 'templates'),
-)
-
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
-
 MEDIA_URL = '/media/'
 
-# Download RSS files to downloads directory, and then
-# load them into the models (and MEDIA_ROOT)
-DOWNLOADS_DIR = Path(PROJ_DIR, 'downloads')
+# Internationalization
+# https://docs.djangoproject.com/en/1.7/topics/i18n/
 
-ANALYSES_DIR = Path(PROJ_DIR, 'analyses')
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
