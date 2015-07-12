@@ -6,9 +6,9 @@ var timeScale = d3.scale.linear(),
     valueScale = d3.scale.linear(),
     showColorScale = d3.scale.ordinal();
 
-// Set time scale globally
+// Set time scale range
+// - domains are set based on query
 timeScale
-  .domain([0, 60 * 60.0])
   .range([0, svgWidth])
 
 // Set value scale globally
@@ -30,6 +30,15 @@ line
 
 function drawEpisodeList(episodes) {
 
+  var maxTimes = [];
+  episodes.forEach(function (episode) {
+    var episodeMax = d3.max(episode.moments, function (moment) { return moment.time; });
+    maxTimes.push(episodeMax);
+  });
+
+  timeScale
+    .domain([0, d3.max(maxTimes)]);
+
   var episodeList = d3.select("#episodeList")
 
   episodeList
@@ -44,9 +53,7 @@ function drawEpisodeList(episodes) {
     .append("div")
     .attr("class", "episode svg-container")
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("preserveAspectRatio", "xMidYMid")
     .attr("viewBox", "0 0 600 400")
     .attr("class", "episode svg-content-responsive")
     .append("g")
@@ -64,6 +71,13 @@ function drawEpisodeList(episodes) {
 
   episodeItems
     .each(drawSegments);
+}
+
+function drawSingleEpisode(episode) {
+  timeScale
+    .domain(d3.extent(episode.moments, function (moment) { return moment.time; }));
+
+  drawSegments(episode);
 }
 
 function drawSegments(episode) {
@@ -112,8 +126,8 @@ function drawSegments(episode) {
   episodeBackground
     .attr("x", d3.min(timeScale.range()))
     .attr("y", d3.min(valueScale.range()))
-    .attr("width", "100%")
-    .attr("height", "100%")
+    .attr("width", d3.max(timeScale.range()))
+    .attr("height", d3.max(valueScale.range()))
     .style("opacity", 0)
     .style("stroke", "black")
 

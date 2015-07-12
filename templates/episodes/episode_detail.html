@@ -11,8 +11,8 @@
 
   <h2>{{ episode.title }}</h2>
 
-  <div class="episode svg-container">
-    <svg preserveAspectRatio="xMinYMin slice" viewBox="0 0 600 400" class="svg-content-responsive">
+  <div class="svg-container">
+    <svg viewBox="0 0 600 400" preserveAspectRatio="xMidYMid" class="svg-content-responsive">
       <g id="episodeGroup{{ episode.id }}">
       </g>
     </svg>
@@ -26,6 +26,6 @@
 {% include 'episodes/_soundscape.html' %}
   <script>
 var globalVars = {};
-d3.json("{% url 'json_episode' episode=episode.pk %}", drawSegments);
+d3.json("{% url 'json_episode' episode=episode.pk %}", drawSingleEpisode);
   </script>
 {% endblock javascript %}
