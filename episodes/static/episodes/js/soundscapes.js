@@ -1,150 +1,181 @@
+
 var svgWidth = 500,
     svgHeight = 200;
 
-var line = d3.svg.line(),
-    timeScale = d3.scale.linear(),
+var timeScale = d3.scale.linear(),
     valueScale = d3.scale.linear(),
-    colorScale = d3.scale.ordinal();
+    showColorScale = d3.scale.ordinal();
 
-var colorRampScale = d3.scale.ordinal()
+// Set time scale globally
+timeScale
+  .domain([0, 60])
+  .range([0, svgWidth])
+
+// Set value scale globally
+valueScale
+  .domain([60, 93, 101])
+  .range([svgHeight, svgHeight/2, 0])
+
+// Hand code colors for Gimlet shows
+showColorScale
   .domain(["StartUp", "Reply All", "Mystery Show"])
   .range(["Blues", "Greens", "Purples"]);
 
+var line = d3.svg.line();
+
+line
+  .x(function (moment) { return timeScale(moment.time); })
+  .y(function (moment) { return valueScale(moment.value); })
+  .interpolate("basis");
+
 function drawEpisodeList(episodes) {
-  globalVars.episodes = episodes;
 
-  // Convert release string to javascript Date
-  episodes.forEach(parseEpisode);
+  var episodeList = d3.select("#episodeList")
 
-  d3.select("#episodeList")
-    .selectAll("li.episode")
+  episodeList
+    .selectAll("li")
     .data(episodes)
     .enter()
     .append("li")
-    .attr("class", "episode");
 
-  var episodeItems = d3.selectAll("li.episode");
+  var episodeItems = episodeList.selectAll("li");
 
   episodeItems
+    .append("div")
+    .attr("class", "episode svg-container")
     .append("svg")
     .attr("width", svgWidth)
     .attr("height", svgHeight)
+    .attr("preserveAspectRatio", "xMinYMin meet")
+    .attr("viewBox", "0 0 600 400")
+    .attr("class", "episode svg-content-responsive")
     .append("g")
-    .attr("class", "episode")
-    .attr("id", function (episode) { return "episode" + episode.id; })
-    .each(drawSegments);
+    .attr("id", function (episode) { return "episodeGroup" + episode.id; })
 
   episodeItems
-    .append("h2")
+    .append("h3")
     .append("a")
-    .attr("href", function (episode) { return episode.url; })
     .text(function (episode) { return episode.title; })
+    .attr("href", function (episode) { return episode.url; });
+
+  episodeItems
+    .append("audio")
+    .attr("src", function (episode) { return episode.mp3; });
+
+  episodeItems
+    .each(drawSegments);
 }
 
 function drawSegments(episode) {
   globalVars.episode = episode;
 
-  line
-    .x(function (moment) { return timeScale(moment.time); })
-    .y(function (moment) { return valueScale(moment.value); })
-    .interpolate("basis");
+  // Add end moments
+  episode.segments.forEach(function(segment) {
+    var firstMoment = {time: segment.start_time, value: 0},
+        lastMoment = {time: segment.end_time, value: 0};
+    segment.moments.splice(0, 0, firstMoment);
+    segment.moments.push(lastMoment);
+  });
 
-  timeScale
-    .domain(d3.extent(episode.moments, function (moment) { return parseFloat(moment.time); }))
-    .range([0, svgWidth]);
+  // Determine segment color
+  // - requires knowing the segment's show name
+  episode.segments.forEach(function (segment) {
+    var ramp = showColorScale(episode.show.name),
+        size = 5,
+        hue = 3;  // arbitrarily select the center hue
+    segment.fill = colorbrewer[ramp][size][hue];
+  });
 
-  // valueScale
-  //   .domain(d3.extent(episode.moments, function (moment) { return moment.value; }))
-  //   .range([svgHeight, 0]);
-  function value(moment) { return moment.value; }
-  var min = d3.min(episode.moments, value),
-      median = d3.median(episode.moments, value),
-      max = d3.max(episode.moments, value);
-  valueScale
-    .domain([min, median - 5, max])
-    .range([svgHeight, svgHeight/2, 0])
+  var episodeGroup = d3.select("#episodeGroup" + episode.id);
 
-  episode.segments.forEach(addEndMoments);
+  // Draw a rectangle behind the soundscapes
+  episodeGroup
+    .append("rect")
+    .attr("id", "episodeBackground" + episode.id)
 
-  needleData = [{x: timeScale(0), y: 0}, {x: timeScale(0), y: d3.max(valueScale.range())}];
-  d3.select("#episode" + episode.id)
+  var episodeBackground = episodeGroup.select("#episodeBackground" + episode.id);
+
+  episodeBackground
+    .attr("x", d3.min(timeScale.range()))
+    .attr("y", d3.min(valueScale.range()))
+    .attr("width", svgWidth)
+    .attr("height", svgHeight)
+
+  // Draw player needle
+  episodeGroup
     .append("line")
     .attr("id", "needle")
+
+  var needle = episodeGroup.select("#needle");
+
+  needle
     .style("stroke", "black")
     .attr("x1", timeScale(0))
-    .attr("y1", 0)
+    .attr("y1", d3.min(valueScale.range()))
     .attr("x2", timeScale(0))
     .attr("y2", d3.max(valueScale.range()));
 
-  d3.select("#episode" + episode.id)
+  function moveNeedle() {
+    var mouseX = d3.mouse(this)[0];
+    needle
+      .attr("x1", mouseX)
+      .attr("x2", mouseX);
+  }
+
+  function removeNeedle() {
+    var resetX = timeScale(0);
+    needle
+      .attr("x1", resetX)
+      .attr("x2", resetX);
+  }
+
+  episodeBackground
+    .on("mousemove", moveNeedle)
+    .on("mouseout", removeNeedle)
+
+  // Draw each segment as a path
+  episodeGroup
     .selectAll("path.segment")
     .data(episode.segments)
     .enter()
     .append("path")
     .attr("class", "segment")
-    .attr("id", function (segment) { return "segment" + segment.id; })
+    .attr("id", function (segment) { return "segment" + segment.id; });
+
+  var episodeSegments = episodeGroup.selectAll("path.segment");
+
+  episodeSegments
     .attr("d", function (segment) { return line(segment.moments) + "Z"; })
-    .on("click", selectSegment)
-    .on("mousemove", updateNeedle)
-    .style("fill", function (segment) {
-      var ramp = colorRampScale(episode.show.name),
-          size = 5;
-          hue = 3;  // arbitrarily select the center hue
-      return colorbrewer[ramp][size][hue];
-    });
+    .style("fill", function (segment) { return segment.fill; });
 
-  function selectSegment(segment) {
+  function playSegment(segment) {
+    // Prevent clicking segment from triggering other click listeners
     d3.event.stopPropagation();
-    console.log("clicked segment");
 
-    toggleAudio();
+    var audioElement = document.querySelector("audio");
+
+    // Toggle the audio
+    if (audioElement.paused) {
+      audioElement.play();
+      episodeGroup.classed("playing", true);
+    } else {
+      audioElement.pause();
+      episodeGroup.classed("playing", false);
+    }
   }
 
-  function selectSVG() {
-    console.log("clicked svg");
+  episodeSegments
+    .on("click", playSegment)
+
+  function updateProgress() {
+    var audioElement = document.querySelector("audio"),
+        currentTime = audioElement.currentTime;
+
+    needle
+      .attr("x1", timeScale(currentTime))
+      .attr("x2", timeScale(currentTime));
   }
 
-  function updateNeedle(segment) {
-    var mouseX = d3.mouse(this)[0];
-    d3.select("#needle")
-      .attr("x1", mouseX)
-      .attr("x2", mouseX);
-
-  }
-
-  d3.select("svg").on("click", selectSVG);
-}
-
-function parseEpisode(episode) {
-  episode.released = Date.parse(episode.released);
-}
-
-function addEndMoments(segment, minimum) {
-  var firstMoment = {time: segment.start_time, value: 0.1},
-      lastMoment = {time: segment.end_time, value: 0.1};
-  segment.moments.splice(0, 0, firstMoment);
-  segment.moments.push(lastMoment);
-}
-
-
-function updateProgress() {
   var audioElement = document.querySelector("audio");
-
-  currentTime = audioElement.currentTime;
-  console.log(timeScale(currentTime));
-
-  d3.select("#needle")
-    .attr("x1", timeScale(currentTime))
-    .attr("x2", timeScale(currentTime));
-}
-
-function toggleAudio() {
-  var audioElement = document.querySelector("audio");
-
-  if (audioElement.paused) {
-    audioElement.play();
-  } else {
-    audioElement.pause();
-  }
-
+  audioElement.addEventListener("timeupdate", updateProgress, false);
 }
