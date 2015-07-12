@@ -1,6 +1,6 @@
 
-var svgWidth = 500,
-    svgHeight = 200;
+var svgWidth = 600,
+    svgHeight = 400;
 
 var timeScale = d3.scale.linear(),
     valueScale = d3.scale.linear(),
@@ -8,13 +8,13 @@ var timeScale = d3.scale.linear(),
 
 // Set time scale globally
 timeScale
-  .domain([0, 60])
+  .domain([0, 60 * 60.0])
   .range([0, svgWidth])
 
 // Set value scale globally
 valueScale
-  .domain([60, 93, 101])
-  .range([svgHeight, svgHeight/2, 0])
+  .domain([60, 93, 101, 120])
+  .range([svgHeight, svgHeight/2, svgHeight/8, 0])
 
 // Hand code colors for Gimlet shows
 showColorScale
@@ -88,19 +88,6 @@ function drawSegments(episode) {
 
   var episodeGroup = d3.select("#episodeGroup" + episode.id);
 
-  // Draw a rectangle behind the soundscapes
-  episodeGroup
-    .append("rect")
-    .attr("id", "episodeBackground" + episode.id)
-
-  var episodeBackground = episodeGroup.select("#episodeBackground" + episode.id);
-
-  episodeBackground
-    .attr("x", d3.min(timeScale.range()))
-    .attr("y", d3.min(valueScale.range()))
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-
   // Draw player needle
   episodeGroup
     .append("line")
@@ -114,6 +101,21 @@ function drawSegments(episode) {
     .attr("y1", d3.min(valueScale.range()))
     .attr("x2", timeScale(0))
     .attr("y2", d3.max(valueScale.range()));
+
+  // Draw a rectangle behind the soundscapes
+  episodeGroup
+    .append("rect")
+    .attr("id", "episodeBackground" + episode.id)
+
+  var episodeBackground = episodeGroup.select("#episodeBackground" + episode.id);
+
+  episodeBackground
+    .attr("x", d3.min(timeScale.range()))
+    .attr("y", d3.min(valueScale.range()))
+    .attr("width", "100%")
+    .attr("height", "100%")
+    .style("opacity", 0)
+    .style("stroke", "black")
 
   function moveNeedle() {
     var mouseX = d3.mouse(this)[0];
