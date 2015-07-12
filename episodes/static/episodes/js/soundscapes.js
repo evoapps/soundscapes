@@ -1,6 +1,6 @@
 
 var svgWidth = 600,
-    svgHeight = 400;
+    svgHeight = 200;
 
 var timeScale = d3.scale.linear(),
     valueScale = d3.scale.linear(),
@@ -54,7 +54,7 @@ function drawEpisodeList(episodes) {
     .attr("class", "episode svg-container")
     .append("svg")
     .attr("preserveAspectRatio", "xMidYMid")
-    .attr("viewBox", "0 0 600 400")
+    .attr("viewBox", "0 0 600 200")
     .attr("class", "episode svg-content-responsive")
     .append("g")
     .attr("id", function (episode) { return "episodeGroup" + episode.id; })
