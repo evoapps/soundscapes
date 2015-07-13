@@ -134,6 +134,8 @@ function drawSegments(episode) {
   function moveNeedle() {
     var mouseX = d3.mouse(this)[0];
     needle
+      .transition()
+      .duration(10)
       .attr("x1", mouseX)
       .attr("x2", mouseX);
   }
@@ -141,6 +143,7 @@ function drawSegments(episode) {
   function removeNeedle() {
     var resetX = timeScale(0);
     needle
+      .transition()
       .attr("x1", resetX)
       .attr("x2", resetX);
   }
