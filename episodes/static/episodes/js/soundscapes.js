@@ -1,3 +1,4 @@
+var audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
 var svgWidth = 600,
     svgHeight = 200;
@@ -148,9 +149,16 @@ function drawSegments(episode) {
       .attr("x2", resetX);
   }
 
+  function playMoment() {
+    var mouseX = d3.mouse(this)[0],
+        time = timeScale(mouseX);
+    playEpisode(time);
+  }
+
   episodeBackground
     .on("mousemove", moveNeedle)
     .on("mouseout", removeNeedle)
+    .on("click", playMoment)
 
   // Draw each segment as a path
   episodeGroup
@@ -171,30 +179,38 @@ function drawSegments(episode) {
     // Prevent clicking segment from triggering other click listeners
     d3.event.stopPropagation();
 
-    var audioElement = document.querySelector("audio");
-
-    // Toggle the audio
-    if (audioElement.paused) {
-      audioElement.play();
-      episodeGroup.classed("playing", true);
-    } else {
-      audioElement.pause();
-      episodeGroup.classed("playing", false);
-    }
+    playEpisode(segment.start_time);
   }
 
   episodeSegments
     .on("click", playSegment)
 
+  var audio = new Audio(episode.mp3);
+
+  function playEpisode(time) {
+
+    audio.addEventListener("canplay", function () {
+        this.currentTime = time;
+
+        if (audio.paused) {
+          audio.play();
+          episodeGroup.classed("playing", true);
+        } else {
+          audio.pause();
+          episodeGroup.classed("playing", false);
+        }
+
+    });
+  }
+
   function updateProgress() {
-    var audioElement = document.querySelector("audio"),
-        currentTime = audioElement.currentTime;
+    var currentTime = audio.currentTime;
 
     needle
       .attr("x1", timeScale(currentTime))
       .attr("x2", timeScale(currentTime));
   }
 
-  var audioElement = document.querySelector("audio");
-  audioElement.addEventListener("timeupdate", updateProgress, false);
+  audio.addEventListener("timeupdate", updateProgress);
+
 }
