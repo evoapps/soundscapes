@@ -9,7 +9,7 @@ from episodes import views
 urlpatterns = patterns('',
     url(
         r'^$',
-        TemplateView.as_view(template_name = 'home.html'),
+        TemplateView.as_view(template_name = 'index.html'),
     ),
     url(
         r'^feed/$',
