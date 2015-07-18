@@ -55,10 +55,9 @@ TEMPLATE_DIRS = (
 )
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    Path(APP_DIR, 'soundscapes/static'),
-)
 STATICFILES_FINDERS = (
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'djangobower.finders.BowerFinder',
 )
 
@@ -66,6 +65,7 @@ BOWER_COMPONENTS_ROOT = Path(APP_DIR, 'components')
 BOWER_INSTALLED_APPS = (
     'bootstrap#3.3.5',
     'backbone#1.2.1',
+    'colorbrewer#1.0.0',
     'jquery#2.1.4',
     'd3#3.5.6',
     'underscore#1.8.3'
