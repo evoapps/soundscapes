@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, url
 
+from rest_framework.routers import DefaultRouter
+
 from . import views
 
 urlpatterns = patterns('',
@@ -24,3 +26,7 @@ urlpatterns = patterns('',
         name = 'json_episode_feed',
     ),
 )
+
+router = DefaultRouter()
+router.register(r'episodes', views.EpisodeViewSet)
+urlpatterns += router.urls

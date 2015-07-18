@@ -1,7 +1,11 @@
-from rest_framework import generics
+from rest_framework import generics, viewsets
 
 from episodes.models import Show, Episode
 from .serializers import EpisodeSerializer
+
+class EpisodeViewSet(viewsets.ModelViewSet):
+    serializer_class = EpisodeSerializer
+    queryset = Episode.objects.all()
 
 class EpisodeListAPIView(generics.ListAPIView):
     """ Serialize a list of episodes """
