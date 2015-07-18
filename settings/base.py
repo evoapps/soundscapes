@@ -25,8 +25,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
+    'djangobower',
     'crispy_forms',
+    'rest_framework',
 
     'episodes',
     'api',
@@ -56,6 +57,18 @@ TEMPLATE_DIRS = (
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     Path(APP_DIR, 'soundscapes/static'),
+)
+STATICFILES_FINDERS = (
+    'djangobower.finders.BowerFinder',
+)
+
+BOWER_COMPONENTS_ROOT = Path(APP_DIR, 'components')
+BOWER_INSTALLED_APPS = (
+    'bootstrap#3.3.5',
+    'backbone#1.2.1',
+    'jquery#2.1.4',
+    'd3#3.5.6',
+    'underscore#1.8.3'
 )
 
 MEDIA_URL = '/media/'

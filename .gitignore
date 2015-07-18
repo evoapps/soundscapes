@@ -1,15 +1,8 @@
 # Python files
 *.pyc
 
-# App files
-*.sqlite3
-/static/
-/media/
-/downloads/
-/analyses/
+# Third-party packages
+components/
 
 # OS files
 .DS_Store
-
-# Secrets
-secrets.yml
