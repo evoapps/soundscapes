@@ -5,7 +5,7 @@ from .serializers import EpisodeSerializer
 
 class EpisodeViewSet(viewsets.ModelViewSet):
     serializer_class = EpisodeSerializer
-    queryset = Episode.objects.all()
+    queryset = Episode.objects.all().order_by('-released')
 
 class EpisodeListAPIView(generics.ListAPIView):
     """ Serialize a list of episodes """

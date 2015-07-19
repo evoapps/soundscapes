@@ -11,17 +11,13 @@
     <ul style="list-style: none;">
     </ul>
     <script src="{% static 'd3/d3.js' %}"></script>
-    <script src="{% static 'jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'colorbrewer/colorbrewer.js' %}"></script>
+    <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'underscore/underscore.js' %}"></script>
     <script src="{% static 'backbone/backbone.js' %}"></script>
-    <script src="{% static 'backbone.collectionView/dist/backbone.collectionView.js' %}"></script>
     <script src="{% static 'episodes/js/app.js' %}"></script>
     <script src="{% static 'episodes/js/models.js' %}"></script>
     <script src="{% static 'episodes/js/views.js' %}"></script>
     <script src="{% static 'episodes/js/router.js' %}"></script>
-    <script>
-      var episodes = new EpisodeCollection();
-      episodes.reset({{ serialized_episodes }});
-    </script>
   </body>
 </html>
