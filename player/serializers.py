@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from episodes.models import Show, Episode, Moment, Segment
+from manager.models import Show, Episode, Moment, Segment
 
 class MomentSerializer(serializers.ModelSerializer):
 

@@ -16,7 +16,6 @@ DEPLOY_DIR = APP_DIR.parent
 PROJ_DIR = DEPLOY_DIR.parent
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -29,11 +28,21 @@ INSTALLED_APPS = (
     'crispy_forms',
     'rest_framework',
 
-    'episodes',
-    'api',
+    'manager',
+    'player',
 )
 
-# Third party app definitions
+# Third party app settings
+BOWER_COMPONENTS_ROOT = Path(APP_DIR, 'components')
+BOWER_INSTALLED_APPS = (
+    'bootstrap#3.3.5',
+    'backbone#1.2.1',
+    'colorbrewer#1.0.0',
+    'jquery#2.1.4',
+    'd3#3.5.6',
+    'underscore#1.8.3'
+)
+
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 MIDDLEWARE_CLASSES = (
@@ -59,16 +68,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     'djangobower.finders.BowerFinder',
-)
-
-BOWER_COMPONENTS_ROOT = Path(APP_DIR, 'components')
-BOWER_INSTALLED_APPS = (
-    'bootstrap#3.3.5',
-    'backbone#1.2.1',
-    'colorbrewer#1.0.0',
-    'jquery#2.1.4',
-    'd3#3.5.6',
-    'underscore#1.8.3'
 )
 
 MEDIA_URL = '/media/'

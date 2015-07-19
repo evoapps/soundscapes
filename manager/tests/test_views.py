@@ -8,9 +8,9 @@ from django.utils.six import BytesIO
 from model_mommy import mommy
 from rest_framework.parsers import JSONParser
 
-from episodes.models import Show, Episode
-from episodes.serializers import EpisodeSerializer
-from episodes.views import (ShowListView, ShowCreateView, ShowDetailView)
+from manager.models import Show, Episode
+from manager.serializers import EpisodeSerializer
+from manager.views import (ShowListView, ShowCreateView, ShowDetailView)
 
 class EpisodeViewTest(TestCase):
 

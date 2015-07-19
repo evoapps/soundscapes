@@ -5,9 +5,9 @@ import unittest
 from django.conf import settings
 from django.core.files import File
 
-from episodes.handlers import fetch_rss_entries
-from episodes.handlers import get_audio_duration
-from episodes.handlers import get_audio_features
+from manager.handlers import fetch_rss_entries
+from manager.handlers import get_audio_duration
+from manager.handlers import get_audio_features
 
 class HandlerTest(unittest.TestCase):
     def setUp(self):

@@ -1,9 +1,9 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from episodes.models import Show
+from manager.models import Show
 
 class Command(BaseCommand):
-    help = 'Retrieve missing RSS entries and save them as Episodes'
+    help = 'Refresh each show, download missing episodes, and analyze a segment'
 
     def add_arguments(self, parser):
         parser.add_argument('--show-name', nargs = '+')
@@ -19,3 +19,5 @@ class Command(BaseCommand):
                 raise CommandError('Show "{}" does not exist'.format(show_name))
 
             show.refresh()
+            for episode in show.episode_set.all():
+                episode.download()

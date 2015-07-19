@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from episodes.models import Episode
+from manager.models import Episode
 
 class Command(BaseCommand):
     help = 'Downloads missing .mp3\'s.'

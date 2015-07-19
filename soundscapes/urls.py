@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
 
-from episodes import views
+from manager import views
 
 urlpatterns = patterns('',
     url(

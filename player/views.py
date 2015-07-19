@@ -1,6 +1,6 @@
 from rest_framework import generics, viewsets
 
-from episodes.models import Show, Episode
+from manager.models import Show, Episode
 from .serializers import EpisodeSerializer
 
 class EpisodeViewSet(viewsets.ModelViewSet):
