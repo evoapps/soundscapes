@@ -1,13 +1,8 @@
 
-d3settings = new D3Settings();
 
 var EpisodeView = Backbone.View.extend({
   tagName: "svg",
-  initialize: function () {
-    console.log(this.model);
-
-    d3
-  },
+  initialize: function () {},
   render: function () {
     var episode = this.model.attributes;
 
@@ -27,10 +22,35 @@ var EpisodeView = Backbone.View.extend({
   }
 })
 
-var collectionView = new Backbone.CollectionView( {
-  el: $("ul"),
-  collection: episodeCollection,
-  modelView: EpisodeView
-} );
+var EpisodeCollectionView = Backbone.View.extend({
+  el: "ul",
 
+  initialize: function () {
+    this._episodeViews = [];
+  },
+
+  render: function () {
+    var that = this;
+    $(this.el).empty();
+
+    this.collection.each(function (episode) {
+      episodeView = new EpisodeView({ model: episode });
+      that._episodeViews.push(episodeView);
+    });
+
+    _(this._episodeViews).each(function (episodeView) {
+      $(that.el).append("<li>" + episodeView.render().el + "</li>");
+    });
+  }
+});
+
+var collectionView = new EpisodeCollectionView({collection: episodeCollection});
 collectionView.render();
+
+// var collectionView = new Backbone.CollectionView( {
+//   el: $("ul"),
+//   collection: episodeCollection,
+//   modelView: EpisodeView
+// } );
+//
+// collectionView.render();
