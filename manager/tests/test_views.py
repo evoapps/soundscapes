@@ -29,3 +29,11 @@ class ManagerViewTest(TestCase):
         response = self.client.get(reverse('show_create'))
         show_form = response.context['form']
         self.assertIsInstance(show_form, ShowForm)
+
+    def test_show_detail_view_adds_show_episodes_to_context(self):
+        num_episodes = 5
+        show = mommy.make(Show)
+        mommy.make(Episode, show = show, _quantity = num_episodes)
+        response = self.client.get(show.get_absolute_url())
+        self.assertIn('episode_list', response.context.keys())
+        self.assertEquals(len(response.context['episode_list']), num_episodes)

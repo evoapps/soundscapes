@@ -13,5 +13,11 @@ class ShowCreateView(CreateView):
 class ShowDetailView(DetailView):
     model = Show
 
+    def get_context_data(self, **kwargs):
+        context_data = super(ShowDetailView, self).get_context_data(**kwargs)
+        show = context_data['show']
+        context_data['episode_list'] = show.episode_set.all().order_by('-released')
+        return context_data
+
 class EpisodeDetailView(DetailView):
     model = Episode
