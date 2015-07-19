@@ -2,13 +2,15 @@
 
 var EpisodeView = Backbone.View.extend({
   tagName: "svg",
-  initialize: function () {},
+  initialize: function () {
+    
+  },
   render: function () {
-    var episode = this.model.attributes;
+    var episode = _.clone(model.attributes);
 
-    // Set svg attributes for this episode
     var svg = d3.select(this.el);
 
+    // Set svg attributes for this episode
     var width = 600, //d3.max(d3settings.timeScale.range()),
         height = 400; // d3.max(valueScale.range());
 
@@ -17,8 +19,40 @@ var EpisodeView = Backbone.View.extend({
       .attr("height", height);
 
     svg
-      .append("text")
-      .text(episode.title);
+      .append("line")
+      .attr("class", "needle")
+
+    var needle = svg.select(".needle");
+
+    needle
+      .style("stroke", "black")
+      .attr("x1", timeScale(0))
+      .attr("y1", d3.min(valueScale.range()))
+      .attr("x2", timeScale(0))
+      .attr("y2", d3.max(valueScale.range()));
+
+    svg
+      .append("rect")
+      .attr("class", "background")
+
+    var background = svg.select(".background");
+
+    background
+      .attr("x", d3.min(timeScale.range()))
+      .attr("y", d3.min(valueScale.range()))
+      .attr("width", d3.max(timeScale.range()))
+      .attr("height", d3.max(valueScale.range()))
+      .style("opacity", 0)
+      .style("stroke", "black");
+
+    svg
+      .append("path")
+      .attr("class", "horizon");
+
+    var horizon = svg.select(".horizon");
+
+    horizon
+      .attr("d", line(episode.moments) + "Z");
   }
 })
 

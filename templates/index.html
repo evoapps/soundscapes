@@ -19,5 +19,9 @@
     <script src="{% static 'episodes/js/models.js' %}"></script>
     <script src="{% static 'episodes/js/views.js' %}"></script>
     <script src="{% static 'episodes/js/router.js' %}"></script>
+    <script>
+      var episodes = new EpisodeCollection();
+      episodes.reset({{ serialized_episodes }});
+    </script>
   </body>
 </html>
