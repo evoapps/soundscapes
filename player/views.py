@@ -1,7 +1,12 @@
+from django.views.generic import TemplateView
+
 from rest_framework import generics, viewsets
 
 from manager.models import Show, Episode
 from .serializers import EpisodeSerializer
+
+class FeedView(TemplateView):
+    template_name = 'player/index.html'
 
 class EpisodeViewSet(viewsets.ModelViewSet):
     serializer_class = EpisodeSerializer

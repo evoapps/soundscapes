@@ -16,10 +16,11 @@ TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
 class Show(models.Model):
     """ A collection of Episodes, plugged in to an RSS podcast feed """
     name = models.CharField(unique = True, max_length = 30)
+    slug = models.SlugField(unique = True)
     rss_url = models.URLField(unique = True)
 
     def get_absolute_url(self):
-        return reverse('view_show', kwargs = {'pk': self.pk})
+        return reverse('show_detail', kwargs = {'slug': self.slug})
 
     def refresh(self, max = 10):
         """ Create episodes from new RSS entries
@@ -63,6 +64,7 @@ class EpisodeManager(models.Manager):
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """
     show = models.ForeignKey(Show)
+    slug = models.SlugField(unique = True)
     rss_entry = models.TextField()
 
     released = models.DateTimeField()
@@ -77,7 +79,8 @@ class Episode(models.Model):
     objects = EpisodeManager()
 
     def get_absolute_url(self):
-        return reverse('view_episode', kwargs = {'pk': self.pk})
+        slug_kwargs = {'show_slug': self.show.slug, 'episode_slug': self.slug}
+        return reverse('episode_detail', kwargs = slug_kwargs)
 
     def __str__(self):
         return '{show}: {title}'.format(show = self.show, title = self.title)

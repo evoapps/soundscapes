@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'manager/base.html' %}
 
 {% block body %}
 
@@ -11,5 +11,7 @@
       </li>
     {% endfor %}
   </ul>
+
+  {{ block.super }}
 
 {% endblock body %}

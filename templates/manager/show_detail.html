@@ -1,23 +1,17 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block style %}
-  <link href="{% static 'episodes/css/soundscapes.css' %}" rel="stylesheet">
-{% endblock style %}
+{% extends 'manager/base.html' %}
 
 {% block body %}
 
   <h1>{{ show.name }}</h1>
 
-  <ul id="episodeList" class="list-unstyled">
+  <ul id="id_episode_list" class="list-unstyled">
+    {% for episode in show.episodes %}
+      <li class="list-group-item">
+        <a href="{{ episode.get_absolute_url }}">{{ episode.title }}</a>
+      </li>
+    {% endfor %}
   </ul>
 
-{% endblock body %}
+  {{ block.super }}
 
-{% block javascript %}
-{% include 'episodes/_soundscape.html' %}
-  <script>
-var globalVars = {};
-d3.json("{% url 'json_episode_list' show=show.pk %}", drawEpisodeList);
-  </script>
-{% endblock javascript %}
+{% endblock body %}

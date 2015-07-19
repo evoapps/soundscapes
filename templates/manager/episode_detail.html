@@ -1,31 +1,8 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block style %}
-  <link href="{% static 'episodes/css/soundscapes.css' %}" rel="stylesheet">
-{% endblock style %}
+{% extends 'manager/base.html' %}
 
 {% block body %}
 
   <h1>{{ episode.show.name }}</h1>
-
   <h2>{{ episode.title }}</h2>
 
-  <div class="svg-container">
-    <svg viewBox="0 0 600 200" preserveAspectRatio="xMidYMid" class="svg-content-responsive">
-      <g id="episodeGroup{{ episode.id }}">
-      </g>
-    </svg>
-  </div>
-
-  <audio src="{{ episode.mp3.url }}"></audio>
-
 {% endblock body %}
-
-{% block javascript %}
-{% include 'episodes/_soundscape.html' %}
-  <script>
-var globalVars = {};
-d3.json("{% url 'json_episode' episode=episode.pk %}", drawSingleEpisode);
-  </script>
-{% endblock javascript %}
