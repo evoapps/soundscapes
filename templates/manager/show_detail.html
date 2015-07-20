@@ -2,6 +2,8 @@
 
 {% block body %}
 
+  <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-triangle-left"></span></a> {{ show.name }}</h1>
+
   <ul class="nav nav-pills">
     <form action="{% url 'refresh' slug=show.slug %}" method="POST" class="navbar-form">
       {% csrf_token %}
@@ -10,8 +12,6 @@
          Refresh</button>
     </form>
   </ul>
-
-  <h1>{{ show.name }}</h1>
 
   <ul id="id_episode_list" class="list-group">
     {% for episode in episode_list %}

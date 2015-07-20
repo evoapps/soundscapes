@@ -1,14 +1,11 @@
 {% extends 'manager/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block body %}
 
-  <h1>New Show</h1>
+  <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-triangle-left"></span></a> New Show</h1>
 
-  <form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Submit" />
-  </form>
+  {% crispy form form.helper %}
 
   {{ block.super }}
 
