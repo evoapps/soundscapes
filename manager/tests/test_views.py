@@ -7,8 +7,6 @@ from model_mommy import mommy
 
 from manager.models import Show, Episode
 from manager.forms import ShowForm
-from manager.views import ShowListView, ShowCreateView, ShowDetailView
-from manager.views import EpisodeDetailView
 
 class ManagerViewTest(TestCase):
 
@@ -37,3 +35,9 @@ class ManagerViewTest(TestCase):
         response = self.client.get(show.get_absolute_url())
         self.assertIn('episode_list', response.context.keys())
         self.assertEquals(len(response.context['episode_list']), num_episodes)
+
+    def test_episode_detail_view_adds_show_to_context(self):
+        episode = mommy.make(Episode)
+        response = self.client.get(episode.get_absolute_url())
+        self.assertIn('show', response.context.keys())
+        self.assertEquals(response.context['show'], episode.show)

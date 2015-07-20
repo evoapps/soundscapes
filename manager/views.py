@@ -30,3 +30,8 @@ def refresh(request, slug):
 class EpisodeDetailView(DetailView):
     model = Episode
     slug_url_kwarg = 'episode_slug'
+
+    def get_context_data(self, **kwargs):
+        context_data = super(EpisodeDetailView, self).get_context_data(**kwargs)
+        context_data['show'] = context_data['episode'].show
+        return context_data
