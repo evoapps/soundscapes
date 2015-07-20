@@ -2,6 +2,15 @@
 
 {% block body %}
 
+  <ul class="nav nav-pills">
+    <li role="presentation">
+      <a class="btn btn-default" href="{% url 'show_create' %}" role="button">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+         Add Show
+      </a>
+    </li>
+  </ul>
+
   <h1>Shows</h1>
 
   <ul id="id_show_list" class="list-group">

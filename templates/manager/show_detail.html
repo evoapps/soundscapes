@@ -2,12 +2,25 @@
 
 {% block body %}
 
+  <ul class="nav nav-pills">
+    <form action="{% url 'refresh' slug=show.slug %}" method="POST" class="navbar-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-default">
+        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+         Refresh</button>
+    </form>
+  </ul>
+
   <h1>{{ show.name }}</h1>
 
-  <ul id="id_episode_list" class="list-unstyled">
+  <ul id="id_episode_list" class="list-group">
     {% for episode in episode_list %}
       <li class="list-group-item">
         <a href="{{ episode.get_absolute_url }}">{{ episode.title }}</a>
+      </li>
+    {% empty %}
+      <li class="list-group-item">
+        (no episodes in feed)
       </li>
     {% endfor %}
   </ul>

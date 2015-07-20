@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.core.files.storage import FileSystemStorage
 from django.db import models
+from django.utils.text import slugify
 
 from .handlers import fetch_rss_entries, dump_rss_entry
 from .handlers import download_episode
@@ -56,6 +57,7 @@ class EpisodeManager(models.Manager):
             'show': show,
             'released': dateparser.parse(rss_entry['published']),
             'title': rss_entry['title'],
+            'slug': slugify(rss_entry['title']),
             'rss_mp3_url': rss_entry['media_content'][0]['url'],
             'rss_entry': dump_rss_entry(rss_entry),
         }

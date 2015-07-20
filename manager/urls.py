@@ -19,6 +19,11 @@ urlpatterns = patterns('',
         name = 'show_detail',
     ),
     url(
+        r'^(?P<slug>[\w-]+)/refresh$',
+        views.refresh,
+        name = 'refresh',
+    ),
+    url(
         r'^(?P<show_slug>[\w-]+)/(?P<episode_slug>[\w-]+)/$',
         views.EpisodeDetailView.as_view(),
         name = 'episode_detail',
