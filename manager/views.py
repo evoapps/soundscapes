@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 
-from .forms import ShowForm
+from .forms import ShowForm, SegmentForm
 from .models import Show, Episode
 
 class ShowListView(ListView):
@@ -36,4 +36,5 @@ class EpisodeDetailView(DetailView):
         episode = context_data['episode']
         context_data['show'] = episode.show
         context_data['segments'] = episode.segments.all()
+        context_data['segment_form'] = SegmentForm()
         return context_data
