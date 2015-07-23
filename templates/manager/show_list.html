@@ -1,18 +1,19 @@
 {% extends 'manager/base.html' %}
 
-{% block body %}
+{% block header %}
+  <h1>Shows</h1>
+{% endblock header %}
 
-  <ul class="nav nav-pills">
+{% block nav %}
     <li role="presentation">
       <a class="btn btn-default" href="{% url 'show_create' %}" role="button">
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
          Add Show
       </a>
     </li>
-  </ul>
+{% endblock nav %}
 
-  <h1>Shows</h1>
-
+{% block main %}
   <ul id="id_show_list" class="list-group">
     {% for show in show_list %}
       <li class="list-group-item">
@@ -20,7 +21,4 @@
       </li>
     {% endfor %}
   </ul>
-
-  {{ block.super }}
-
-{% endblock body %}
+{% endblock main %}

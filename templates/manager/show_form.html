@@ -1,12 +1,10 @@
 {% extends 'manager/base.html' %}
 {% load crispy_forms_tags %}
 
-{% block body %}
+{% block header %}
+  <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-step-backward"></span></a> New Show</h1>
+{% endblock header %}
 
-  <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-triangle-left"></span></a> New Show</h1>
-
+{% block main %}
   {% crispy form form.helper %}
-
-  {{ block.super }}
-
-{% endblock body %}
+{% endblock main %}

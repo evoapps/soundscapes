@@ -1,10 +1,8 @@
 {% extends 'manager/base.html' %}
 
-{% block body %}
-
+{% block header %}
   <h1>
     <a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-fast-backward"></span></a>
     <a href="{% url 'show_detail' slug=show.slug %}">{{ show.name }}</a></h1>
   <h2>{{ episode.title }}</h2>
-
-{% endblock body %}
+{% endblock header %}

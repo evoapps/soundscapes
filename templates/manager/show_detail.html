@@ -1,18 +1,19 @@
 {% extends 'manager/base.html' %}
 
-{% block body %}
-
+{% block header %}
   <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-step-backward"></span></a> {{ show.name }}</h1>
+{% endblock header %}
 
-  <ul class="nav nav-pills">
-    <form action="{% url 'refresh' slug=show.slug %}" method="POST" class="navbar-form">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-default">
-        <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
-         Refresh</button>
-    </form>
-  </ul>
+{% block nav %}
+  <form action="{% url 'refresh' slug=show.slug %}" method="POST" class="navbar-form">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-default">
+      <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+       Refresh</button>
+  </form>
+{% endblock nav %}
 
+{% block main %}
   <ul id="id_episode_list" class="list-group">
     {% for episode in episode_list %}
       <li class="list-group-item">
@@ -24,7 +25,4 @@
       </li>
     {% endfor %}
   </ul>
-
-  {{ block.super }}
-
-{% endblock body %}
+{% endblock main %}
