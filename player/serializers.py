@@ -1,18 +1,12 @@
 from rest_framework import serializers
 
-from manager.models import Show, Episode, Moment, Segment
-
-class MomentSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Moment
+from manager.models import Show, Episode, Segment
 
 class SegmentSerializer(serializers.ModelSerializer):
-    moments = MomentSerializer(many = True)
 
     class Meta:
         model = Segment
-        fields = ('id', 'start_time', 'end_time', 'moments')
+        fields = ('id', 'start_time', 'end_time')
 
 class EpisodeSerializer(serializers.ModelSerializer):
     segments = SegmentSerializer(many = True)
@@ -21,5 +15,5 @@ class EpisodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Episode
         fields = ('id', 'show', 'released', 'title', 'mp3', 'duration',
-                  'segments', 'moments', 'url')
+                  'segments', 'url')
         depth = 1
