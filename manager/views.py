@@ -33,5 +33,7 @@ class EpisodeDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context_data = super(EpisodeDetailView, self).get_context_data(**kwargs)
-        context_data['show'] = context_data['episode'].show
+        episode = context_data['episode']
+        context_data['show'] = episode.show
+        context_data['segments'] = episode.segments.all()
         return context_data

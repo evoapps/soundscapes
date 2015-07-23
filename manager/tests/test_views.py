@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from manager.models import Show, Episode
+from manager.models import Show, Episode, Segment
 from manager.forms import ShowForm
 
 class ManagerViewTest(TestCase):
@@ -41,3 +41,11 @@ class ManagerViewTest(TestCase):
         response = self.client.get(episode.get_absolute_url())
         self.assertIn('show', response.context.keys())
         self.assertEquals(response.context['show'], episode.show)
+
+    def test_episode_detail_view_adds_segments_to_context(self):
+        num_segments = 5
+        episode = mommy.make(Episode)
+        mommy.make(Segment, episode = episode, _quantity = num_segments)
+        response = self.client.get(episode.get_absolute_url())
+        self.assertIn('segments', response.context.keys())
+        self.assertEquals(len(response.context['segments']), num_segments)

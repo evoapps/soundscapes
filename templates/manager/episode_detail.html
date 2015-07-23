@@ -6,3 +6,20 @@
     <a href="{% url 'show_detail' slug=show.slug %}">{{ show.name }}</a></h1>
   <h2>{{ episode.title }}</h2>
 {% endblock header %}
+
+{% block nav %}
+{% endblock nav %}
+
+{% block main %}
+  <ul id="id_segment_list" class="list-group">
+    {% for segment in segments %}
+      <li class="list-group-item">
+        {{ segment.start_time}}:{{ segment.end_time }} {{ segment.tags }}
+      </li>
+    {% empty %}
+      <li class="list-group-item">
+        (no segments in episode)
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock main %}
