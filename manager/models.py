@@ -1,11 +1,8 @@
-from dateutil import parser as dateparser
 from unipath import Path
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
-from django.core.files.storage import FileSystemStorage
 from django.db import models
-from django.utils.text import slugify
 
 from .handlers import fetch_rss_entries
 from .handlers import RSSEntryHandler
@@ -72,11 +69,10 @@ class Episode(models.Model):
     released = models.DateTimeField()
     title = models.CharField(max_length = 80)
 
-    rss_mp3_url = models.URLField(unique = True)
-
-    # mp3 and analyses require downloading the episode
-    mp3 = models.FileField(max_length = 200, blank = True)
     duration = models.FloatField(null = True)
+
+    mp3_url = models.URLField(unique = True)
+    mp3 = models.FileField(max_length = 200, blank = True)
 
     objects = EpisodeManager()
 
@@ -88,7 +84,7 @@ class Episode(models.Model):
         return '{show}: {title}'.format(show = self.show, title = self.title)
 
     def download(self):
-        """ Download the episode file
+        """ Download the episode
 
         Episodes are downloaded if the mp3 FileField is empty or if the file
         doesn't exist on the server.

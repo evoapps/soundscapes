@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import ListView, CreateView, DetailView
 
@@ -22,6 +21,7 @@ class ShowDetailView(DetailView):
         return context_data
 
 def refresh(request, slug):
+    """ Create new Episodes for any RSS entries not already in the show """
     if request.method == 'POST':
         show = get_object_or_404(Show, slug = slug)
         show.refresh()
