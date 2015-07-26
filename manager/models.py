@@ -33,15 +33,11 @@ class Show(models.Model):
         TODO: hash the rss_entry instead of comparing full json
         """
         all_entries = fetch_rss_entries(self.rss_url, n = max)
-        all_entries_json = []
-        for rss_entry in all_entries:
-            rss_handler = RSSEntryHandler(rss_entry)
-            all_entries_json.append(rss_handler.rss_entry)
 
         current_entries = self.episode_set.values_list('rss_entry', flat = True)
 
-        new_entries = filter(lambda e: e not in current_entries,
-                             all_entries_json)
+        compare_rss_entry_dump = lambda rss_entry: RSSEntryHandler(rss_entry).rss_entry_dump not in current_entries
+        new_entries = filter(compare_rss_entry_dump, all_entries)
 
         for rss_entry in new_entries:
             entry_handler = RSSEntryHandler(rss_entry)

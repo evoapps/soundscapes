@@ -22,10 +22,11 @@ class ShowDetailView(DetailView):
 
 def refresh(request, slug):
     """ Create new Episodes for any RSS entries not already in the show """
+    print 'refreshing'
     if request.method == 'POST':
         show = get_object_or_404(Show, slug = slug)
         show.refresh()
-        return redirect('show_detail', slug = slug)
+        return redirect('show:detail', slug = slug)
 
 class EpisodeDetailView(DetailView):
     model = Episode

@@ -3,12 +3,14 @@ from unipath import Path
 # RSS handling
 import feedparser
 import json
+from dateutil import parser as dateparser
 
 # Episode downloading
 import requests
 
 from django.conf import settings
 from django.core.files import File
+from django.utils.text import slugify
 
 class RSSEntryHandler(object):
     """ Interface between json RSS entries and Episode models """
@@ -44,7 +46,7 @@ class RSSEntryHandler(object):
         return (hours*3600) + (minutes*60) + seconds
 
     @property
-    def rss_entry(self):
+    def rss_entry_dump(self):
         """ RSS entry dump """
         # hack! "json.dumps(rss_entry)" chokes on time object
         modified_rss_entry = self.rss_entry.copy()
@@ -52,7 +54,7 @@ class RSSEntryHandler(object):
             str(modified_rss_entry['published_parsed'])
         return json.dumps(modified_rss_entry)
 
-    def episode_kwargs():
+    def episode_kwargs(self):
         """ Return RSS fields as kwargs for creating an Episode.
 
         TODO: parse show from RSS feed
@@ -64,7 +66,7 @@ class RSSEntryHandler(object):
             'slug': self.slug,
             'mp3_url': self.mp3_url,
             'duration': self.duration,
-            'rss_entry': self.rss_entry,
+            'rss_entry': self.rss_entry_dump,
         }
 
 def fetch_rss_entries(rss_url, n = None):
