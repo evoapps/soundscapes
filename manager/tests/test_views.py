@@ -36,6 +36,14 @@ class ShowViewsTest(TestCase):
         self.assertIn('episode_list', response.context.keys())
         self.assertEquals(len(response.context['episode_list']), num_episodes)
 
+    def test_show_refresh_view_fetches_new_episodes(self):
+        valid_rss_url = "http://feeds.gimletmedia.com/hearstartup"
+        show = mommy.make(Show, rss_url = valid_rss_url)
+        response = self.client.post(reverse('show:refresh', kwargs = {'slug': show.slug}))
+        self.assertEquals(response.status_code, 302)
+        episodes = show.episode_set.all()
+        self.assertGreater(len(episodes), 0)
+
 
 class EpisodeDetailViewTest(TestCase):
 

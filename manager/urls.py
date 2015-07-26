@@ -9,12 +9,12 @@ show_patterns = [
         name = 'list',
     ),
     url(
-        r'^new/',
+        r'^new/$',
         views.ShowCreateView.as_view(),
         name = 'create',
     ),
     url(
-        r'^(?P<slug>[\w-]+)/',
+        r'^(?P<slug>[\w-]+)/$',
         views.ShowDetailView.as_view(),
         name = 'detail',
     ),
@@ -29,7 +29,7 @@ show_patterns = [
 
 episode_patterns = [
     url(
-        r'^(?P<pk>\d+)/',
+        r'^(?P<pk>\d+)/$',
         views.EpisodeDetailView.as_view(),
         name = 'detail',
     ),
@@ -38,7 +38,7 @@ episode_patterns = [
 
 segment_patterns = [
     url(
-        r'^(?P<pk>\d+)/',
+        r'^(?P<pk>\d+)/$',
         views.SegmentDetailView.as_view(),
         name = 'detail',
     ),
