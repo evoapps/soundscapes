@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
-from manager.models import Episode
+from manager.models import Episode, Segment
 from player.models import HorizonLine, SegmentBubble
+
+class SegmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Segment
+        fields = ('start_time', 'end_time')
 
 class HorizonLineSerializer(serializers.ModelSerializer):
     """
@@ -13,10 +19,11 @@ class HorizonLineSerializer(serializers.ModelSerializer):
       .append("path")
       .attr("d", horizon_line_generator)
     """
+    segments = SegmentSerializer(many = True)
 
     class Meta:
         model = HorizonLine
-        fields = ('heights', 'interval')
+        fields = ('heights', 'interval', 'segments')
 
 
 class SegmentBubbleSerializer(serializers.ModelSerializer):
