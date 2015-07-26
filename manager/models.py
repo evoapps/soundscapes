@@ -18,7 +18,7 @@ class Show(models.Model):
     rss_url = models.URLField(unique = True)
 
     def get_absolute_url(self):
-        return reverse('show_detail', kwargs = {'slug': self.slug})
+        return reverse('show:detail', kwargs = {'slug': self.slug})
 
     def refresh(self, max = 10):
         """ Create episodes from new RSS entries
@@ -77,8 +77,7 @@ class Episode(models.Model):
     objects = EpisodeManager()
 
     def get_absolute_url(self):
-        slug_kwargs = {'show_slug': self.show.slug, 'episode_slug': self.slug}
-        return reverse('episode_detail', kwargs = slug_kwargs)
+        return reverse('episode:detail', kwargs = {'pk': self.pk})
 
     def __str__(self):
         return '{show}: {title}'.format(show = self.show, title = self.title)

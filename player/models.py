@@ -1,8 +1,8 @@
-from django.db import model
+from django.db import models
 
 from manager.models import Episode
 
-class HorizonLine(model.Model):
+class HorizonLine(models.Model):
     """ """
     episode = models.ForeignKey(Episode)
 
@@ -12,7 +12,7 @@ class HorizonLine(model.Model):
     # The time interval between height samples
     interval = models.IntegerField()
 
-class SegmentBubble(model.Model):
+class SegmentBubble(models.Model):
     episode = models.ForeignKey(Episode)
 
     size = models.IntegerField()

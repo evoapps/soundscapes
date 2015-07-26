@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, include, url
 
 from . import views
 
@@ -45,7 +45,7 @@ segment_patterns = [
 ]
 
 urlpatterns = patterns('',
-    url(r'^show/', include(show_patterns, namespace = 'show'),
-    url(r'^episode/', include(episode_patterns, namespace = 'episode'),
-    url(r'^segment/', include(segment_patterns, namespace = 'segment'),
+    url(r'^show/', include(show_patterns, namespace = 'show')),
+    url(r'^episode/', include(episode_patterns, namespace = 'episode')),
+    url(r'^segment/', include(segment_patterns, namespace = 'segment')),
 )

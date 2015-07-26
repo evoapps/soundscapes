@@ -1,11 +1,11 @@
 {% extends 'manager/base.html' %}
 
 {% block header %}
-  <h1><a href="{% url 'show_list' %}"><span class="glyphicon glyphicon-step-backward"></span></a> {{ show.name }}</h1>
+  <h1><a href="{% url 'show:list' %}"><span class="glyphicon glyphicon-step-backward"></span></a> {{ show.name }}</h1>
 {% endblock header %}
 
 {% block nav %}
-  <form action="{% url 'refresh' slug=show.slug %}" method="POST" class="navbar-form">
+  <form action="{% url 'show:refresh' slug=show.slug %}" method="POST" class="navbar-form">
     {% csrf_token %}
     <button type="submit" class="btn btn-default">
       <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
