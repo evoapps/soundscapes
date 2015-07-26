@@ -2,30 +2,50 @@ from django.conf.urls import patterns, url
 
 from . import views
 
-urlpatterns = patterns('',
+show_patterns = [
     url(
         r'^$',
         views.ShowListView.as_view(),
-        name = 'show_list',
+        name = 'list',
     ),
     url(
-        r'^new/$',
+        r'^new/',
         views.ShowCreateView.as_view(),
-        name = 'show_create',
+        name = 'create',
     ),
     url(
-        r'^(?P<slug>[\w-]+)/$',
+        r'^(?P<slug>[\w-]+)/',
         views.ShowDetailView.as_view(),
-        name = 'show_detail',
+        name = 'detail',
     ),
+    # expose show.refresh
     url(
         r'^(?P<slug>[\w-]+)/refresh$',
         views.refresh,
         name = 'refresh',
     ),
+]
+
+
+episode_patterns = [
     url(
-        r'^(?P<show_slug>[\w-]+)/(?P<episode_slug>[\w-]+)/$',
+        r'^(?P<pk>\d+)/',
         views.EpisodeDetailView.as_view(),
-        name = 'episode_detail',
+        name = 'detail',
     ),
+]
+
+
+segment_patterns = [
+    url(
+        r'^(?P<pk>\d+)/',
+        views.SegmentDetailView.as_view(),
+        name = 'detail',
+    ),
+]
+
+urlpatterns = patterns('',
+    url(r'^show/', include(show_patterns, namespace = 'show'),
+    url(r'^episode/', include(episode_patterns, namespace = 'episode'),
+    url(r'^segment/', include(segment_patterns, namespace = 'segment'),
 )

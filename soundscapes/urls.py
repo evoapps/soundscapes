@@ -9,6 +9,6 @@ from player.urls import router
 urlpatterns = patterns('',
     url(r'^$', FeedView.as_view(), name = 'feed_view'),
     url(r'^api/', include(router.urls)),
-    url(r'^shows/', include('manager.urls')),
+    url(r'^manager/', include('manager.urls')),
     url(r'^admin/', include(admin.site.urls)),
 ) + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

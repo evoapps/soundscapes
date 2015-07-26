@@ -16,7 +16,7 @@ class ShowForm(forms.ModelForm):
         super(ShowForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        self.helper.form_action = reverse('show_create')
+        self.helper.form_action = reverse('show:create')
         self.helper.add_input(Submit('submit', 'Add'))
 
     def save(self, *args, **kwargs):

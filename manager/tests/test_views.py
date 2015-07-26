@@ -8,23 +8,23 @@ from model_mommy import mommy
 from manager.models import Show, Episode, Segment
 from manager.forms import ShowForm, SegmentForm
 
-class ManagerViewTest(TestCase):
+class ShowViewsTest(TestCase):
 
     def test_show_list_view_returns_list_of_shows(self):
         num_shows = 5
         mommy.make(Show, _quantity = num_shows)
-        response = self.client.get(reverse('show_list'))
+        response = self.client.get(reverse('show:list'))
         shows = response.context['show_list']
         self.assertEquals(len(shows), num_shows)
 
     def test_show_create_view_creates_new_shows(self):
         show = mommy.prepare(Show)
         post = {'name': show.name, 'slug': show.slug, 'rss_url': show.rss_url}
-        self.client.post(reverse('show_create'), post)
+        self.client.post(reverse('show:create'), post)
         self.assertEquals(Show.objects.last().name, show.name)
 
     def test_show_create_view_renders_show_form(self):
-        response = self.client.get(reverse('show_create'))
+        response = self.client.get(reverse('show:create'))
         show_form = response.context['form']
         self.assertIsInstance(show_form, ShowForm)
 
@@ -36,13 +36,16 @@ class ManagerViewTest(TestCase):
         self.assertIn('episode_list', response.context.keys())
         self.assertEquals(len(response.context['episode_list']), num_episodes)
 
-    def test_episode_detail_view_adds_show_to_context(self):
+
+class EpisodeDetailViewTest(TestCase):
+
+    def test_adds_show_to_context(self):
         episode = mommy.make(Episode)
         response = self.client.get(episode.get_absolute_url())
         self.assertIn('show', response.context.keys())
         self.assertEquals(response.context['show'], episode.show)
 
-    def test_episode_detail_view_adds_segments_to_context(self):
+    def test_adds_segments_to_context(self):
         num_segments = 5
         episode = mommy.make(Episode)
         mommy.make(Segment, episode = episode, _quantity = num_segments)
@@ -50,7 +53,7 @@ class ManagerViewTest(TestCase):
         self.assertIn('segments', response.context.keys())
         self.assertEquals(len(response.context['segments']), num_segments)
 
-    def test_episode_detail_view_adds_segment_form_to_context(self):
+    def test_adds_segment_form_to_context(self):
         episode = mommy.make(Episode)
         response = self.client.get(episode.get_absolute_url())
         self.assertIn('segment_form', response.context.keys())
