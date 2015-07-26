@@ -11,11 +11,3 @@ class HorizonLine(models.Model):
 
     # The time interval between height samples
     interval = models.IntegerField()
-
-    def segments(self):
-        return self.episode.segments
-
-class SegmentBubble(models.Model):
-    episode = models.ForeignKey(Episode, related_name = 'segment_bubbles')
-
-    size = models.IntegerField()
