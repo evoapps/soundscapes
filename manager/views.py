@@ -40,3 +40,7 @@ class EpisodeDetailView(DetailView):
 
 class SegmentDetailView(DetailView):
     model = Segment
+
+class SegmentCreateView(CreateView):
+    model = Segment
+    form_class = SegmentForm
