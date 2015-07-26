@@ -44,21 +44,12 @@ class Show(models.Model):
                              all_entries_json)
 
         for rss_entry in new_entries:
-            Episode.objects.create_from_rss_entry(rss_entry, show = self)
+            entry_handler = RSSEntryHandler(rss_entry)
+            kwargs = entry_handler.episode_kwargs()
+            self.episode_set.create(**kwargs)
 
     def __str__(self):
         return self.name
-
-class EpisodeManager(models.Manager):
-    def create_from_rss_entry(self, rss_entry, show):
-        """ Create an Episode from an RSS entry """
-        entry_handler = RSSEntryHandler(rss_entry)
-        kwargs = entry_handler.episode_kwargs()
-
-        # RSSEntryHandler does not process the show from the entry
-        kwargs['show'] = show
-
-        return self.create(**kwargs)
 
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """
@@ -73,8 +64,6 @@ class Episode(models.Model):
 
     mp3_url = models.URLField(unique = True)
     mp3 = models.FileField(max_length = 200, blank = True)
-
-    objects = EpisodeManager()
 
     def get_absolute_url(self):
         return reverse('episode:detail', kwargs = {'pk': self.pk})
