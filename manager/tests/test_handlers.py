@@ -24,13 +24,14 @@ class HandlerTest(unittest.TestCase):
 class RSSEntryHandlerTest(unittest.TestCase):
 
     def test_parse_duration(self):
-        test_rss = {'itunes_duration': '00:30:10'}
-        handler = RSSEntryHandler(test_rss)
-        parsed_duration = handler.duration
-        self.assertEquals(parsed_duration, 30 * 60 + 10)
 
-        # Test minutes:seconds format works too
-        test_rss['itunes_duration'] = '38:36'
-        handler = RSSEntryHandler(test_rss)
-        parsed_duration = handler.duration
-        self.assertEquals(parsed_duration, 38 * 60 + 36)
+        def _parse_duration(itunes_duration):
+            test_rss = {'itunes_duration': itunes_duration}
+            handler = RSSEntryHandler(test_rss)
+            return handler.duration
+
+        # hours:minutes:seconds format
+        self.assertEquals(_parse_duration('00:30:10'), 30 * 60 + 10)
+
+        # minutes:seconds format
+        self.assertEquals(_parse_duration('38:36'), 38 * 60 + 36)
