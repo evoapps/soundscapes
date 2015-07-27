@@ -28,3 +28,9 @@ class RSSEntryHandlerTest(unittest.TestCase):
         handler = RSSEntryHandler(test_rss)
         parsed_duration = handler.duration
         self.assertEquals(parsed_duration, 30 * 60 + 10)
+
+        # Test minutes:seconds format works too
+        test_rss['itunes_duration'] = '38:36'
+        handler = RSSEntryHandler(test_rss)
+        parsed_duration = handler.duration
+        self.assertEquals(parsed_duration, 38 * 60 + 36)

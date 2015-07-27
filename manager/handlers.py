@@ -42,7 +42,11 @@ class RSSEntryHandler(object):
         # a more accurate way to get the episode duration
         # would be to read the duration from the downloaded mp3.
         durationstr = self.rss_entry.get('itunes_duration', '00:00:00')
-        hours, minutes, seconds = map(int, durationstr.split(':'))
+        try:
+            hours, minutes, seconds = map(int, durationstr.split(':'))
+        except ValueError:
+            hours = 0
+            minutes, seconds = map(int, durationstr.split(':'))
         return (hours*3600) + (minutes*60) + seconds
 
     @property
