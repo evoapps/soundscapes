@@ -3,7 +3,7 @@
 var EpisodeView = Backbone.View.extend({
 
   // Each episode is rendered in its own svg element
-  tagName: "svg",
+  tagName: "li",
 
   initialize: function (options) {
 
@@ -31,10 +31,10 @@ var EpisodeView = Backbone.View.extend({
   render: function () {
     var episode = _.clone(this.model.attributes);
 
-    var svg = d3.select(this.el);
+    var svg = d3.select(this.el).append("svg");
 
     svg
-      .attr("width", this.timeScale(this.model.get("duration")))
+      .attr("width", this.timeScale(episode.duration))
       .attr("height", d3.max(this.valueScale.range()));
 
     /* Needle */
@@ -75,8 +75,9 @@ var EpisodeView = Backbone.View.extend({
         .attr("x2", mouseX);
     }
 
+    var that = this;
     function removeNeedle() {
-      var resetX = this.timeScale(0);
+      var resetX = that.timeScale(0);
       needle
         .transition()
         .attr("x1", resetX)
@@ -85,7 +86,7 @@ var EpisodeView = Backbone.View.extend({
 
     function playMoment() {
       var mouseX = d3.mouse(this)[0],
-          time = this.timeScale(mouseX);
+          time = that.timeScale(mouseX);
       //playEpisode(time);
       console.log("playing episode at time:" + time);
     }
@@ -93,7 +94,7 @@ var EpisodeView = Backbone.View.extend({
     background
       .on("mousemove", moveNeedle)
       .on("mouseout", removeNeedle)
-      .on("click", playMoment)
+      .on("click", playMoment);
 
     /* Horizon */
     /*
@@ -115,9 +116,26 @@ var EpisodeCollectionView = Backbone.View.extend({
   el: "ul",
 
   initialize: function () {
-    this.maxDuration = d3.max(this.collection.models, function (episode) {
+    var that = this;
+
+    var maxDuration,
+        maxWidth;
+
+    maxDuration = d3.max(this.collection.models, function (episode) {
       return episode.get("duration");
     });
+    maxWidth = window.innerWidth;
+
+    this._episodeViews = [];
+    this.collection.each(function (episode) {
+      that._episodeViews.push(new EpisodeView({
+        model: episode,
+        maxDuration: maxDuration,
+        maxWidth: maxWidth,
+        }));
+    });
+
+    this.maxDuration =
 
     this.maxWidth = window.innerWidth;
   },
@@ -126,13 +144,9 @@ var EpisodeCollectionView = Backbone.View.extend({
     var that = this;
     $(this.el).empty();
 
-    this.collection.each(function (episode) {
-      episodeView = new EpisodeView({
-        model: episode,
-        maxDuration: this.maxDuration,
-        maxWidth: this.maxWidth
-      });
-      $(that.el).append("<li>" + episodeView.render().el + "</li>");
+    _(this._episodeViews).each(function (episodeView) {
+      $(that.el).append(episodeView.render().el);
     });
+
   }
 });
