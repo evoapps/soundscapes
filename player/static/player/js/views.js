@@ -96,6 +96,7 @@ var EpisodeView = Backbone.View.extend({
       .on("click", playMoment)
 
     /* Horizon */
+    /*
     svg
       .append("path")
       .attr("class", "horizon");
@@ -104,6 +105,7 @@ var EpisodeView = Backbone.View.extend({
 
     horizon
       .attr("d", this.line(episode.moments) + "Z");
+    */
 
     return this;
   },
@@ -113,9 +115,7 @@ var EpisodeCollectionView = Backbone.View.extend({
   el: "ul",
 
   initialize: function () {
-    console.log(this.collection);
     this.maxDuration = d3.max(this.collection.models, function (episode) {
-      console.log(episode);
       return episode.get("duration");
     });
 
