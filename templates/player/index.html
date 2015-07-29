@@ -20,9 +20,9 @@
     <script src="{% static 'player/js/views.js' %}"></script>
     <script>
 var episodeCollection = new EpisodeCollection;
-episodeCollection.reset({{ episodes }});
+episodeCollection.reset({{ episodes|safe }});
 
-var episodeCollectionView = new EpisodeCollectionView(collection = episodeCollection);
+var episodeCollectionView = new EpisodeCollectionView({collection: episodeCollection});
 episodeCollectionView.render();
     </script>
   </body>

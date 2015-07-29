@@ -41,6 +41,10 @@ var EpisodeView = Backbone.View.extend({
     // Copy the attributes to use with D3
     var episode = _.clone(this.model.attributes);
 
+    d3.select(this.el)
+      .append("audio")
+      .attr("src", episode.mp3)
+
     var title = svg
       .append("text")
       .text(episode.title)
