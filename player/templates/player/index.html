@@ -16,11 +16,20 @@
     <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'underscore/underscore.js' %}"></script>
     <script src="{% static 'backbone/backbone.js' %}"></script>
+    <script src="{% static 'soundmanager2/script/soundmanager2.js' %}"></script>
     <script src="{% static 'player/js/models.js' %}"></script>
     <script src="{% static 'player/js/views.js' %}"></script>
     <script>
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
+
+soundManager.setup({
+  url: "{% static 'soundmanager2/swf' %}",
+  flashVersion: 9,
+  onready: function () {
+    episodeCollection.trigger("soundmanager:ready");
+  }
+});
 
 var episodeCollectionView = new EpisodeCollectionView({collection: episodeCollection});
 episodeCollectionView.render();

@@ -26,6 +26,7 @@ var EpisodeView = Backbone.View.extend({
       .x(function (moment) { return this.timeScale(moment.time); })
       .y(function (moment) { return this.valueScale(moment.value); })
       .interpolate("basis");
+
   },
 
   render: function () {
@@ -37,6 +38,9 @@ var EpisodeView = Backbone.View.extend({
       .attr("class", "episode-player");
 
     var svg = d3.select(this.el).select("svg.episode-player");
+
+    svg
+      .on("click", this.select);
 
     // Copy the attributes to use with D3
     var episode = _.clone(this.model.attributes);
@@ -141,35 +145,8 @@ var EpisodeView = Backbone.View.extend({
     return this;
   },
 
-  loadEpisodeBuffer: function () {
-
-    // This should set the buffer to an attribute on the model
-
-    var getSound = new XMLHttpRequest(),
-        that = this;
-
-    getSound.open("GET", this.model.get("url"), true);
-    getSound.responseType = "arraybuffer";
-    getSound.onload = function () {
-      context.decodeAudioData(getSound.response, function (buffer) {
-        that.episodeBuffer = buffer;
-      })
-    }
-
-    getSound.send();
-  },
-
   playEpisodeAtTime: function (time) {
-
-    console.log("playing episode");
-
-    if (this.episodeBuffer) {
-      var playSound = context.createBufferSource();
-      playSound.buffer = this.episodeBuffer;
-      playSound.connect(context.destination);
-      playSound.start(time);
-    }
-
+    this.model.playEpisode(time);
   }
 });
 
