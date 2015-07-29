@@ -60,10 +60,6 @@ ROOT_URLCONF = 'soundscapes.urls'
 
 WSGI_APPLICATION = 'soundscapes.wsgi.application'
 
-TEMPLATE_DIRS = (
-    Path(APP_DIR, 'templates'),
-)
-
 STATIC_URL = '/static/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
