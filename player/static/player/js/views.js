@@ -1,5 +1,4 @@
 
-
 var EpisodeView = Backbone.View.extend({
 
   // Each episode is rendered in its own svg element
@@ -113,7 +112,6 @@ var EpisodeCollectionView = Backbone.View.extend({
   el: "ul",
 
   initialize: function () {
-    console.log(this.collection);
     this.maxDuration = d3.max(this.collection.models, function (episode) {
       console.log(episode);
       return episode.get("duration");
