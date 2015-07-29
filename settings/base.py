@@ -39,6 +39,7 @@ BOWER_INSTALLED_APPS = (
     'backbone#1.2.1',
     'colorbrewer#1.0.0',
     'jquery#2.1.4',
+    'soundmanager2#e6394dafc3cdc99596a18a6625d32bd5831345ab',
     'd3#3.5.6',
     'underscore#1.8.3'
 )
