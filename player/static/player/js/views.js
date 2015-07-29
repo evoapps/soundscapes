@@ -132,16 +132,19 @@ var EpisodeView = Backbone.View.extend({
       .attr("d", this.line(episode.moments) + "Z");
     */
 
-    this.loadEpisodeBuffer();
+    // this.loadEpisodeBuffer();
 
     return this;
   },
 
   loadEpisodeBuffer: function () {
+
+    // This should set the buffer to an attribute on the model
+
     var getSound = new XMLHttpRequest(),
         that = this;
 
-    getSound.open("GET", this.model.get("mp3"), true);
+    getSound.open("GET", this.model.get("url"), true);
     getSound.responseType = "arraybuffer";
     getSound.onload = function () {
       context.decodeAudioData(getSound.response, function (buffer) {
@@ -153,6 +156,8 @@ var EpisodeView = Backbone.View.extend({
   },
 
   playEpisodeAtTime: function (time) {
+
+    console.log("playing episode");
 
     if (this.episodeBuffer) {
       var playSound = context.createBufferSource();
