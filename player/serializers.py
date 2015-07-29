@@ -27,9 +27,9 @@ class HorizonLineSerializer(serializers.ModelSerializer):
 class EpisodeSerializer(serializers.ModelSerializer):
     segments = SegmentSerializer(many = True)
     horizon_line = HorizonLineSerializer()
-
+    url = serializers.CharField(source='get_mp3_url', read_only=True)
 
     class Meta:
         model = Episode
-        fields = ('id', 'show', 'released', 'title', 'mp3', 'duration',
+        fields = ('id', 'show', 'released', 'title', 'mp3', 'url', 'duration',
                   'segments', 'horizon_line')

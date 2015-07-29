@@ -64,6 +64,12 @@ class Episode(models.Model):
     def get_absolute_url(self):
         return reverse('episode:detail', kwargs = {'pk': self.pk})
 
+    def get_mp3_url(self):
+        if self.mp3:
+            return self.mp3.url
+        else:
+            return None
+
     def __str__(self):
         return '{show}: {title}'.format(show = self.show, title = self.title)
 

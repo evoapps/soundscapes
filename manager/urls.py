@@ -38,6 +38,11 @@ episode_patterns = [
 
 segment_patterns = [
     url(
+        r'new/$',
+        views.SegmentCreateView.as_view(),
+        name = 'create',
+    ),
+    url(
         r'^(?P<pk>\d+)/$',
         views.SegmentDetailView.as_view(),
         name = 'detail',

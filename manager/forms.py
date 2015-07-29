@@ -34,5 +34,5 @@ class SegmentForm(forms.ModelForm):
         super(SegmentForm, self).__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = 'post'
-        #self.helper.form_action = reverse('segment_create')
+        self.helper.form_action = reverse('segment:create')
         self.helper.add_input(Submit('submit', 'Create'))

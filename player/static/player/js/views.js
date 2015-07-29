@@ -1,8 +1,9 @@
+var context = new (window.AudioContext || window.webkitAudioContext)();
 
 var EpisodeView = Backbone.View.extend({
 
   // Each episode is rendered in its own svg element
-  tagName: "svg",
+  tagName: "li",
 
   initialize: function (options) {
 
@@ -28,20 +29,32 @@ var EpisodeView = Backbone.View.extend({
   },
 
   render: function () {
+
+    // Populate the <li> element
+
+    d3.select(this.el)
+      .append("svg")
+      .attr("class", "episode-player");
+
+    var svg = d3.select(this.el).select("svg.episode-player");
+
+    // Copy the attributes to use with D3
     var episode = _.clone(this.model.attributes);
 
-    var svg = d3.select(this.el);
+    var title = svg
+      .append("text")
+      .text(episode.title)
+      .attr("x", this.timeScale(30))
+      .attr("y", this.valueScale.range()[1]);
 
+    // Width of <svg> is determined by the length of the episode
     svg
-      .attr("width", this.timeScale(this.model.get("duration")))
+      .attr("width", this.timeScale(episode.duration))
       .attr("height", d3.max(this.valueScale.range()));
 
-    /* Needle */
-    svg
-      .append("line")
-      .attr("class", "needle")
-
-    var needle = svg.select(".needle");
+    // Create the needle
+    var needle = svg.append("line")
+      .attr("class", "needle");
 
     needle
       .style("stroke", "black")
@@ -50,12 +63,9 @@ var EpisodeView = Backbone.View.extend({
       .attr("x2", this.timeScale(0))
       .attr("y2", d3.max(this.valueScale.range()));
 
-    /* Background */
-    svg
-      .append("rect")
+    // Create the background
+    var background = svg.append("rect")
       .attr("class", "background")
-
-    var background = svg.select(".background");
 
     background
       .attr("x", d3.min(this.timeScale.range()))
@@ -65,7 +75,13 @@ var EpisodeView = Backbone.View.extend({
       .style("opacity", 0)
       .style("stroke", "black");
 
-    function moveNeedle() {
+    // Monitor events with D3
+
+    function moveNeedleOnMouse() {
+
+      // When the mouse moves, move the needle
+      // to the x position of the mouse.
+
       var mouseX = d3.mouse(this)[0];
       needle
         .transition()
@@ -74,27 +90,38 @@ var EpisodeView = Backbone.View.extend({
         .attr("x2", mouseX);
     }
 
-    function removeNeedle() {
-      var resetX = this.timeScale(0);
+    var timeScale = this.timeScale;
+
+    function resetNeedle() {
+
+      // Move the needle back to the beginning of the episode
+
+      var resetX = timeScale(0);
       needle
         .transition()
         .attr("x1", resetX)
         .attr("x2", resetX);
     }
 
-    function playMoment() {
+    var playEpisodeAtTime = this.playEpisodeAtTime;
+
+    function playAtMousePos() {
+
+      // Play the episode at the mouse position
+
       var mouseX = d3.mouse(this)[0],
-          time = this.timeScale(mouseX);
-      //playEpisode(time);
-      console.log("playing episode at time:" + time);
+          time = timeScale(mouseX);
+
+      playEpisodeAtTime(time);
     }
 
     background
-      .on("mousemove", moveNeedle)
-      .on("mouseout", removeNeedle)
-      .on("click", playMoment)
+      .on("mousemove", moveNeedleOnMouse)
+      .on("mouseout", resetNeedle)
+      .on("click", playAtMousePos);
 
     /* Horizon */
+    /*
     svg
       .append("path")
       .attr("class", "horizon");
@@ -103,19 +130,69 @@ var EpisodeView = Backbone.View.extend({
 
     horizon
       .attr("d", this.line(episode.moments) + "Z");
+    */
+
+    // this.loadEpisodeBuffer();
 
     return this;
   },
+
+  loadEpisodeBuffer: function () {
+
+    // This should set the buffer to an attribute on the model
+
+    var getSound = new XMLHttpRequest(),
+        that = this;
+
+    getSound.open("GET", this.model.get("url"), true);
+    getSound.responseType = "arraybuffer";
+    getSound.onload = function () {
+      context.decodeAudioData(getSound.response, function (buffer) {
+        that.episodeBuffer = buffer;
+      })
+    }
+
+    getSound.send();
+  },
+
+  playEpisodeAtTime: function (time) {
+
+    console.log("playing episode");
+
+    if (this.episodeBuffer) {
+      var playSound = context.createBufferSource();
+      playSound.buffer = this.episodeBuffer;
+      playSound.connect(context.destination);
+      playSound.start(time);
+    }
+
+  }
 });
 
 var EpisodeCollectionView = Backbone.View.extend({
   el: "ul",
 
   initialize: function () {
-    this.maxDuration = d3.max(this.collection.models, function (episode) {
-      console.log(episode);
+    var that = this;
+
+    var maxDuration,
+        maxWidth;
+
+    maxDuration = d3.max(this.collection.models, function (episode) {
       return episode.get("duration");
     });
+    maxWidth = window.innerWidth;
+
+    this._episodeViews = [];
+    this.collection.each(function (episode) {
+      that._episodeViews.push(new EpisodeView({
+        model: episode,
+        maxDuration: maxDuration,
+        maxWidth: maxWidth,
+        }));
+    });
+
+    this.maxDuration =
 
     this.maxWidth = window.innerWidth;
   },
@@ -124,13 +201,9 @@ var EpisodeCollectionView = Backbone.View.extend({
     var that = this;
     $(this.el).empty();
 
-    this.collection.each(function (episode) {
-      episodeView = new EpisodeView({
-        model: episode,
-        maxDuration: this.maxDuration,
-        maxWidth: this.maxWidth
-      });
-      $(that.el).append("<li>" + episodeView.render().el + "</li>");
+    _(this._episodeViews).each(function (episodeView) {
+      $(that.el).append(episodeView.render().el);
     });
+
   }
 });

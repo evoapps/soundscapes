@@ -22,3 +22,9 @@ class EpisodeSerializerTest(TestCase):
         mommy.make(HorizonLine, episode = episode)
         serializer = EpisodeSerializer(episode)
         self.assertIn('horizon_line', serializer.data.keys())
+
+    def test_serialized_episode_includes_mp3_url(self):
+        episode = mommy.make(Episode, _fill_optional = 'mp3')
+        serializer = EpisodeSerializer(episode)
+        self.assertIn('mp3', serializer.data.keys())
+        self.assertEquals(serializer.data['mp3'], episode.mp3.url)
