@@ -23,16 +23,20 @@
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
 
+var episodeCollectionView = new EpisodeCollectionView({collection: episodeCollection});
+episodeCollectionView.render();
+
 soundManager.setup({
   url: "{% static 'soundmanager2/swf' %}",
   flashVersion: 9,
+  preferFlash: false,
   onready: function () {
-    episodeCollection.trigger("soundmanager:ready");
+    console.log("triggering soundmanager:ready");
+    episodeCollectionView.trigger("soundmanager:ready");
   }
 });
 
-var episodeCollectionView = new EpisodeCollectionView({collection: episodeCollection});
-episodeCollectionView.render();
+
     </script>
   </body>
 </html>

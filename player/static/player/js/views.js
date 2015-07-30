@@ -26,7 +26,6 @@ var EpisodeView = Backbone.View.extend({
       .x(function (moment) { return this.timeScale(moment.time); })
       .y(function (moment) { return this.valueScale(moment.value); })
       .interpolate("basis");
-
   },
 
   render: function () {
@@ -145,8 +144,26 @@ var EpisodeView = Backbone.View.extend({
     return this;
   },
 
+  loadEpisode: function () {
+    // Load soundManager object
+    var that = this;
+
+    this.episodeSound = soundManager.createSound({
+      id: "episode" + this.model.get("id"),
+      url: this.model.get("url"),
+      autoLoad: true,
+      onload: function () {
+        d3.select(that.el).classed("loaded", true);
+        console.log("episode " + this.get("id") + " loaded");
+      }
+    });
+
+    this.episodeSound.load();
+  },
+
   playEpisodeAtTime: function (time) {
-    this.model.playEpisode(time);
+    console.log(this.episodeSound);
+    this.episodeSound.play();
   }
 });
 
@@ -173,8 +190,6 @@ var EpisodeCollectionView = Backbone.View.extend({
         }));
     });
 
-    this.maxDuration =
-
     this.maxWidth = window.innerWidth;
   },
 
@@ -186,5 +201,25 @@ var EpisodeCollectionView = Backbone.View.extend({
       $(that.el).append(episodeView.render().el);
     });
 
+    this.on("soundmanager:ready", function () {
+      console.log("soundmanager:ready, so loading first episode")
+      var firstEpisodeId = this.collection.models[0].id;
+      this.trigger("collection:load", firstEpisodeId)
+    });
+
+    this.on("collection:load", this.loadEpisode);
+  },
+
+  loadEpisode: function (id) {
+    // Search the children episodeViews for the correct model.id and
+    // load that episode
+    console.log("triggering episode:load on the first episode");
+    this._episodeViews.forEach(function (episodeView) {
+      if (episodeView.model.get("id") === id) {
+        console.log("Found correct episodeView, now loading episode");
+        episodeView.loadEpisode();
+      }
+    });
   }
+
 });
