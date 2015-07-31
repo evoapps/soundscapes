@@ -7,6 +7,8 @@ var EpisodeView = Backbone.View.extend({
 
   initialize: function (options) {
 
+    _.bindAll(this, "loadEpisode", "playEpisodeAtTime");
+
     this.timeScale = d3.scale.linear()
       .domain([0, options.maxDuration || this.model.get('duration')])
       .range([0, options.maxWidth || window.innerWidth]);
@@ -43,10 +45,6 @@ var EpisodeView = Backbone.View.extend({
 
     // Copy the attributes to use with D3
     var episode = _.clone(this.model.attributes);
-
-    d3.select(this.el)
-      .append("audio")
-      .attr("src", episode.mp3)
 
     var title = svg
       .append("text")
@@ -146,23 +144,17 @@ var EpisodeView = Backbone.View.extend({
 
   loadEpisode: function () {
     // Load soundManager object
-    var that = this;
-
-    this.episodeSound = soundManager.createSound({
+    var episodeSound = soundManager.createSound({
       id: "episode" + this.model.get("id"),
       url: this.model.get("url"),
-      autoLoad: true,
-      onload: function () {
-        d3.select(that.el).classed("loaded", true);
-        console.log("episode " + this.get("id") + " loaded");
-      }
     });
 
-    this.episodeSound.load();
+    this.episodeSound = episodeSound;
   },
 
   playEpisodeAtTime: function (time) {
-    console.log(this.episodeSound);
+    console.log(time);
+    this.episodeSound.setPosition(time);
     this.episodeSound.play();
   }
 });
