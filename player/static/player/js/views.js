@@ -149,12 +149,21 @@ var EpisodeView = Backbone.View.extend({
       url: this.model.get("url"),
     });
 
+    episodeSound.load();
+
     this.episodeSound = episodeSound;
   },
 
   playEpisodeAtTime: function (time) {
-    console.log(time);
-    this.episodeSound.setPosition(time);
+    console.log("playing at time:" + time);
+
+    if (this.episodeSound.playState == 1) {
+      this.episodeSound.stop();
+    }
+
+    console.log("position: " + this.episodeSound.position);
+    this.episodeSound.setPosition(time * 1000.0);
+    console.log("position: " + this.episodeSound.position);
     this.episodeSound.play();
   }
 });
