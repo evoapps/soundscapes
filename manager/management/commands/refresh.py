@@ -16,6 +16,6 @@ class Command(BaseCommand):
             try:
                 show = Show.objects.get(name = name)
             except Show.DoesNotExist:
-                raise CommandError('Show "{}" does not exist'.format(show_name))
+                raise CommandError('Show "{}" does not exist'.format(name))
 
             show.refresh()
