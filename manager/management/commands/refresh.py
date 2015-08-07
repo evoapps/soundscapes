@@ -6,16 +6,17 @@ class Command(BaseCommand):
     help = 'Retrieve missing RSS entries and save them as Episodes'
 
     def add_arguments(self, parser):
-        parser.add_argument('--show-name', nargs = '+')
+        parser.add_argument('--show-name', nargs = '+', default = [])
+        parser.add_argument('--show-id', nargs = '+', default = [])
 
     def handle(self, *args, **options):
-        all_show_names = Show.objects.values_list('name', flat = True)
-        show_names = options['show_name'] or all_show_names
+        shows_to_refresh = []
+        shows_to_refresh.extend(Show.objects.filter(name__in = options['show_name']))
+        shows_to_refresh.extend(Show.objects.filter(id__in = options['show_id']))
 
-        for name in show_names:
-            try:
-                show = Show.objects.get(name = name)
-            except Show.DoesNotExist:
-                raise CommandError('Show "{}" does not exist'.format(name))
+        if not shows_to_refresh:
+            shows_to_refresh = Show.objects.all()
 
+        for show in shows_to_refresh:
+            self.stdout.write('Refreshing {id}: {name}'.format(id = show.id, name = show.name))
             show.refresh()
