@@ -18,8 +18,8 @@ DATABASES = {
     },
 }
 
-STATIC_ROOT = Path(PROJ_DIR, 'static')
-MEDIA_ROOT = Path(PROJ_DIR, 'media')
+STATIC_ROOT = Path(DEPLOY_DIR, 'static')
+MEDIA_ROOT = Path(DEPLOY_DIR, 'media')
 
-DOWNLOADS_DIR = Path(PROJ_DIR, 'downloads')
-ANALYSES_DIR = Path(PROJ_DIR, 'analyses')
+DOWNLOADS_DIR = Path(DEPLOY_DIR, 'downloads')
+ANALYSES_DIR = Path(DEPLOY_DIR, 'analyses')
