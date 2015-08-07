@@ -29,7 +29,7 @@ class RSSEntryHandler(object):
 
     @property
     def slug(self):
-        return slugify(self.title)
+        return slugify(self.title)[0:50]
 
     @property
     def mp3_url(self):

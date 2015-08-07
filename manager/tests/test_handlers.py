@@ -35,3 +35,8 @@ class RSSEntryHandlerTest(unittest.TestCase):
 
         # minutes:seconds format
         self.assertEquals(_parse_duration('38:36'), 38 * 60 + 36)
+
+    def test_trim_slug(self):
+        very_long_title = 'a' * 100
+        handler = RSSEntryHandler({'title': very_long_title})
+        self.assertLessEqual(len(handler.slug), 50)
