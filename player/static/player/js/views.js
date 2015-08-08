@@ -28,11 +28,16 @@ var EpisodeView = Backbone.View.extend({
       .x(function (moment) { return this.timeScale(moment.time); })
       .y(function (moment) { return this.valueScale(moment.value); })
       .interpolate("basis");
+
+    this.on("episode:load", this.loadEpisode);
   },
 
   render: function () {
 
     // Populate the <li> element
+
+    // Copy the attributes to use with D3
+    var episode = _.clone(this.model.attributes);
 
     d3.select(this.el)
       .append("svg")
@@ -43,8 +48,10 @@ var EpisodeView = Backbone.View.extend({
     svg
       .on("click", this.select);
 
-    // Copy the attributes to use with D3
-    var episode = _.clone(this.model.attributes);
+    // Width of <svg> is determined by the length of the episode
+    svg
+      .attr("width", this.timeScale(episode.duration))
+      .attr("height", d3.max(this.valueScale.range()));
 
     var title = svg
       .append("text")
@@ -52,10 +59,6 @@ var EpisodeView = Backbone.View.extend({
       .attr("x", this.timeScale(30))
       .attr("y", this.valueScale.range()[1]);
 
-    // Width of <svg> is determined by the length of the episode
-    svg
-      .attr("width", this.timeScale(episode.duration))
-      .attr("height", d3.max(this.valueScale.range()));
 
     // Create the needle
     var needle = svg.append("line")
@@ -77,7 +80,7 @@ var EpisodeView = Backbone.View.extend({
       .attr("y", d3.min(this.valueScale.range()))
       .attr("width", d3.max(this.timeScale.range()))
       .attr("height", d3.max(this.valueScale.range()))
-      .style("opacity", 0)
+      .style("opacity", 0.2)
       .style("stroke", "black");
 
     // Monitor events with D3
@@ -144,6 +147,7 @@ var EpisodeView = Backbone.View.extend({
 
   loadEpisode: function () {
     // Load soundManager object
+    console.log("loading episode");
     var episodeSound = soundManager.createSound({
       id: "episode" + this.model.get("id"),
       url: this.model.get("url"),
@@ -203,23 +207,17 @@ var EpisodeCollectionView = Backbone.View.extend({
     });
 
     this.on("soundmanager:ready", function () {
-      console.log("soundmanager:ready, so loading first episode")
-      var firstEpisodeId = this.collection.models[0].id;
-      this.trigger("collection:load", firstEpisodeId)
+      // console.log("soundmanager:ready, so loading first episode")
+      // var firstEpisodeId = this.collection.models[0].id;
+      this.trigger("collection:load");
     });
 
     this.on("collection:load", this.loadEpisode);
   },
 
-  loadEpisode: function (id) {
-    // Search the children episodeViews for the correct model.id and
-    // load that episode
-    console.log("triggering episode:load on the first episode");
+  loadEpisode: function () {
     this._episodeViews.forEach(function (episodeView) {
-      if (episodeView.model.get("id") === id) {
-        console.log("Found correct episodeView, now loading episode");
-        episodeView.loadEpisode();
-      }
+      episodeView.loadEpisode();
     });
   }
 

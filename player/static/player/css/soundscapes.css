@@ -2,6 +2,10 @@ text {
   font: 24px Helvetica;
 }
 
+rect {
+  fill: black;
+}
+
 g {
   fill-opacity: 0.5;
 }
