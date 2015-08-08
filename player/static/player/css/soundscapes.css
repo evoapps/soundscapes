@@ -2,9 +2,20 @@ text {
   font: 24px Helvetica;
 }
 
-rect {
-  fill: black;
+path.line {
+  fill: none;
+  stroke: #666;
+  stroke-width: 1.5px;
 }
+
+.axis {
+  shape-rendering: crispEdges;
+}
+
+.timeline {
+  stroke: #fff;
+}
+
 
 g {
   fill-opacity: 0.5;

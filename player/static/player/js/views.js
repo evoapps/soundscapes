@@ -47,16 +47,32 @@ var EpisodeView = Backbone.View.extend({
       .on("click", this.select);
 
     // Width of <svg> is determined by the length of the episode
+    var svgWidth = this.timeScale(episode.duration),
+        svgHeight = d3.max(this.valueScale.range());
+
+    var margin = {right: 40, bottom: 20};
     svg
-      .attr("width", this.timeScale(episode.duration))
-      .attr("height", d3.max(this.valueScale.range()));
+      .attr("width", svgWidth + margin.right)
+      .attr("height", svgHeight + margin.bottom);
+
+    // Create the background
+    var background = svg.append("rect")
+      .attr("class", "background")
+
+    background
+      .attr("x", d3.min(this.timeScale.range()))
+      .attr("y", d3.min(this.valueScale.range()))
+      .attr("width", d3.max(this.timeScale.range()))
+      .attr("height", d3.max(this.valueScale.range()))
+      .style("fill", "white")
+      .style("stroke", "black")
+      .style("stroke-width", "1.5px");
 
     var title = svg
       .append("text")
       .text(episode.title)
       .attr("x", this.timeScale(30))
       .attr("y", this.valueScale.range()[1]);
-
 
     // Create the needle
     var needle = svg.append("line")
@@ -69,17 +85,16 @@ var EpisodeView = Backbone.View.extend({
       .attr("x2", this.timeScale(0))
       .attr("y2", d3.max(this.valueScale.range()));
 
-    // Create the background
-    var background = svg.append("rect")
-      .attr("class", "background")
 
-    background
-      .attr("x", d3.min(this.timeScale.range()))
-      .attr("y", d3.min(this.valueScale.range()))
-      .attr("width", d3.max(this.timeScale.range()))
-      .attr("height", d3.max(this.valueScale.range()))
-      .style("opacity", 0.2)
-      .style("stroke", "black");
+    // Axes
+    var timeLine = d3.svg.axis()
+      .scale(this.timeScale)
+
+        // Add the x-axis.
+    svg.append("g")
+        .attr("class", "axis timeline")
+        .attr("transform", "translate(0," + svgHeight + ")")
+        .call(timeLine);
 
     // Monitor events with D3
 
