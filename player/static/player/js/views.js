@@ -81,14 +81,19 @@ var EpisodeView = Backbone.View.extend({
 
 
     // Axes
-    var timeLine = d3.svg.axis()
+    var formatTime = d3.time.format("%M"),
+        formatSeconds = function (seconds) { return formatTime(new Date(2012, 0, 1, 0, 0, seconds)); };
+
+    var timeAxes = d3.svg.axis()
       .scale(this.timeScale)
+      .tickFormat(formatSeconds);
+
 
         // Add the x-axis.
     episodeGroup.append("g")
         .attr("class", "axis timeline")
         .attr("transform", "translate(0," + svgHeight + ")")
-        .call(timeLine);
+        .call(timeAxes);
 
     // Monitor events with D3
 
