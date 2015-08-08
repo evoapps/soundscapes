@@ -2,39 +2,33 @@ var context = new (window.AudioContext || window.webkitAudioContext)();
 
 var EpisodeView = Backbone.View.extend({
 
-  // Each episode is rendered in its own svg element
+  // Each episode is rendered in its own <li> element
   tagName: "li",
 
   initialize: function (options) {
 
-    _.bindAll(this, "createEpisodeSound", "playEpisodeAtTime");
+    this.margin = {left: 40, top: 40, right: 80, bottom: 80};
 
     this.timeScale = d3.scale.linear()
       .domain([0, options.maxDuration || this.model.get('duration')])
-      .range([0, options.maxWidth || window.innerWidth]);
+      .range([0, window.innerWidth - 2 * (this.margin.left + this.margin.right)]);
 
-    var svgHeight = 200;
-    // Hand-tuned polylinear scale
-    this.valueScale = d3.scale.linear()
-      .domain([60, 93, 101, 120])
-      .range([svgHeight, svgHeight/2, svgHeight/8, 0]);
+    this.waveformScale = d3.scale.linear()
+      .range([0, 200])
 
     // Hand code colorbrewer ramps for Gimlet shows
     this.showColorScale = d3.scale.ordinal()
       .domain(["StartUp", "Reply All", "Mystery Show"])
       .range(["Blues", "Greens", "Purples"]);
 
-    this.line = d3.svg.line()
-      .x(function (moment) { return this.timeScale(moment.time); })
-      .y(function (moment) { return this.valueScale(moment.value); })
-      .interpolate("basis");
+    // Attach this view to functions
+    _.bindAll(this, "createEpisodeSound", "playEpisodeAtTime");
   },
 
   render: function () {
 
-    // Populate the <li> element
+    // Render the episode using D3
 
-    // Copy the attributes to use with D3
     var episode = _.clone(this.model.attributes);
 
     d3.select(this.el)
@@ -43,47 +37,47 @@ var EpisodeView = Backbone.View.extend({
 
     var svg = d3.select(this.el).select("svg.episode-player");
 
-    svg
-      .on("click", this.select);
-
     // Width of <svg> is determined by the length of the episode
     var svgWidth = this.timeScale(episode.duration),
-        svgHeight = d3.max(this.valueScale.range());
+        svgHeight = d3.max(this.waveformScale.range());
 
-    var margin = {right: 40, bottom: 20};
     svg
-      .attr("width", svgWidth + margin.right)
-      .attr("height", svgHeight + margin.bottom);
+      .attr("width", svgWidth + this.margin.left + this.margin.right)
+      .attr("height", svgHeight + this.margin.top + this.margin.bottom);
+
+    episodeGroup = svg.append("g")
+      .attr("transform", "translate(" + this.margin.top + "," + this.margin.right + ")");
 
     // Create the background
-    var background = svg.append("rect")
+    var background = episodeGroup.append("rect")
       .attr("class", "background")
 
     background
       .attr("x", d3.min(this.timeScale.range()))
-      .attr("y", d3.min(this.valueScale.range()))
-      .attr("width", d3.max(this.timeScale.range()))
-      .attr("height", d3.max(this.valueScale.range()))
+      .attr("y", d3.min(this.waveformScale.range()))
+      // rect width needs to be determined by this episode
+      .attr("width", this.timeScale(episode.duration))
+      .attr("height", d3.max(this.waveformScale.range()))
       .style("fill", "white")
       .style("stroke", "black")
       .style("stroke-width", "1.5px");
 
-    var title = svg
+    var title = episodeGroup
       .append("text")
       .text(episode.title)
       .attr("x", this.timeScale(30))
-      .attr("y", this.valueScale.range()[1]);
+      .attr("y", this.waveformScale.range()[1]);
 
     // Create the needle
-    var needle = svg.append("line")
+    var needle = episodeGroup.append("line")
       .attr("class", "needle");
 
     needle
       .style("stroke", "black")
       .attr("x1", this.timeScale(0))
-      .attr("y1", d3.min(this.valueScale.range()))
+      .attr("y1", d3.min(this.waveformScale.range()))
       .attr("x2", this.timeScale(0))
-      .attr("y2", d3.max(this.valueScale.range()));
+      .attr("y2", d3.max(this.waveformScale.range()));
 
 
     // Axes
@@ -91,7 +85,7 @@ var EpisodeView = Backbone.View.extend({
       .scale(this.timeScale)
 
         // Add the x-axis.
-    svg.append("g")
+    episodeGroup.append("g")
         .attr("class", "axis timeline")
         .attr("transform", "translate(0," + svgHeight + ")")
         .call(timeLine);
@@ -194,14 +188,12 @@ var EpisodeCollectionView = Backbone.View.extend({
     maxDuration = d3.max(this.collection.models, function (episode) {
       return episode.get("duration");
     });
-    maxWidth = window.innerWidth;
 
     this._episodeViews = [];
     this.collection.each(function (episode) {
       that._episodeViews.push(new EpisodeView({
         model: episode,
-        maxDuration: maxDuration,
-        maxWidth: maxWidth,
+        maxDuration: maxDuration
         }));
     });
 
