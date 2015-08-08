@@ -64,9 +64,19 @@ var EpisodeView = Backbone.View.extend({
 
     var title = episodeGroup
       .append("text")
+
+    title
       .text(episode.title)
       .attr("x", this.timeScale(30))
       .attr("y", this.waveformScale.range()[1]);
+
+    // Make sure the full title shows in the svg
+    var titleWidth = title.node().getComputedTextLength();
+
+    console.log(episode.title + ": " + titleWidth);
+    if (titleWidth > svg.attr("width")) {
+      svg.attr("width", titleWidth);
+    }
 
     // Create the needle
     var needle = episodeGroup.append("line")
@@ -86,6 +96,7 @@ var EpisodeView = Backbone.View.extend({
 
     var timeAxes = d3.svg.axis()
       .scale(this.timeScale)
+      .ticks(d3.time.seconds, 60 * 5)
       .tickFormat(formatSeconds);
 
 
