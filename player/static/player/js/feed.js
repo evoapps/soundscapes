@@ -17,7 +17,7 @@ var EpisodeCollectionView = Backbone.View.extend({
       that._episodeBarViews.push(new EpisodeBarView({
         model: episode,
         maxDuration: maxDuration
-        }));
+      }));
     });
 
     this.maxWidth = window.innerWidth;

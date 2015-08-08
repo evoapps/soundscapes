@@ -1,7 +1,13 @@
 from rest_framework import serializers
 
-from manager.models import Episode, Segment
+from manager.models import Show, Episode, Segment
 from player.models import HorizonLine
+
+class ShowSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Show
+        fields = ('name', )
 
 class SegmentSerializer(serializers.ModelSerializer):
 
@@ -23,11 +29,11 @@ class HorizonLineSerializer(serializers.ModelSerializer):
         model = HorizonLine
         fields = ('heights', 'interval')
 
-
 class EpisodeSerializer(serializers.ModelSerializer):
     segments = SegmentSerializer(many = True)
     horizon_line = HorizonLineSerializer()
     url = serializers.CharField(source='get_mp3_url', read_only=True)
+    show = ShowSerializer()
 
     class Meta:
         model = Episode

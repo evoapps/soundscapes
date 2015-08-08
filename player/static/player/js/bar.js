@@ -56,7 +56,7 @@ var EpisodeBarView = Backbone.View.extend({
       // rect width needs to be determined by this episode
       .attr("width", this.timeScale(episode.duration))
       .attr("height", d3.max(this.waveformScale.range()))
-      .style("fill", "white")
+      .style("fill", colorbrewer[this.showColorScale(episode.show.name)][5][3])
       .style("stroke", "black")
       .style("stroke-width", "1.5px");
 

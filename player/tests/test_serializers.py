@@ -2,11 +2,19 @@ from django.test import TestCase
 
 from model_mommy import mommy
 
-from manager.models import Episode, Segment
+from manager.models import Show, Episode, Segment
 from player.models import HorizonLine
 from player.serializers import EpisodeSerializer
 
 class EpisodeSerializerTest(TestCase):
+
+    def test_serialized_episode_includes_show(self):
+        show = mommy.make(Show)
+        episode = mommy.make(Episode, show = show)
+        serializer = EpisodeSerializer(episode)
+        serialized_show = serializer.data['show']
+        self.assertIn('name', serialized_show.keys())
+        self.assertEquals(serialized_show['name'], show.name)
 
     def test_serialized_episode_includes_segments(self):
         num_segments = 5
