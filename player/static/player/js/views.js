@@ -7,7 +7,7 @@ var EpisodeView = Backbone.View.extend({
 
   initialize: function (options) {
 
-    _.bindAll(this, "loadEpisode", "playEpisodeAtTime");
+    _.bindAll(this, "createEpisodeSound", "playEpisodeAtTime");
 
     this.timeScale = d3.scale.linear()
       .domain([0, options.maxDuration || this.model.get('duration')])
@@ -28,8 +28,6 @@ var EpisodeView = Backbone.View.extend({
       .x(function (moment) { return this.timeScale(moment.time); })
       .y(function (moment) { return this.valueScale(moment.value); })
       .interpolate("basis");
-
-    this.on("episode:load", this.loadEpisode);
   },
 
   render: function () {
@@ -145,15 +143,12 @@ var EpisodeView = Backbone.View.extend({
     return this;
   },
 
-  loadEpisode: function () {
+  createEpisodeSound: function () {
     // Load soundManager object
-    console.log("loading episode");
     var episodeSound = soundManager.createSound({
       id: "episode" + this.model.get("id"),
       url: this.model.get("url"),
     });
-
-    episodeSound.load();
 
     this.episodeSound = episodeSound;
   },
@@ -163,12 +158,12 @@ var EpisodeView = Backbone.View.extend({
 
     if (this.episodeSound.playState == 1) {
       this.episodeSound.stop();
+    } else {
+      console.log("position: " + this.episodeSound.position);
+      this.episodeSound.setPosition(time * 1000.0);
+      console.log("position: " + this.episodeSound.position);
+      this.episodeSound.play();
     }
-
-    console.log("position: " + this.episodeSound.position);
-    this.episodeSound.setPosition(time * 1000.0);
-    console.log("position: " + this.episodeSound.position);
-    this.episodeSound.play();
   }
 });
 
@@ -217,7 +212,7 @@ var EpisodeCollectionView = Backbone.View.extend({
 
   loadEpisode: function () {
     this._episodeViews.forEach(function (episodeView) {
-      episodeView.loadEpisode();
+      episodeView.createEpisodeSound();
     });
   }
 
