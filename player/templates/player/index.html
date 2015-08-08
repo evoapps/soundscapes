@@ -17,8 +17,10 @@
     <script src="{% static 'underscore/underscore.js' %}"></script>
     <script src="{% static 'backbone/backbone.js' %}"></script>
     <script src="{% static 'soundmanager2/script/soundmanager2.js' %}"></script>
+
     <script src="{% static 'player/js/models.js' %}"></script>
-    <script src="{% static 'player/js/views.js' %}"></script>
+    <script src="{% static 'player/js/bar.js' %}"></script>
+    <script src="{% static 'player/js/feed.js' %}"></script>
     <script>
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
@@ -31,12 +33,9 @@ soundManager.setup({
   flashVersion: 9,
   preferFlash: false,
   onready: function () {
-    console.log("triggering soundmanager:ready");
     episodeCollectionView.trigger("soundmanager:ready");
   }
 });
-
-
     </script>
   </body>
 </html>
