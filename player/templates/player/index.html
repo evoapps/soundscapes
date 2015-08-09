@@ -19,8 +19,8 @@
     <script src="{% static 'soundmanager2/script/soundmanager2.js' %}"></script>
 
     <script src="{% static 'player/js/models.js' %}"></script>
-    <script src="{% static 'player/js/bar.js' %}"></script>
-    <script src="{% static 'player/js/feed.js' %}"></script>
+    <script src="{% static 'player/js/views.js' %}"></script>
+    <!-- <script src="{% static 'player/js/feed.js' %}"></script> -->
     <script>
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
@@ -34,7 +34,8 @@ soundManager.setup({
   preferFlash: false,
   onready: function () {
     episodeCollectionView.trigger("soundmanager:ready");
-  }
+  },
+  debugMode: true
 });
     </script>
   </body>
