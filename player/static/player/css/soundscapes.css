@@ -2,6 +2,16 @@ text {
   font: 30px Helvetica;
 }
 
+rect {
+  fill-opacity: 0.5;
+}
+
+g:hover {
+  fill: blue;
+}
+
+
+/*
 svg {
   display: block;
   margin: auto;
@@ -46,17 +56,4 @@ path.hover {
   fill: none;
 }
 
-.svg-container {
-    display: inline-block;
-    position: relative;
-    width: 100%;
-    padding-bottom: 33%; /* aspect ratio */
-    vertical-align: top;
-    overflow: hidden;
-}
-.svg-content-responsive {
-    display: inline-block;
-    position: absolute;
-    top: 10px;
-    left: 0;
-}
+*/

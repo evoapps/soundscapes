@@ -9,8 +9,8 @@
     <link href="{% static 'player/css/soundscapes.css' %}" rel="stylesheet">
   </head>
   <body>
-    <ul class="feed" style="list-style: none; text-style: center;">
-    </ul>
+    <svg>
+    </svg>
     <script src="{% static 'd3/d3.js' %}"></script>
     <script src="{% static 'colorbrewer/colorbrewer.js' %}"></script>
     <script src="{% static 'jquery/dist/jquery.min.js' %}"></script>
@@ -19,21 +19,21 @@
     <script src="{% static 'soundmanager2/script/soundmanager2.js' %}"></script>
 
     <script src="{% static 'player/js/models.js' %}"></script>
-    <script src="{% static 'player/js/views.js' %}"></script>
-    <!-- <script src="{% static 'player/js/feed.js' %}"></script> -->
+    <!-- <script src="{% static 'player/js/views.js' %}"></script> -->
+    <script src="{% static 'player/js/bar.js' %}"></script>
     <script>
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
 
-var episodeCollectionView = new EpisodeCollectionView({collection: episodeCollection});
-episodeCollectionView.render();
+var barView = new BarView({collection: episodeCollection});
+barView.render();
 
 soundManager.setup({
   url: "{% static 'soundmanager2/swf' %}",
   flashVersion: 9,
   preferFlash: false,
   onready: function () {
-    episodeCollectionView.trigger("soundmanager:ready");
+    //bar.trigger("soundmanager:ready");
   },
   debugMode: false
 });

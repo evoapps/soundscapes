@@ -2,10 +2,10 @@
 var EpisodeBarView = Backbone.View.extend({
   // Each episode is rendered in its own <li> element
   tagName: "li",
-
-  events: {
-    "click": "togglePlay"
-  },
+  //
+  // events: {
+  //   "click": "togglePlay"
+  // },
 
   initialize: function (options) {
 
@@ -154,7 +154,13 @@ var EpisodeBarView = Backbone.View.extend({
 
     background
       .on("mousemove", moveNeedleOnMouse)
-      .on("mouseout", resetNeedle);
+      .on("mouseout", resetNeedle)
+      .on("click", function () {
+        console.log("clicked background");
+        var mouseX = d3.mouse(this)[0],
+            time = that.timeScale(mouseX);
+        that.playEpisodeAtTime(time);
+      });
 
     /* Horizon */
     /*
@@ -185,6 +191,7 @@ var EpisodeBarView = Backbone.View.extend({
   },
 
   playEpisodeAtTime: function (time) {
+    console.log("playing time at " + time + " seconds or " + time / 60 + " minutes");
     var episodeSound = soundManager.getSoundById(this.model.get("soundId"));
 
     if (episodeSound.playState == 0) {
