@@ -167,25 +167,24 @@ var EpisodeBarView = Backbone.View.extend({
   },
 
   createEpisodeSound: function () {
-    // Load soundManager object
-    var episodeSound = soundManager.createSound({
-      id: "episode" + this.model.get("id"),
+    soundManager.createSound({
+      id: this.model.get("soundId"),
       url: this.model.get("url"),
     });
-
-    this.episodeSound = episodeSound;
   },
 
   playEpisodeAtTime: function (time) {
     console.log("playing at time:" + time);
 
-    if (this.episodeSound.playState == 1) {
-      this.episodeSound.stop();
+    episodeSound = soundManager.getSoundById(this.model.get("soundId"));
+
+    if (episodeSound.playState == 1) {
+      episodeSound.stop();
     } else {
       console.log("position: " + this.episodeSound.position);
-      this.episodeSound.setPosition(time * 1000.0);
+      episodeSound.setPosition(time * 1000.0);
       console.log("position: " + this.episodeSound.position);
-      this.episodeSound.play();
+      episodeSound.play();
     }
   }
 });
