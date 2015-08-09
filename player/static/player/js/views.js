@@ -98,9 +98,22 @@ var EpisodeBarView = Backbone.View.extend({
     // var formatTime = d3.time.format("%M"),
     //     formatSeconds = function (seconds) { return formatTime(new Date(2012, 0, 1, 0, 0, seconds)); };
 
+    var formatTime = d3.time.format("%M");
+    var formatSeconds = function (seconds) {
+      var minutes = seconds/60;
+      return minutes;
+    };
+
+    var minutesPerTick = 10;
+    var tickValues = [0];
+    for (var i = 0; (i - 1) * minutesPerTick * 60 < episode.duration; i++) {
+      tickValues.push(i * minutesPerTick * 60);
+    }
+
     var timeAxis = d3.svg.axis()
       .scale(this.timeScale)
-      .ticks(5); // d3.time.seconds, 60 * 5);
+      .tickValues(tickValues)
+      .tickFormat(formatSeconds)
 
     var timeAxisHeight = waveFormHeight + 10;
 

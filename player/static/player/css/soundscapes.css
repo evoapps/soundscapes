@@ -13,7 +13,10 @@ path.line {
   stroke-width: 1.5px;
 }
 
-.axis {
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
   shape-rendering: crispEdges;
 }
 
