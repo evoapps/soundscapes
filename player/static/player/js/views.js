@@ -71,8 +71,9 @@ var EpisodeBarView = Backbone.View.extend({
 
     title
       .text(episode.title)
-      .attr("x", this.timeScale(30))
-      .attr("y", waveFormHeight / 2);
+      .attr("x", this.timeScale(episode.duration)/2)
+      .attr("y", waveFormHeight / 2)
+      .attr("text-anchor", "middle");
 
     // Make sure the full title shows in the svg
     var titleWidth = title.node().getComputedTextLength();
