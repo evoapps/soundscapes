@@ -11,11 +11,6 @@ var BarView = Backbone.View.extend({
       .attr("width", width)
       .attr("height", height);
 
-    // BarView is a stack layout
-    var stackedBars = d3.layout.stack()
-      .values(function (episode) { return episode.get("duration"); });
-    this.stackedBars = stackedBars;
-
     // Define scales
     var timeScale = d3.scale.linear(),
         orderScale = d3.scale.ordinal(),
@@ -45,26 +40,42 @@ var BarView = Backbone.View.extend({
     this.colorScale = colorScale;
   },
   render: function () {
+
     // Render collection using D3
-    var episodes = _.clone(this.collection.models),
-        that = this;
+
+    var that = this;
+
+    // hack!
+    // Clone each models attributes
+    // so we can use D3 layouts
+    var episodesData = [];
+    this.collection.forEach(function (episode) {
+      var datum = _.clone(episode.attributes);
+      episodesData.push(datum);
+    });
 
     var svg = d3.select(this.el);
 
-    // Create a <g> for each episode model
+    // Create a <g> for each episode
+    // and center it
+
+    var xMax = d3.max(this.timeScale.range());
+
     var episodes = svg.selectAll("g.episode")
-      .data(episodes)
+      .data(episodesData)
       .enter()
       .append("g")
       .attr("class", "episode")
       .attr("transform", function (episode) {
-        return "translate(0," + that.orderScale(episode.get("id")) + ")";
+        var y = that.orderScale(episode.id),
+            x = xMax/2 - that.timeScale(episode.duration)/2;
+        return "translate(" + x + "," + y + ")";
       });
 
     // Create titles for each episode
     var titleDY = 20;
     var episodeTitle = episodes.append("text")
-      .text(function (episode) { return episode.get("title"); })
+      .text(function (episode) { return episode.title; })
       .attr("dy", titleDY);
 
     // Create <rects> for each episode
@@ -74,7 +85,7 @@ var BarView = Backbone.View.extend({
       .attr("y", 0)
       .attr("height", barHeight)
       .attr("width", function (episode) {
-        return that.timeScale(episode.get("duration"));
+        return that.timeScale(episode.duration);
       });
   },
 });
