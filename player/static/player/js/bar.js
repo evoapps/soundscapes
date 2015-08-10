@@ -2,6 +2,11 @@
 var BarView = Backbone.View.extend({
   el: "svg",
   initialize: function () {
+    _.bindAll(this, "center", "left");
+
+    this.on("center", this.center);
+    this.on("left", this.left);
+
     var svg = d3.select(this.el);
 
     var width = window.innerWidth,
@@ -57,35 +62,93 @@ var BarView = Backbone.View.extend({
     var svg = d3.select(this.el);
 
     // Create a <g> for each episode
-    // and center it
-
-    var xMax = d3.max(this.timeScale.range());
 
     var episodes = svg.selectAll("g.episode")
       .data(episodesData)
       .enter()
       .append("g")
-      .attr("class", "episode")
-      .attr("transform", function (episode) {
-        var y = that.orderScale(episode.id),
-            x = xMax/2 - that.timeScale(episode.duration)/2;
-        return "translate(" + x + "," + y + ")";
-      });
+      .attr("class", "episode");
 
     // Create titles for each episode
     var titleDY = 20;
-    var episodeTitle = episodes.append("text")
-      .text(function (episode) { return episode.title; })
-      .attr("dy", titleDY);
+
+    var titles = episodes.append("g")
+      .attr("class", "title");
+
+    titles.append("text")
+      .text(function (episode) { return episode.title; });
 
     // Create <rects> for each episode
-    var barHeight = 40;
-    var episodeRects = episodes.append("rect")
+    this.barHeight = 40;
+
+    var bars = episodes.append("g")
+      .attr("class", "bar")
+
+    bars
+      .append("rect")
       .attr("x", 0)
       .attr("y", 0)
-      .attr("height", barHeight)
+      .attr("height", this.barHeight)
       .attr("width", function (episode) {
         return that.timeScale(episode.duration);
+      })
+      .style("fill", function (episode) {
+        var ramp = that.colorScale(episode.show.name),
+            size = 7,
+            select = 3;
+        return colorbrewer[ramp][size][select];
       });
+
+    this.trigger("center");
   },
+
+  center: function () {
+    var episodes = d3.select(this.el).selectAll("g.episode");
+    var xMax = d3.max(this.timeScale.range());
+
+    var that = this;
+
+    episodes
+      .attr("transform", function (episode) {
+        var x = xMax/2;
+            y = that.orderScale(episode.id);
+        return "translate(" + x + "," + y + ")";
+      });
+
+    // Translate the bars
+    episodes.selectAll("g.bar")
+      .attr("transform", function (episode) {
+        var barWidth = that.timeScale(episode.duration),
+            barHeight = that.barHeight; // Ahh!
+        return "translate(-" + barWidth/2 + ",-" + barHeight/2 + ")";
+      });
+
+    // Translate the titles
+    episodes.selectAll("g.title").selectAll("text")
+      .attr("dominant-baseline", "central")
+      .attr("text-anchor", "middle");
+  },
+
+  left: function () {
+    var episodes = d3.select(this.el).selectAll("g.episode");
+    var xMax = d3.max(this.timeScale.range());
+
+    var that = this;
+
+    episodes
+      .attr("transform", function (episode) {
+        var y = that.orderScale(episode.id);
+        return "translate(0," + y + ")";
+      });
+
+    // Translate the bars
+    episodes.selectAll("g.bar")
+      .attr("transform", "translate(0,-" + that.barHeight/2 + ")");
+
+    // Translate the titles
+    episodes.selectAll("g.title").selectAll("text")
+      .attr("dominant-baseline", "central")
+      .attr("text-anchor", "left");
+
+  }
 });

@@ -1,59 +1,16 @@
 text {
   font: 30px Helvetica;
+  fill-opacity: 0.5;
 }
 
 rect {
   fill-opacity: 0.5;
 }
 
-g:hover {
-  fill: blue;
+rect:hover {
+  fill-opacity: 0.8;
 }
 
-
-/*
-svg {
-  display: block;
-  margin: auto;
-}
-
-path.line {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: black;
-  shape-rendering: crispEdges;
-}
-
-.timeline {
-  stroke: #fff;
-}
-
-
-g {
-  fill-opacity: 0.5;
-}
-
-g.loaded {
+text:hover {
   fill-opacity: 1.0;
 }
-
-path.segment {
-  stroke-width: 1.5px;
-}
-
-.hover {
-  fill: blue;
-}
-
-path.hover {
-  stroke: blue;
-  fill: none;
-}
-
-*/
