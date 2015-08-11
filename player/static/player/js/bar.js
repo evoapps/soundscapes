@@ -93,10 +93,7 @@ var BarView = Backbone.View.extend({
         return that.timeScale(episode.duration);
       })
       .style("fill", function (episode) {
-        var ramp = that.colorScale(episode.show.name),
-            size = 7,
-            select = 3;
-        return colorbrewer[ramp][size][select];
+        return episode.show.color_scheme[0];
       });
 
     var logoSize = this.barHeight;

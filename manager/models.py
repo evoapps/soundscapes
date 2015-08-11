@@ -4,8 +4,9 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from .handlers import RSSHandler, RSSShowHandler, RSSEpisodeHandler
-from .handlers import download_file
+from .handlers.rss import RSSHandler, RSSShowHandler, RSSEpisodeHandler
+from .handlers.rss import download_file
+from .handlers.image import extract_color_scheme, serialize_color_scheme
 
 # Decimal field kwargs for moments and segments
 TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
@@ -14,7 +15,7 @@ class ShowManager(models.Manager):
     def create_from_rss_url(self, rss_url, **kwargs):
         rss_show = RSSShowHandler(rss_url)
         kwargs.update(rss_show.show_kwargs())
-        self.create(**kwargs)
+        return self.create(**kwargs)
 
 class Show(models.Model):
     """ A collection of Episodes, plugged in to an RSS podcast feed """
@@ -24,6 +25,8 @@ class Show(models.Model):
 
     image_url = models.URLField()
     image = models.ImageField(blank = True)
+
+    color_scheme = models.TextField()
 
     objects = ShowManager()
 
@@ -45,6 +48,14 @@ class Show(models.Model):
         if not self.image or not Path(self.image.path).exists():
             self.image = download_file(self.image_url)
             self.save()
+
+    def extract_color_scheme(self):
+        if not self.image:
+            raise AssertionError('Logo is not available')
+
+        color_scheme = extract_color_scheme(self.image.path)
+        self.color_scheme = serialize_color_scheme(color_scheme)
+        self.save()
 
     def refresh(self, max = 10):
         """ Create episodes from new RSS entries
@@ -76,7 +87,7 @@ class EpisodeManager(models.Manager):
     def create_from_rss_entry(self, rss_entry, **kwargs):
         entry_handler = RSSEpisodeHandler(rss_entry)
         kwargs.update(entry_handler.episode_kwargs())
-        self.create(**kwargs)
+        return self.create(**kwargs)
 
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """

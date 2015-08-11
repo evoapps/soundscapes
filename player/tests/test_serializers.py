@@ -1,10 +1,12 @@
+import json
+
 from django.test import TestCase
 
 from model_mommy import mommy
 
 from manager.models import Show, Episode, Segment
 from player.models import HorizonLine
-from player.serializers import EpisodeSerializer
+from player.serializers import EpisodeSerializer, ShowSerializer
 
 class EpisodeSerializerTest(TestCase):
 
@@ -36,3 +38,10 @@ class EpisodeSerializerTest(TestCase):
         serializer = EpisodeSerializer(episode)
         self.assertIn('mp3', serializer.data.keys())
         self.assertEquals(serializer.data['mp3'], episode.mp3.url)
+
+    def test_serialized_show_correctly_parses_color_scheme(self):
+        color_scheme = ['rgb(0,0,0)', 'rgb(1,1,1)']
+        color_scheme_dump = json.dumps(color_scheme)
+        show = mommy.make(Show, color_scheme = color_scheme_dump)
+        serializer = ShowSerializer(show)
+        self.assertEquals(serializer.data['color_scheme'], color_scheme)
