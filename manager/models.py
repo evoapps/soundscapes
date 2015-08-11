@@ -30,6 +30,12 @@ class Show(models.Model):
     def get_absolute_url(self):
         return reverse('show:detail', kwargs = {'slug': self.slug})
 
+    def get_image_url(self):
+        if self.image:
+            return self.image.url
+        else:
+            return None
+
     def download_image(self):
         """ Download the image
 

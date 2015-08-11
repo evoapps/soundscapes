@@ -4,10 +4,11 @@ from manager.models import Show, Episode, Segment
 from player.models import HorizonLine
 
 class ShowSerializer(serializers.ModelSerializer):
+    image_url = serializers.CharField(source='get_image_url', read_only=True)
 
     class Meta:
         model = Show
-        fields = ('name', )
+        fields = ('name', 'image_url')
 
 class SegmentSerializer(serializers.ModelSerializer):
 

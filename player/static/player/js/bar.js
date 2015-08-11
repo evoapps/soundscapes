@@ -82,7 +82,7 @@ var BarView = Backbone.View.extend({
     this.barHeight = 40;
 
     var bars = episodes.append("g")
-      .attr("class", "bar")
+      .attr("class", "bar");
 
     bars
       .append("rect")
@@ -98,6 +98,17 @@ var BarView = Backbone.View.extend({
             select = 3;
         return colorbrewer[ramp][size][select];
       });
+
+    var logoSize = this.barHeight;
+    var logos = episodes.append("g")
+      .attr("class", "logos")
+      .attr("transform", "translate(0,-" + logoSize/2 + ")");
+
+    logos
+      .append("image")
+      .attr("xlink:href", function (episode) { return episode.show.image_url; })
+      .attr("width", logoSize)
+      .attr("height", logoSize);
 
     var needle = bars.append("line")
       .attr("class", "needle");
@@ -152,7 +163,7 @@ var BarView = Backbone.View.extend({
     episodes.selectAll("g.bar")
       .attr("transform", function (episode) {
         var barWidth = that.timeScale(episode.duration),
-            barHeight = that.barHeight; // Ahh!
+            barHeight = that.barHeight; // Smelly
         return "translate(-" + barWidth/2 + ",-" + barHeight/2 + ")";
       });
 
@@ -175,8 +186,12 @@ var BarView = Backbone.View.extend({
       });
 
     // Translate the bars
+    var logoWidth = 40;
     episodes.selectAll("g.bar")
-      .attr("transform", "translate(0,-" + that.barHeight/2 + ")");
+      .attr("transform", "translate(" + logoWidth + ",-" + that.barHeight/2 + ")");
+
+    episodes.selectAll("g.title")
+      .attr("transform", "translate(" + logoWidth + ",0)");
 
     // Translate the titles
     episodes.selectAll("g.title").selectAll("text")
