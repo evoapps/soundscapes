@@ -99,7 +99,40 @@ var BarView = Backbone.View.extend({
         return colorbrewer[ramp][size][select];
       });
 
-    this.trigger("center");
+    var needle = bars.append("line")
+      .attr("class", "needle");
+
+    needle
+      .attr("x1", this.timeScale(0))
+      .attr("y1", this.barHeight)
+      .attr("x2", this.timeScale(0))
+      .attr("y2", 0);
+
+    this.needle = needle;
+
+    function moveNeedleOnMouse() {
+      var mouseX = d3.mouse(this)[0];
+      that.needle
+        .transition()
+        .duration(10)
+        .attr("x1", mouseX)
+        .attr("x2", mouseX);
+    };
+
+    var resetNeedle = function () {
+      var resetX = that.timeScale(0);
+
+      needle
+        .transition()
+        .attr("x1", resetX)
+        .attr("x2", resetX);
+    };
+
+    bars.selectAll("rect")
+      .on("mousemove", moveNeedleOnMouse)
+      .on("mouseout", resetNeedle);
+
+    this.trigger("left");
   },
 
   center: function () {

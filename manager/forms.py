@@ -6,11 +6,8 @@ from crispy_forms.layout import Submit
 
 from .models import Show, Segment
 
-class ShowForm(forms.ModelForm):
-
-    class Meta:
-        model = Show
-        fields = ('name', 'slug', 'rss_url')
+class ShowForm(forms.Form):
+    rss_url = forms.URLField()
 
     def __init__(self, *args, **kwargs):
         super(ShowForm, self).__init__(*args, **kwargs)
@@ -20,9 +17,7 @@ class ShowForm(forms.ModelForm):
         self.helper.add_input(Submit('submit', 'Add'))
 
     def save(self, *args, **kwargs):
-        show = super(ShowForm, self).save(*args, **kwargs)
-        show.refresh()
-        return show
+        return Show.objects.create_from_rss_url(self.cleaned_data['rss_url'])
 
 class SegmentForm(forms.ModelForm):
 

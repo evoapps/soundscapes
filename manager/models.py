@@ -4,12 +4,17 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 
-from .handlers import fetch_rss_entries
-from .handlers import RSSEntryHandler
-from .handlers import download_episode
+from .handlers import RSSHandler, RSSShowHandler, RSSEpisodeHandler
+from .handlers import download_file
 
 # Decimal field kwargs for moments and segments
 TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
+
+class ShowManager(models.Manager):
+    def create_from_rss_url(self, rss_url, **kwargs):
+        rss_show = RSSShowHandler(rss_url)
+        kwargs.update(rss_show.show_kwargs())
+        self.create(**kwargs)
 
 class Show(models.Model):
     """ A collection of Episodes, plugged in to an RSS podcast feed """
@@ -17,8 +22,23 @@ class Show(models.Model):
     slug = models.SlugField(unique = True)
     rss_url = models.URLField(unique = True)
 
+    image_url = models.URLField()
+    image = models.ImageField(blank = True)
+
+    objects = ShowManager()
+
     def get_absolute_url(self):
         return reverse('show:detail', kwargs = {'slug': self.slug})
+
+    def download_image(self):
+        """ Download the image
+
+        Images are downloaded if the image FileFiled is empty or if the
+        file doesn't exist on the server.
+        """
+        if not self.image or not Path(self.image.path).exists():
+            self.image = download_file(self.image_url)
+            self.save()
 
     def refresh(self, max = 10):
         """ Create episodes from new RSS entries
@@ -32,20 +52,25 @@ class Show(models.Model):
         TODO: add "revert" as an optional argument.
         TODO: hash the rss_entry instead of comparing full json
         """
-        all_entries = fetch_rss_entries(self.rss_url, n = max)
+        all_entries = RSSHandler(self.rss_url)['entries'][0:max]
 
         current_entries = self.episode_set.values_list('rss_entry', flat = True)
 
-        compare_rss_entry_dump = lambda rss_entry: RSSEntryHandler(rss_entry).rss_entry_dump not in current_entries
+        def compare_rss_entry_dump(rss_entry):
+            return RSSEpisodeHandler(rss_entry).rss_entry_dump not in current_entries
         new_entries = filter(compare_rss_entry_dump, all_entries)
 
         for rss_entry in new_entries:
-            entry_handler = RSSEntryHandler(rss_entry)
-            kwargs = entry_handler.episode_kwargs()
-            self.episode_set.create(**kwargs)
+            self.episode_set.create_from_rss_entry(rss_entry)
 
     def __str__(self):
         return self.name
+
+class EpisodeManager(models.Manager):
+    def create_from_rss_entry(self, rss_entry, **kwargs):
+        entry_handler = RSSEpisodeHandler(rss_entry)
+        kwargs.update(entry_handler.episode_kwargs())
+        self.create(**kwargs)
 
 class Episode(models.Model):
     """ A RSS entry from a podcast feed """
@@ -60,6 +85,8 @@ class Episode(models.Model):
 
     mp3_url = models.URLField(unique = True)
     mp3 = models.FileField(max_length = 200, blank = True)
+
+    objects = EpisodeManager()
 
     def get_absolute_url(self):
         return reverse('episode:detail', kwargs = {'pk': self.pk})
@@ -82,7 +109,7 @@ class Episode(models.Model):
         TODO: use case for "overwrite" as an optional argument?
         """
         if not self.mp3 or not Path(self.mp3.path).exists():
-            self.mp3 = download_episode(self.mp3_url)
+            self.mp3 = download_file(self.mp3_url)
             self.save()
 
 class Segment(models.Model):

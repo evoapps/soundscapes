@@ -14,3 +14,7 @@ rect:hover {
 text:hover {
   fill-opacity: 1.0;
 }
+
+line.needle {
+  stroke: black;
+}

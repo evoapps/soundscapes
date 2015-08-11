@@ -12,7 +12,46 @@ from django.conf import settings
 from django.core.files import File
 from django.utils.text import slugify
 
-class RSSEntryHandler(object):
+class RSSHandler(object):
+    """ Wrapper around feedparser.parse """
+    def __init__(self, rss_url):
+        self.feed = feedparser.parse(rss_url)
+
+    def __getitem__(self, key):
+        return self.feed[key]
+
+class RSSShowHandler(object):
+    """ Interface between an rss url and Show models """
+    def __init__(self, rss_url):
+        """ Shows are created from the feed """
+        rss_handler = RSSHandler(rss_url)
+        self.rss_feed = rss_handler['feed']
+
+        self.rss_url = rss_url
+
+    @property
+    def name(self):
+        return self.rss_feed.get('title', 'Untitled')
+
+    @property
+    def slug(self):
+        return slugify(self.name)[0:50]
+
+    @property
+    def image_url(self):
+        # Not sure if it is required that all podcasts have images
+        return self.rss_feed['image']['href']
+
+    def show_kwargs(self):
+        return {
+            # 'rss_url':
+            'name': self.name,
+            'rss_url': self.rss_url,
+            'slug': self.slug,
+            'image_url': self.image_url,
+        }
+
+class RSSEpisodeHandler(object):
     """ Interface between json RSS entries and Episode models """
     def __init__(self, rss_entry):
         self.rss_entry = rss_entry
@@ -73,23 +112,13 @@ class RSSEntryHandler(object):
             'rss_entry': self.rss_entry_dump,
         }
 
-def fetch_rss_entries(rss_url, n = None):
-    """ Retrieve entries from an RSS feed
 
-    n: the number of recent episodes to return
 
-    Defaults to returning the full feed.
-    """
-    feed = feedparser.parse(rss_url)
-    entries = feed['entries']
-    n = n or len(entries)
-    return entries[0:n]
-
-def download_episode(downloadable_url):
-    """ Downloads an episode if it doesn't exist in DOWNLOADS_DIR
+def download_file(downloadable_url):
+    """ File is only downloaded if it doesn't exist in DOWNLOADS_DIR
 
     This function does not rename the file. It only downloads the file
-    if the expected name is not present in the DOWNLOADS_DIR directory.
+    if the expected name is not present in the DOWNLOADS_DIR.
 
     Returns a django.core.files.File object that can be stored in a FileField.
     """

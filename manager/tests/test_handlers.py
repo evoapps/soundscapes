@@ -3,31 +3,13 @@ import unittest
 from django.conf import settings
 from django.core.files import File
 
-from manager.handlers import fetch_rss_entries
-from manager.handlers import RSSEntryHandler
+from manager import handlers
 
-class HandlerTest(unittest.TestCase):
-    def setUp(self):
-        self.reply_all_feed = "http://feeds.gimletmedia.com/hearreplyall"
-
-    def test_fetch_rss_entries_limit(self):
-        limit = 5
-        entries = fetch_rss_entries(self.reply_all_feed, n = limit)
-        self.assertLessEqual(len(entries), limit)
-
-    def test_fetch_rss_entries_over_limit(self):
-        num_in_feed = len(fetch_rss_entries(self.reply_all_feed))
-        over_limit = num_in_feed + 1
-        entries = fetch_rss_entries(self.reply_all_feed, n = over_limit)
-        self.assertEquals(len(entries), num_in_feed)
-
-class RSSEntryHandlerTest(unittest.TestCase):
-
+class RSSEpisodeHandlerTest(unittest.TestCase):
     def test_parse_duration(self):
-
         def _parse_duration(itunes_duration):
             test_rss = {'itunes_duration': itunes_duration}
-            handler = RSSEntryHandler(test_rss)
+            handler = handlers.RSSEpisodeHandler(test_rss)
             return handler.duration
 
         # hours:minutes:seconds format
@@ -38,5 +20,5 @@ class RSSEntryHandlerTest(unittest.TestCase):
 
     def test_trim_slug(self):
         very_long_title = 'a' * 100
-        handler = RSSEntryHandler({'title': very_long_title})
+        handler = handlers.RSSEpisodeHandler({'title': very_long_title})
         self.assertLessEqual(len(handler.slug), 50)
