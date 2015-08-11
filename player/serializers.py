@@ -5,14 +5,6 @@ from rest_framework import serializers
 from manager.models import Show, Episode, Segment
 from player.models import HorizonLine
 
-class JSONSerializerField(serializers.Field):
-    """ Serializer for JSONField -- required to make field writable"""
-    def to_internal_value(self, data):
-        return data
-    def to_representation(self, value):
-        print 'to_representation', value
-        return value
-
 class ShowSerializer(serializers.ModelSerializer):
     image_url = serializers.CharField(source='get_image_url', read_only=True)
     color_scheme = serializers.SerializerMethodField()
@@ -22,9 +14,12 @@ class ShowSerializer(serializers.ModelSerializer):
         fields = ('name', 'image_url', 'color_scheme')
 
     def get_color_scheme(self, obj):
+        """ Try to load the color_scheme as json """
         try:
             return json.loads(obj.color_scheme)
         except ValueError:
+            # color_scheme is just a text field so validation
+            # is not enforced!
             return obj.color_scheme
 
 class SegmentSerializer(serializers.ModelSerializer):
