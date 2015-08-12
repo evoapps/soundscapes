@@ -1,6 +1,6 @@
 text {
-  font: 30px Helvetica;
-  fill-opacity: 0.5;
+  font: 26px Helvetica;
+  fill-opacity: 0.8;
 }
 
 rect {
@@ -17,4 +17,9 @@ text:hover {
 
 line.needle {
   stroke: black;
+}
+
+path.area {
+  stroke: black;
+  stroke-width: 0.2;
 }

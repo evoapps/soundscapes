@@ -21,8 +21,7 @@ var BarView = Backbone.View.extend({
     // Define scales
     var timeScale = d3.scale.linear(),
         waveformScale = d3.scale.linear(),
-        orderScale = d3.scale.ordinal(),
-        colorScale = d3.scale.ordinal();
+        orderScale = d3.scale.ordinal();
 
     // Waveform area generator
     var interval = 5; // hardcoded!
@@ -43,21 +42,14 @@ var BarView = Backbone.View.extend({
     // Set waveformScale
     waveformScale
       .domain([-31000, 31000])
-      .range([40, 0]);
+      .range([40, -40]);
     this.waveformScale = waveformScale;
 
     // Set orderScale
     orderScale
       .domain(this.collection.pluck("id"))
-      .rangeBands([0, height]);
+      .rangeBands([80, height]);
     this.orderScale = orderScale;
-
-    // Set colorScale
-    // Hand code colorbrewer ramps for Gimlet shows
-    colorScale = d3.scale.ordinal()
-      .domain(["StartUp", "Reply All", "Mystery Show"])
-      .range(["Blues", "Greens", "Purples"]);
-    this.colorScale = colorScale;
   },
   render: function () {
 
@@ -84,6 +76,22 @@ var BarView = Backbone.View.extend({
       .append("g")
       .attr("class", "episode");
 
+    // Create a waveform for each episode
+    var waveforms = episodes.append("g")
+      .attr("class", "waveform")
+
+    waveforms
+      .each(function (episode) {
+        var fillColor = episode.show.color_scheme[episode.id % episode.show.color_scheme.length];
+
+        d3.select(this)
+          .append("path")
+          .datum(episode.waveform.values)
+          .attr("class", "area")
+          .attr("d", that.waveformArea)
+          .attr("fill", fillColor);
+      });
+
     // Create titles for each episode
     var titleDY = 20;
 
@@ -93,22 +101,7 @@ var BarView = Backbone.View.extend({
     titles.append("text")
       .text(function (episode) { return episode.title; });
 
-    // Create <rects> for each episode
-    this.barHeight = 40;
-
-    var waveforms = episodes.append("g")
-      .attr("class", "waveform")
-
-    waveforms
-      .each(function (episode) {
-        d3.select(this)
-          .append("path")
-          .datum(episode.waveform.values)
-          .attr("class", "area")
-          .attr("d", that.waveformArea);
-      });
-
-    var logoSize = this.barHeight;
+    var logoSize = 80;
     var logos = episodes.append("g")
       .attr("class", "logos")
       .attr("transform", "translate(0,-" + logoSize/2 + ")");
@@ -118,6 +111,8 @@ var BarView = Backbone.View.extend({
       .attr("xlink:href", function (episode) { return episode.show.image_url; })
       .attr("width", logoSize)
       .attr("height", logoSize);
+
+    this.logoSize = logoSize;
 
     var needle = waveforms.append("line")
       .attr("class", "needle");
@@ -148,7 +143,7 @@ var BarView = Backbone.View.extend({
         .attr("x2", resetX);
     };
 
-    this.trigger("center");
+    this.trigger("left");
   },
 
   center: function () {
@@ -164,18 +159,20 @@ var BarView = Backbone.View.extend({
         return "translate(" + x + "," + y + ")";
       });
 
-    // Translate the bars
-    episodes.selectAll("g.area")
+    // Translate the areas
+    var drop = d3.max(this.waveformScale.range()) + 10;
+    episodes.selectAll("g.waveform")
       .attr("transform", function (episode) {
-        var barWidth = that.timeScale(episode.duration),
-            barHeight = that.barHeight; // Smelly
-        return "translate(-" + barWidth/2 + ",-" + barHeight/2 + ")";
+        var waveformWidth = that.timeScale(episode.duration);
+        return "translate(-" + waveformWidth/2 + "," + drop + ")";
       });
 
     // Translate the titles
-    episodes.selectAll("g.title").selectAll("text")
+    episodes.selectAll("g.title")
+      .selectAll("text")
       .attr("dominant-baseline", "central")
-      .attr("text-anchor", "middle");
+      .attr("text-anchor", "left");
+
   },
 
   left: function () {
@@ -190,13 +187,12 @@ var BarView = Backbone.View.extend({
         return "translate(0," + y + ")";
       });
 
-    // Translate the bars
-    var logoWidth = 40;
-    episodes.selectAll("g.area")
-      .attr("transform", "translate(" + logoWidth + ",-" + that.barHeight/2 + ")");
+    // Translate the waveforms
+    episodes.selectAll("g.waveform")
+      .attr("transform", "translate(" + that.logoSize + ",0)");
 
     episodes.selectAll("g.title")
-      .attr("transform", "translate(" + logoWidth + ",0)");
+      .attr("transform", "translate(" + that.logoSize + ",0)");
 
     // Translate the titles
     episodes.selectAll("g.title").selectAll("text")

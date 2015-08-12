@@ -11,7 +11,7 @@ class FeedView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context_data = super(FeedView, self).get_context_data(**kwargs)
-        episodes = Episode.objects.all().order_by('-released')
+        episodes = Episode.objects.all().order_by('-released')[:10]
         serializer = EpisodeSerializer(episodes, many = True)
         jsoned = JSONRenderer().render(serializer.data)
         context_data['episodes'] = jsoned
