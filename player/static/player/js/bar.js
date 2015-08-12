@@ -2,6 +2,8 @@
 var BarView = Backbone.View.extend({
   el: "svg",
   initialize: function () {
+    var that = this;
+
     _.bindAll(this, "center", "left");
 
     this.on("center", this.center);
@@ -18,18 +20,31 @@ var BarView = Backbone.View.extend({
 
     // Define scales
     var timeScale = d3.scale.linear(),
+        waveformScale = d3.scale.linear(),
         orderScale = d3.scale.ordinal(),
         colorScale = d3.scale.ordinal();
 
+    // Waveform area generator
+    var interval = 5; // hardcoded!
+    var waveformArea = d3.svg.area()
+      .x(function (d, i) { return timeScale(i * interval); })
+      .y0(function (d) { return waveformScale(d[0]); })
+      .y1(function (d) { return waveformScale(d[1]); });
+    this.waveformArea = waveformArea;
+
     // Set timeScale
-    var maxDuration = d3.max(this.collection.models, function (episode) {
-      return episode.get("duration");
-    });
+    var maxDuration = d3.max(this.collection.pluck("duration"));
 
     timeScale
       .domain([0, maxDuration])
       .range([0, window.innerWidth]);
     this.timeScale = timeScale;
+
+    // Set waveformScale
+    waveformScale
+      .domain([-31000, 31000])
+      .range([40, 0]);
+    this.waveformScale = waveformScale;
 
     // Set orderScale
     orderScale
@@ -81,20 +96,16 @@ var BarView = Backbone.View.extend({
     // Create <rects> for each episode
     this.barHeight = 40;
 
-    var bars = episodes.append("g")
-      .attr("class", "bar");
+    var waveforms = episodes.append("g")
+      .attr("class", "waveform")
 
-    bars
-      .append("rect")
-      .attr("x", 0)
-      .attr("y", 0)
-      .attr("height", this.barHeight)
-      .attr("width", function (episode) {
-        return that.timeScale(episode.duration);
-      })
-      .style("fill", function (episode) {
-        var num_colors = episode.show.color_scheme.length;
-        return episode.show.color_scheme[episode.id % num_colors];
+    waveforms
+      .each(function (episode) {
+        d3.select(this)
+          .append("path")
+          .datum(episode.waveform.values)
+          .attr("class", "area")
+          .attr("d", that.waveformArea);
       });
 
     var logoSize = this.barHeight;
@@ -108,7 +119,7 @@ var BarView = Backbone.View.extend({
       .attr("width", logoSize)
       .attr("height", logoSize);
 
-    var needle = bars.append("line")
+    var needle = waveforms.append("line")
       .attr("class", "needle");
 
     needle
@@ -137,11 +148,7 @@ var BarView = Backbone.View.extend({
         .attr("x2", resetX);
     };
 
-    bars.selectAll("rect")
-      .on("mousemove", moveNeedleOnMouse)
-      .on("mouseout", resetNeedle);
-
-    this.trigger("left");
+    this.trigger("center");
   },
 
   center: function () {
@@ -158,7 +165,7 @@ var BarView = Backbone.View.extend({
       });
 
     // Translate the bars
-    episodes.selectAll("g.bar")
+    episodes.selectAll("g.area")
       .attr("transform", function (episode) {
         var barWidth = that.timeScale(episode.duration),
             barHeight = that.barHeight; // Smelly
@@ -185,7 +192,7 @@ var BarView = Backbone.View.extend({
 
     // Translate the bars
     var logoWidth = 40;
-    episodes.selectAll("g.bar")
+    episodes.selectAll("g.area")
       .attr("transform", "translate(" + logoWidth + ",-" + that.barHeight/2 + ")");
 
     episodes.selectAll("g.title")

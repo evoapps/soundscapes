@@ -9,6 +9,7 @@ class Command(BaseCommand):
         parser.add_argument('-p', '--process-image', action='store_true', default=False)
 
     def handle(self, *args, **options):
+        print options
         installed_shows = Show.objects.values_list('rss_url', flat = True)
 
         show_urls = ['http://feeds.gimletmedia.com/hearstartup',
@@ -18,8 +19,11 @@ class Command(BaseCommand):
         show_urls = filter(lambda x: x not in installed_shows, show_urls)
 
         for show_url in show_urls:
-            show = Show.objects.create_from_rss_url(show_url)
+            Show.objects.create_from_rss_url(show_url)
 
+        shows = Show.objects.all()
+
+        for show in shows:
             show.refresh()
 
             if options['download_image']:

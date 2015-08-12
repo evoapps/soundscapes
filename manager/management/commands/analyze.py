@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--episode-id', nargs = '+')
-        parser.add_argument('--reset', action = 'store_true')
+        parser.add_argument('-r', '--reset', action='store_true', default=False)
 
     def handle(self, *args, **options):
         all_episodes_ids = Episode.objects.values_list('id', flat = True)

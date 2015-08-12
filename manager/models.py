@@ -4,9 +4,10 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from .handlers.downloads import download_file
 from .handlers.rss import RSSHandler, RSSShowHandler, RSSEpisodeHandler
-from .handlers.rss import download_file
 from .handlers.image import extract_color_scheme, serialize_color_scheme
+from .handlers.waveform import get_waveform
 
 # Decimal field kwargs for moments and segments
 TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
@@ -129,6 +130,24 @@ class Episode(models.Model):
             self.mp3 = download_file(self.mp3_url)
             self.save()
 
+    def analyze(self, reset):
+        if not self.mp3:
+            raise AssertionError('No episode file. Download episode first.')
+
+        try:
+            has_waveform = (self.waveform is not None)
+        except Waveform.DoesNotExist:
+            has_waveform = False
+
+        if has_waveform and reset:
+            self.waveform.delete()
+            has_waveform = False
+
+        if not has_waveform:
+            interval = 5 # seconds
+            values = get_waveform(self.mp3.path, interval = interval)
+            Waveform.objects.create(episode = self, interval = interval, values = values)
+
 class Segment(models.Model):
     """ A section of an Episode
 
@@ -138,6 +157,18 @@ class Segment(models.Model):
 
     start_time = models.DecimalField(**TIME_RESOLUTION)
     end_time = models.DecimalField(**TIME_RESOLUTION)
+
+class Waveform(models.Model):
+    episode = models.OneToOneField(Episode, primary_key = True)
+    interval = models.IntegerField()
+    values = models.TextField()
+
+    def delete(self, *args, **kwargs):
+        analysis_txt = Path(self.episode.mp3.path).name + '.csv'
+        analysis_txt = Path(settings.ANALYSES_DIR, analysis_txt)
+        if analysis_txt.exists():
+            analysis_txt.remove()
+        return super(Waveform, self).delete(*args, **kwargs)
 
 class Tag(models.Model):
     name = models.CharField(max_length = 150)
