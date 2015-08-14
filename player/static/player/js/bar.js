@@ -11,8 +11,8 @@ var BarView = Backbone.View.extend({
 
     var svg = d3.select(this.el);
 
-    var width = window.innerWidth,
-        height = window.innerHeight;
+    var width = window.innerWidth * 0.75,
+        height = 200 * this.collection.models.length;
 
     svg
       .attr("width", width)
@@ -168,7 +168,10 @@ var BarView = Backbone.View.extend({
       });
 
     // Translate the titles
+    var groupWidth = this.logoSize + textWidth
+    var textDX = 0.5 * groupWidth;
     episodes.selectAll("g.title")
+      .attr("translate", "transform(" + textDX + ",0)")
       .selectAll("text")
       .attr("dominant-baseline", "central")
       .attr("text-anchor", "left");
@@ -187,9 +190,10 @@ var BarView = Backbone.View.extend({
         return "translate(0," + y + ")";
       });
 
-    // Translate the waveforms
+    // Move waveforms down from logo and text
+    var timeScaleExtent = 80;
     episodes.selectAll("g.waveform")
-      .attr("transform", "translate(" + that.logoSize + ",0)");
+      .attr("transform", "translate(0," + timeScaleExtent + ")");
 
     episodes.selectAll("g.title")
       .attr("transform", "translate(" + that.logoSize + ",0)");
