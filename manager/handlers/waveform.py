@@ -5,12 +5,12 @@ from unipath import Path
 
 from django.conf import settings
 
-def get_waveform(src, interval = 5):
+def get_waveform(src, interval = 5, reset = False):
     audio_name = Path(src).name
     waveform_name = audio_name + '.csv'
     waveform_dst = Path(settings.ANALYSES_DIR, waveform_name)
 
-    if not waveform_dst.exists():
+    if not waveform_dst.exists() or reset:
         sampling_rate = 8000
         data = np.frombuffer(
             subprocess.check_output([
@@ -36,8 +36,9 @@ def get_waveform(src, interval = 5):
         del data
 
         # summarize the data
-        waveform = pd.DataFrame({'wave_min': chunks.min(axis=1),
-                                 'wave_max': chunks.max(axis=1)})
+        low, high = np.percentile(chunks, [5, 95], axis = 1)
+        waveform = pd.DataFrame({'y0': low,
+                                 'y1': high})
         waveform.index *= interval
         waveform.index.name = 'time'
         waveform.to_csv(waveform_dst)

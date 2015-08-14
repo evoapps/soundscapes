@@ -41,7 +41,7 @@ var BarView = Backbone.View.extend({
 
     // Set waveformScale
     waveformScale
-      .domain([-31000, 31000])
+      .domain([-10000, 10000])
       .range([40, -40]);
     this.waveformScale = waveformScale;
 

@@ -110,6 +110,7 @@ class Episode(models.Model):
         return reverse('episode:detail', kwargs = {'pk': self.pk})
 
     def get_mp3_url(self):
+        # can be replaced with source='mp3.url' in the serializer
         if self.mp3:
             return self.mp3.url
         else:
