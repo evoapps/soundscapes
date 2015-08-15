@@ -9,7 +9,6 @@ class Command(BaseCommand):
         parser.add_argument('-p', '--process-image', action='store_true', default=False)
 
     def handle(self, *args, **options):
-        print options
         installed_shows = Show.objects.values_list('rss_url', flat = True)
 
         show_urls = ['http://feeds.gimletmedia.com/hearstartup',
