@@ -19,14 +19,13 @@
     <script src="{% static 'soundmanager2/script/soundmanager2.js' %}"></script>
 
     <script src="{% static 'episodes/js/models.js' %}"></script>
-    <!-- <script src="{% static 'episodes/js/views.js' %}"></script> -->
-    <script src="{% static 'episodes/js/bar.js' %}"></script>
+    <script src="{% static 'episodes/js/waveform.js' %}"></script>
     <script>
 var episodeCollection = new EpisodeCollection;
 episodeCollection.reset({{ episodes|safe }});
 
-var barView = new BarView({collection: episodeCollection});
-barView.render();
+var waveformView = new WaveformView({collection: episodeCollection});
+waveformView.render();
 
 soundManager.setup({
   url: "{% static 'soundmanager2/swf' %}",

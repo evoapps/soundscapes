@@ -1,5 +1,5 @@
 
-var BarView = Backbone.View.extend({
+var WaveformView = Backbone.View.extend({
   el: "svg",
   initialize: function () {
     var that = this;
