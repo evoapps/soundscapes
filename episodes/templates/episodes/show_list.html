@@ -1,0 +1,24 @@
+{% extends 'episodes/base.html' %}
+
+{% block header %}
+  <h1>Shows</h1>
+{% endblock header %}
+
+{% block nav %}
+    <li role="presentation">
+      <a class="btn btn-default" href="{% url 'show:create' %}" role="button">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+         Add Show
+      </a>
+    </li>
+{% endblock nav %}
+
+{% block main %}
+  <ul id="id_show_list" class="list-group">
+    {% for show in show_list %}
+      <li class="list-group-item">
+        <a id="id_show_name" href="{{ show.get_absolute_url }}">{{ show.name }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock main %}

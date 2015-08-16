@@ -28,8 +28,7 @@ INSTALLED_APPS = (
     'crispy_forms',
     'rest_framework',
 
-    'manager',
-    'player',
+    'episodes',
 )
 
 # Third party app settings

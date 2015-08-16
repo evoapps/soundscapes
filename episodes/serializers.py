@@ -1,0 +1,52 @@
+import json
+
+from rest_framework import serializers
+
+from episodes.models import Show, Episode, Segment, Waveform
+
+class ShowSerializer(serializers.ModelSerializer):
+    image_url = serializers.CharField(source='get_image_url', read_only=True)
+    color_scheme = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Show
+        fields = ('name', 'image_url', 'color_scheme')
+
+    def get_color_scheme(self, obj):
+        """ Try to load the color_scheme as json """
+        try:
+            return json.loads(obj.color_scheme)
+        except ValueError:
+            # color_scheme is just a text field so validation
+            # is not enforced!
+            return obj.color_scheme
+
+class SegmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Segment
+        fields = ('start_time', 'end_time')
+
+class WaveformSerializer(serializers.ModelSerializer):
+    values = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Waveform
+        fields = ('interval', 'values')
+
+    def get_values(self, obj):
+        try:
+            return json.loads(obj.values)
+        except ValueError:
+            return obj.values
+
+class EpisodeSerializer(serializers.ModelSerializer):
+    segments = SegmentSerializer(many = True)
+    url = serializers.CharField(source='get_mp3_url', read_only=True)
+    show = ShowSerializer()
+    waveform = WaveformSerializer()
+
+    class Meta:
+        model = Episode
+        fields = ('id', 'show', 'released', 'title', 'mp3', 'url', 'duration',
+                  'segments', 'waveform')

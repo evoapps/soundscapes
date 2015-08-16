@@ -1,0 +1,10 @@
+{% extends 'episodes/base.html' %}
+{% load crispy_forms_tags %}
+
+{% block header %}
+  <h1><a href="{% url 'show:list' %}"><span class="glyphicon glyphicon-step-backward"></span></a> New Show</h1>
+{% endblock header %}
+
+{% block main %}
+  {% crispy form form.helper %}
+{% endblock main %}
