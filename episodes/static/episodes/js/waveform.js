@@ -1,13 +1,12 @@
+var waveformLayout,
+    episodesData,
+    episodesLayout,
+    waveformArea;
 
 var WaveformView = Backbone.View.extend({
   el: "svg",
   initialize: function () {
     var that = this;
-
-    _.bindAll(this, "center", "left");
-
-    this.on("center", this.center);
-    this.on("left", this.left);
 
     var svg = d3.select(this.el);
 
@@ -25,7 +24,7 @@ var WaveformView = Backbone.View.extend({
 
     // Waveform area generator
     var interval = 5; // hardcoded!
-    var waveformArea = d3.svg.area()
+    waveformArea = d3.svg.area()
       .x(function (d, i) { return timeScale(i * interval); })
       .y0(function (d) { return waveformScale(d[0]); })
       .y1(function (d) { return waveformScale(d[1]); });
@@ -50,6 +49,7 @@ var WaveformView = Backbone.View.extend({
       .domain(this.collection.pluck("id"))
       .rangeBands([80, height]);
     this.orderScale = orderScale;
+
   },
   render: function () {
 
@@ -60,27 +60,27 @@ var WaveformView = Backbone.View.extend({
     // hack!
     // Clone each models attributes
     // so we can use D3 layouts
-    var episodesData = [];
+    episodesData = [];
     this.collection.forEach(function (episode) {
       var datum = _.clone(episode.attributes);
+
+      // custom layout
+      datum.yEpisode = that.orderScale(datum.id);
+      datum.xEpisode = 0; // left-aligned
+
       episodesData.push(datum);
     });
 
     var svg = d3.select(this.el);
 
-    // Create a <g> for each episode
-
     var episodes = svg.selectAll("g.episode")
       .data(episodesData)
       .enter()
       .append("g")
-      .attr("class", "episode");
+      .attr("class", "episode")
 
     // Create a waveform for each episode
-    var waveforms = episodes.append("g")
-      .attr("class", "waveform")
-
-    waveforms
+    episodes
       .each(function (episode) {
         var fillColor = episode.show.color_scheme[episode.id % episode.show.color_scheme.length];
 
@@ -91,59 +91,59 @@ var WaveformView = Backbone.View.extend({
           .attr("d", that.waveformArea)
           .attr("fill", fillColor);
       });
-
-    // Create titles for each episode
-    var titleDY = 20;
-
-    var titles = episodes.append("g")
-      .attr("class", "title");
-
-    titles.append("text")
-      .text(function (episode) { return episode.title; });
-
-    var logoSize = 80;
-    var logos = episodes.append("g")
-      .attr("class", "logos")
-      .attr("transform", "translate(0,-" + logoSize/2 + ")");
-
-    logos
-      .append("image")
-      .attr("xlink:href", function (episode) { return episode.show.image_url; })
-      .attr("width", logoSize)
-      .attr("height", logoSize);
-
-    this.logoSize = logoSize;
-
-    var needle = waveforms.append("line")
-      .attr("class", "needle");
-
-    needle
-      .attr("x1", this.timeScale(0))
-      .attr("y1", this.barHeight)
-      .attr("x2", this.timeScale(0))
-      .attr("y2", 0);
-
-    this.needle = needle;
-
-    function moveNeedleOnMouse() {
-      var mouseX = d3.mouse(this)[0];
-      that.needle
-        .transition()
-        .duration(10)
-        .attr("x1", mouseX)
-        .attr("x2", mouseX);
-    };
-
-    var resetNeedle = function () {
-      var resetX = that.timeScale(0);
-
-      needle
-        .transition()
-        .attr("x1", resetX)
-        .attr("x2", resetX);
-    };
-
-    this.trigger("left");
+    //
+    // // Create titles for each episode
+    // var titleDY = 20;
+    //
+    // var titles = episodes.append("g")
+    //   .attr("class", "title");
+    //
+    // titles.append("text")
+    //   .text(function (episode) { return episode.title; });
+    //
+    // var logoSize = 80;
+    // var logos = episodes.append("g")
+    //   .attr("class", "logos")
+    //   .attr("transform", "translate(0,-" + logoSize/2 + ")");
+    //
+    // logos
+    //   .append("image")
+    //   .attr("xlink:href", function (episode) { return episode.show.image_url; })
+    //   .attr("width", logoSize)
+    //   .attr("height", logoSize);
+    //
+    // this.logoSize = logoSize;
+    //
+    // var needle = waveforms.append("line")
+    //   .attr("class", "needle");
+    //
+    // needle
+    //   .attr("x1", this.timeScale(0))
+    //   .attr("y1", this.barHeight)
+    //   .attr("x2", this.timeScale(0))
+    //   .attr("y2", 0);
+    //
+    // this.needle = needle;
+    //
+    // function moveNeedleOnMouse() {
+    //   var mouseX = d3.mouse(this)[0];
+    //   that.needle
+    //     .transition()
+    //     .duration(10)
+    //     .attr("x1", mouseX)
+    //     .attr("x2", mouseX);
+    // };
+    //
+    // var resetNeedle = function () {
+    //   var resetX = that.timeScale(0);
+    //
+    //   needle
+    //     .transition()
+    //     .attr("x1", resetX)
+    //     .attr("x2", resetX);
+    // };
+    //
+    // this.trigger("left");
   },
 
   center: function () {
