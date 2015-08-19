@@ -7,7 +7,7 @@ from django.db import models
 from .handlers.downloads import download_file
 from .handlers.rss import RSSHandler, RSSShowHandler, RSSEpisodeHandler
 from .handlers.image import extract_color_scheme, serialize_color_scheme
-from .handlers.waveform import get_waveform
+from .handlers.waveform import WaveformHandler
 
 # Decimal field kwargs for moments and segments
 TIME_RESOLUTION = {'max_digits': 10, 'decimal_places': 2}
@@ -145,9 +145,8 @@ class Episode(models.Model):
             has_waveform = False
 
         if not has_waveform:
-            interval = 5 # seconds
-            values = get_waveform(self.mp3.path, interval = interval)
-            Waveform.objects.create(episode = self, interval = interval, values = values)
+            waveform_handler = WaveformHandler(self.mp3.path, reset = reset)
+            Waveform.objects.create(episode = self, **waveform_handler.waveform_kwargs())
 
 class Segment(models.Model):
     """ A section of an Episode
@@ -163,6 +162,8 @@ class Waveform(models.Model):
     episode = models.OneToOneField(Episode, primary_key = True)
     interval = models.IntegerField()
     values = models.TextField()
+    min = models.FloatField()
+    max = models.FloatField()
 
     def delete(self, *args, **kwargs):
         analysis_txt = Path(self.episode.mp3.path).name + '.csv'

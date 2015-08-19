@@ -28,11 +28,12 @@ var WaveformView = Backbone.View.extend({
       .domain([0, d3.max(this.collection.pluck("duration"))])
       .range([0, width]);
     this.episodeScale = d3.scale.ordinal()
-      .domain(this.collection.pluck("id"))  // I have no idea what this effectively does
+      .domain(this.collection.pluck("id"))  // I have no idea what this does
       .rangeBands([0, height]);
 
+    var waveforms = this.collection.pluck("waveform");
     this.waveformScale = d3.scale.linear()
-      .domain([-12000, 12000]);
+      .domain([d3.min(_.pluck(waveforms, "min")), d3.max(_.pluck(waveforms, "max"))]);
       // .range() is set for each episode
 
     // Waveform area generator
@@ -44,6 +45,11 @@ var WaveformView = Backbone.View.extend({
       .y1(function (d) { return that.waveformScale(d[1]); })
       .interpolate("cardinal")
       .tension(0);
+
+    // Axes
+    this.episodeAxis = d3.svg.axis()
+      .scale(this.episodeScale)
+      .orient("left");
 
     // hack!
     // Clone each models attributes
@@ -88,7 +94,6 @@ var WaveformView = Backbone.View.extend({
       .each(function (episode) {
         var fillColor = episode.show.color_scheme[episode.id % episode.show.color_scheme.length];
 
-        console.log(episode);
         that.waveformScale.range([episode.y, episode.y + episode.height]);
 
         d3.select(this)
@@ -98,6 +103,13 @@ var WaveformView = Backbone.View.extend({
           .attr("d", that.waveformArea)
           .attr("fill", fillColor);
       });
+
+    // Label each episode
+    episode
+      .append("g")
+      .class("x axis")
+      .call(this.episodeAxis);
+
     //
     // // Create titles for each episode
     // var titleDY = 20;

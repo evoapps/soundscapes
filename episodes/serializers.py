@@ -32,7 +32,7 @@ class WaveformSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Waveform
-        fields = ('interval', 'values')
+        fields = ('interval', 'values', 'min', 'max')
 
     def get_values(self, obj):
         try:
