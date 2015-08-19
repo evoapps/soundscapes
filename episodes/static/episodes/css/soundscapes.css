@@ -7,10 +7,6 @@ rect {
   fill-opacity: 0.5;
 }
 
-rect:hover {
-  fill-opacity: 0.8;
-}
-
 text:hover {
   fill-opacity: 1.0;
 }

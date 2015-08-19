@@ -6,83 +6,90 @@ var waveformLayout,
 var WaveformView = Backbone.View.extend({
   el: "svg",
   initialize: function () {
-    var that = this;
 
-    var svg = d3.select(this.el);
+    // Set up <svg> and D3 scales
 
-    var width = window.innerWidth * 0.75,
-        height = 200 * this.collection.models.length;
+    var that = this,
+        svg = d3.select(this.el);
+
+    this.heightPerEpisode = 100;
+
+    var height = this.heightPerEpisode * this.collection.models.length,
+        width = window.innerWidth * 0.75;
 
     svg
       .attr("width", width)
       .attr("height", height);
 
-    // Define scales
-    var timeScale = d3.scale.linear(),
-        waveformScale = d3.scale.linear(),
-        orderScale = d3.scale.ordinal();
+    // Scales
+    // x is timeScale, y is episodeScale
+    // waveformScale is a subscale of y for plotting episode waveforms
+    this.timeScale = d3.scale.linear()
+      .domain([0, d3.max(this.collection.pluck("duration"))])
+      .range([0, width]);
+    this.episodeScale = d3.scale.ordinal()
+      .domain(this.collection.pluck("id"))  // I have no idea what this effectively does
+      .rangeBands([0, height]);
+
+    this.waveformScale = d3.scale.linear()
+      .domain([-12000, 12000]);
+      // .range() is set for each episode
 
     // Waveform area generator
-    var interval = 5; // hardcoded!
-    waveformArea = d3.svg.area()
-      .x(function (d, i) { return timeScale(i * interval); })
-      .y0(function (d) { return waveformScale(d[0]); })
-      .y1(function (d) { return waveformScale(d[1]); });
-    this.waveformArea = waveformArea;
-
-    // Set timeScale
-    var maxDuration = d3.max(this.collection.pluck("duration"));
-
-    timeScale
-      .domain([0, maxDuration])
-      .range([0, window.innerWidth]);
-    this.timeScale = timeScale;
-
-    // Set waveformScale
-    waveformScale
-      .domain([-10000, 10000])
-      .range([40, -40]);
-    this.waveformScale = waveformScale;
-
-    // Set orderScale
-    orderScale
-      .domain(this.collection.pluck("id"))
-      .rangeBands([80, height]);
-    this.orderScale = orderScale;
-
-  },
-  render: function () {
-
-    // Render collection using D3
-
-    var that = this;
+    // Each d is an array with lower and upper bound values
+    var interval = this.collection.models[0].get("waveform").interval;
+    this.waveformArea = d3.svg.area()
+      .x(function (d, i) { return that.timeScale(i * interval); })
+      .y0(function (d) { return that.waveformScale(d[0]); })
+      .y1(function (d) { return that.waveformScale(d[1]); })
+      .interpolate("cardinal")
+      .tension(0);
 
     // hack!
     // Clone each models attributes
     // so we can use D3 layouts
-    episodesData = [];
+    this.episodesData = [];
     this.collection.forEach(function (episode) {
       var datum = _.clone(episode.attributes);
+      that.episodesData.push(datum);
+    });
+  },
+  render: function () {
 
-      // custom layout
-      datum.yEpisode = that.orderScale(datum.id);
-      datum.xEpisode = 0; // left-aligned
+    // Render episodes using D3
 
-      episodesData.push(datum);
+    var that = this,
+        svg = d3.select(this.el);
+
+    this.episodesData.forEach(function (datum) {
+      datum.x = that.timeScale(0);
+      datum.y = that.episodeScale(datum.id);
+      datum.width = that.timeScale(datum.duration);
+      datum.height = that.heightPerEpisode;
     });
 
-    var svg = d3.select(this.el);
-
     var episodes = svg.selectAll("g.episode")
-      .data(episodesData)
+      .data(this.episodesData)
       .enter()
       .append("g")
-      .attr("class", "episode")
+      .attr("class", "episode");
+
+    // Create a background rect for each episode
+    episodes
+      .append("rect")
+      .attr("class", "background")
+      .attr("x", function (episode) { return episode.x; })
+      .attr("y", function (episode) { return episode.y; })
+      .attr("width", function (episode) { return episode.width; })
+      .attr("height", function (episode) { return episode.height; });
 
     // Create a waveform for each episode
     episodes
       .each(function (episode) {
         var fillColor = episode.show.color_scheme[episode.id % episode.show.color_scheme.length];
+
+        console.log(episode);
+        that.waveformScale.range([episode.y, episode.y + episode.height]);
 
         d3.select(this)
           .append("path")
